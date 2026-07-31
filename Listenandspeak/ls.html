@@ -1,0 +1,4189 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Luyện Nói Tiếng Trung Qua Video Ngắn</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/pinyin-pro.min.js">
+  </script>
+  <style>
+    /* ===== RESET & BASE ===== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #090d16;
+      color: #f8fafc;
+      min-height: 100vh;
+      padding: 20px;
+      background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.08) 0%, transparent 50%);
+      background-attachment: fixed;
+    }
+    :root {
+      --bg-body: #090d16;
+      --bg-card: rgba(21, 30, 52, 0.7);
+      --bg-input: #10192e;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-glow: rgba(99, 102, 241, 0.4);
+      --success: #10b981;
+      --success-hover: #059669;
+      --danger: #f43f5e;
+      --danger-hover: #e11d48;
+      --warning: #f59e0b;
+      --warning-hover: #d97706;
+      --accent: #a855f7;
+      --accent-hover: #9333ea;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(99, 102, 241, 0.5);
+      --shadow: rgba(0, 0, 0, 0.4);
+      --glass-blur: blur(16px);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+    .app-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* ===== TOP BAR ===== */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      backdrop-filter: var(--glass-blur);
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 20px var(--shadow);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .top-bar-left,
+    .top-bar-right {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .theme-switch-btn {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.3s;
+    }
+    .theme-switch-btn:hover {
+      border-color: var(--primary);
+      transform: rotate(15deg);
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 24px;
+      gap: 8px;
+    }
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    header p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    /* ===== MAIN LAYOUT ===== */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 0px 2.2fr 0.8fr;
+      gap: 24px;
+      align-items: start;
+      transition: grid-template-columns 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @media (max-width: 1024px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    .main-layout:not(.library-collapsed) {
+      grid-template-columns: 280px 2.2fr 0.8fr;
+    }
+    .library-section {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 1;
+      visibility: visible;
+    }
+    .main-layout.library-collapsed .library-section {
+      width: 0;
+      min-width: 0;
+      max-width: 0;
+      padding: 0;
+      margin: 0;
+      border: none;
+      box-shadow: none;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* ===== CARDS ===== */
+    .dashboard-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      backdrop-filter: var(--glass-blur);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: 0 10px 30px var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: calc(100vh - 160px);
+      overflow-y: auto;
+    }
+    .dashboard-card h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      margin-bottom: 4px;
+    }
+
+    /* ===== LIBRARY ===== */
+    .library-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 580px;
+      overflow-y: auto;
+      padding-right: 4px;
+      padding-bottom: 60px;
+    }
+    .library-item {
+      padding: 12px 14px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: 0.25s;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .library-item:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+    .library-item.active {
+      background: linear-gradient(135deg, var(--primary), rgba(99, 102, 241, 0.25));
+      border-color: var(--primary);
+      box-shadow: 0 4px 16px var(--primary-glow);
+    }
+    .library-item .video-title-span {
+      font-weight: 600;
+      cursor: pointer;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 180px;
+    }
+    .library-item-modes {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .btn-mode {
+      flex: 1;
+      padding: 6px 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-secondary);
+      transition: 0.2s;
+    }
+    .btn-mode.active {
+      background: var(--primary) !important;
+      color: #fff !important;
+      border-color: var(--primary);
+      box-shadow: 0 0 8px var(--primary-glow);
+    }
+
+    /* ===== VIDEO SECTION ===== */
+    .video-player-container {
+      position: relative;
+      width: 100%;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border);
+      background: #000;
+      height: 65vh;
+      min-height: 420px;
+      max-height: 700px;
+    }
+    .video-player-container video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+    .custom-video-controls {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.5) 70%, rgba(0, 0, 0, 0) 100%);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 10px 12px 6px 12px;
+      gap: 8px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 10;
+    }
+    .video-player-container:hover .custom-video-controls,
+    .video-player-container:focus-within .custom-video-controls {
+      opacity: 1;
+    }
+    .ctrl-btn {
+      background: transparent;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: 0.2s;
+    }
+    .ctrl-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    .timeline-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+    .timeline-slider {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.3);
+      height: 5px;
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+    .timeline-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--primary);
+    }
+    .time-display {
+      color: #e2e8f0;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: monospace;
+    }
+    .speed-selector-wrapper {
+      display: flex;
+      align-items: center;
+    }
+    .speed-selector {
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 0.75rem;
+      outline: none;
+      cursor: pointer;
+    }
+    .volume-slider-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: 4px;
+    }
+    .volume-slider-wrapper input[type="range"] {
+      width: 50px;
+      height: 4px;
+      -webkit-appearance: none;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+    .volume-slider-wrapper input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+    }
+    .volume-slider-wrapper .volume-icon {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .ctrl-btn-toggle {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      white-space: nowrap;
+    }
+    .ctrl-btn-toggle.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      box-shadow: 0 0 8px var(--primary);
+    }
+
+    /* ===== WAVEFORM ===== */
+    .visualizer-container {
+      background: #0b0f19;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 6px 10px;
+      min-height: 60px;
+      display: flex;
+      flex-direction: column;
+    }
+    .visualizer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2px;
+    }
+    .visualizer-status {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+    .waveform-scroll-wrapper {
+      overflow-x: auto;
+      overflow-y: hidden;
+      width: 100%;
+      cursor: grab;
+    }
+    .waveform-scroll-wrapper:active {
+      cursor: grabbing;
+    }
+    .waveform-scroll-wrapper canvas {
+      display: block;
+      width: 100%;
+      height: 40px;
+      min-width: 1000px;
+    }
+
+    /* ===== GLOBAL CONTROLS ===== */
+    .global-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 4px;
+    }
+    .recording-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .dubbing-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .record-timer {
+      font-family: monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--danger);
+      min-width: 50px;
+    }
+    .record-timer.recording {
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%,
+      100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.3;
+      }
+    }
+    .btn-pause-record {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+    .btn-pause-record.paused {
+      border-color: var(--warning);
+      color: var(--warning);
+    }
+    .btn-stop-dubbing {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+    .btn-stop-dubbing:hover {
+      background: var(--danger);
+      border-color: var(--danger);
+      color: #fff;
+    }
+
+    /* === LOG FLOATING === */
+    #floatingLog {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 420px;
+      max-height: 320px;
+      background: rgba(0, 0, 0, 0.88);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: #0f0;
+      z-index: 9999;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      display: block;
+      flex-direction: column;
+    }
+    #floatingLog .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 4px;
+      margin-bottom: 6px;
+      flex-shrink: 0;
+    }
+    #floatingLog .log-header span {
+      font-size: 0.8rem;
+      color: #aaa;
+      font-weight: 600;
+    }
+    #floatingLog .log-toggle-btn {
+      background: none;
+      border: none;
+      color: #aaa;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0 4px;
+    }
+    #floatingLog .log-toggle-btn:hover {
+      color: #fff;
+    }
+    #floatingLog .log-body {
+      overflow-y: auto;
+      flex: 1;
+    }
+    #floatingLog .log-entry {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 2px 0;
+      word-break: break-all;
+    }
+    #floatingLog .log-entry .time {
+      color: #888;
+      margin-right: 8px;
+    }
+    #floatingLog .log-entry.error {
+      color: #f43f5e;
+    }
+    #floatingLog .log-entry.success {
+      color: #10b981;
+    }
+    #floatingLog .log-entry.warning {
+      color: #f59e0b;
+    }
+    #floatingLog .log-entry.info {
+      color: #60a5fa;
+    }
+    #floatingLog.collapsed .log-body {
+      display: none;
+    }
+    #floatingLog.collapsed {
+      max-height: 40px;
+      overflow: hidden;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      padding: 8px 14px;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: 0.2s;
+    }
+    .btn:active {
+      transform: scale(0.97);
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      box-shadow: 0 0 14px var(--primary-glow);
+    }
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+    .btn-danger:hover {
+      background: var(--danger-hover);
+      box-shadow: 0 0 14px rgba(244, 63, 94, 0.3);
+    }
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+    }
+    .btn-success:hover {
+      background: var(--success-hover);
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);
+    }
+    .btn-warning {
+      background: var(--warning);
+      color: #fff;
+    }
+    .btn-warning:hover {
+      background: var(--warning-hover);
+    }
+    .btn-secondary {
+      background: var(--bg-input);
+      border-color: var(--border);
+      color: var(--text-primary);
+    }
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+    .btn-accent {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-accent:hover {
+      background: var(--accent-hover);
+    }
+    .btn:disabled {
+      background: var(--bg-input) !important;
+      color: var(--text-muted) !important;
+      border-color: var(--border) !important;
+      cursor: not-allowed;
+    }
+    .recording-active {
+      animation: pulse-record 1.5s infinite;
+      background: var(--danger-hover) !important;
+    }
+    @keyframes pulse-record {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7);
+      }
+      70% {
+        transform: scale(1.02);
+        box-shadow: 0 0 0 10px rgba(244, 63, 94, 0);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+      }
+    }
+
+    /* ===== PRACTICE (SENTENCE) ===== */
+    .sentence-list-wrapper {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-md);
+      flex: 1;
+    }
+    .focus-window-overlay {
+      position: absolute;
+      top: 35%;
+      left: -2px;
+      right: -2px;
+      height: 120px;
+      transform: translateY(-50%);
+      pointer-events: none;
+      z-index: 10;
+      border-left: 4px solid rgba(99, 102, 241, 0.15);
+      border-right: 4px solid rgba(99, 102, 241, 0.15);
+    }
+    .sentence-list-wrapper.has-active .focus-window-overlay {
+      border-left-color: var(--primary);
+      border-right-color: var(--primary);
+      box-shadow: -5px 0 15px var(--primary-glow), 5px 0 15px var(--primary-glow);
+    }
+    .sentence-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 580px;
+      overflow-y: auto;
+      padding: 130px 4px 300px 4px;
+      scroll-behavior: smooth;
+    }
+    .sentence-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-left: 6px solid var(--text-muted);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      opacity: 0.55;
+      filter: grayscale(25%);
+    }
+    .sentence-card.active {
+      opacity: 1 !important;
+      filter: none !important;
+      background: linear-gradient(135deg, var(--primary), rgba(99, 102, 241, 0.3)) !important;
+      border-left: 8px solid var(--primary) !important;
+      transform: scale(1.02) translateX(4px);
+      box-shadow: 0 10px 30px var(--primary-glow);
+    }
+    .sentence-card.completed {
+      border-left-color: var(--success);
+    }
+    .sub-chinese {
+      font-family: 'Noto Sans SC', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+    .sentence-card.active .sub-chinese {
+      font-size: 1.5rem !important;
+      color: #fff !important;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    }
+    .sub-pinyin {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--warning);
+    }
+    .sentence-card.active .sub-pinyin {
+      font-size: 1rem !important;
+      color: #e0e7ff !important;
+      font-weight: 700 !important;
+    }
+    .sub-vietnamese {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    .sentence-card.active .sub-vietnamese {
+      font-size: 0.95rem !important;
+      color: #c7d2fe !important;
+      font-weight: 600 !important;
+    }
+    .controls-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 8px;
+      width: 100%;
+    }
+    .controls-group .btn {
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      border-radius: 6px;
+    }
+
+    /* ===== MODAL ===== */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(2, 6, 23, 0.7);
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .modal.show {
+      display: block;
+      opacity: 1;
+    }
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      margin: 40px auto;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 700px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      animation: modal-slide 0.3s ease;
+    }
+    @keyframes modal-slide {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    .close-modal {
+      float: right;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .close-modal:hover {
+      color: var(--danger);
+    }
+    .modal h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      flex-shrink: 0;
+    }
+    .modal-body-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+    .form-group input[type="text"],
+    .form-group input[type="file"] {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus {
+      border-color: var(--primary);
+    }
+    .subtitle-row {
+      background: var(--bg-input);
+      padding: 12px 40px 12px 12px;
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .btn-remove-row {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: color 0.2s;
+    }
+    .btn-remove-row:hover {
+      color: var(--danger);
+    }
+    .time-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .time-inputs input[type="number"] {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      outline: none;
+      font-size: 0.85rem;
+      width: 100%;
+    }
+    .time-inputs input[type="number"]:focus {
+      border-color: var(--primary);
+    }
+    .subtitle-row input[type="text"] {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      outline: none;
+      font-size: 0.9rem;
+      width: 100%;
+    }
+    .subtitle-row input[type="text"]:focus {
+      border-color: var(--primary);
+    }
+    .inline-error {
+      color: var(--danger);
+      font-size: 0.8rem;
+      margin-top: 4px;
+      display: none;
+    }
+    .inline-error.visible {
+      display: block;
+    }
+    .import-export-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    /* Video preview trong modal */
+    .modal-video-preview {
+      background: #000;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      max-height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      position: relative;
+      margin-bottom: 12px;
+    }
+    .modal-video-preview video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .modal-video-preview .placeholder {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      text-align: center;
+      padding: 20px;
+      gap: 8px;
+    }
+    .modal-video-preview .placeholder span:first-child {
+      font-size: 1.8rem;
+    }
+    .modal-video-preview .placeholder span:last-child {
+      font-size: 0.9rem;
+    }
+
+    /* ===== COMPACT MODE ===== */
+    .sentence-list.compact-mode .sub-pinyin,
+    .sentence-list.compact-mode .sub-vietnamese {
+      display: none !important;
+    }
+    .sentence-list.hide-controls .controls-group {
+      display: none !important;
+    }
+
+    /* ===== LISTENING ===== */
+    .listening-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      width: 100%;
+    }
+    .listening-input {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      outline: none;
+      transition: 0.25s;
+    }
+    .listening-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+    .listening-input.correct {
+      border-color: var(--success) !important;
+      background: rgba(16, 185, 129, 0.08) !important;
+      color: var(--success) !important;
+    }
+    .listening-input.incorrect {
+      border-color: var(--danger) !important;
+      background: rgba(244, 63, 94, 0.08) !important;
+    }
+    .listening-feedback-icon {
+      font-size: 1.1rem;
+      display: inline-flex;
+      align-items: center;
+      min-width: 24px;
+    }
+
+    /* ===== VOCAB POPUPS ===== */
+    .vocab-popup {
+      display: none;
+      position: absolute;
+      z-index: 10000;
+      pointer-events: auto;
+      flex-direction: column;
+      align-items: stretch;
+      padding: 12px 16px;
+      min-width: 250px;
+      gap: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      backdrop-filter: var(--glass-blur);
+    }
+    #vocabInfoPopup {
+      display: none;
+      position: fixed;
+      z-index: 10001;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      min-width: 200px;
+      max-width: 300px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: var(--glass-blur);
+      flex-direction: column;
+      gap: 6px;
+    }
+    .vocab-highlight-word {
+      display: inline-block;
+      background: rgba(245, 158, 11, 0.25);
+      border-radius: 4px;
+      padding: 0 4px;
+      border-bottom: 2px solid #f59e0b;
+      cursor: pointer;
+      transition: 0.2s;
+      font-weight: 600;
+    }
+    .vocab-highlight-word:hover {
+      background: rgba(245, 158, 11, 0.4);
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    }
+    .editable-cell {
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 4px;
+      transition: background 0.2s;
+      min-height: 30px;
+    }
+    .editable-cell:hover {
+      background: var(--border);
+    }
+    .editable-cell input {
+      width: 100%;
+      padding: 4px 6px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      border-radius: 4px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .context-cell {
+      cursor: pointer;
+      color: var(--primary);
+      text-decoration: underline dotted;
+    }
+    .context-cell.no-context {
+      color: var(--text-muted);
+      text-decoration: none;
+      cursor: default;
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    @media (max-width: 1024px) {
+      .main-layout {
+        grid-template-columns: 1fr !important;
+      }
+      .main-layout.library-collapsed {
+        grid-template-columns: 1fr !important;
+      }
+      .dashboard-card {
+        max-height: none;
+      }
+      .sentence-list {
+        max-height: 400px;
+      }
+      .video-player-container {
+        height: 50vh;
+        min-height: 300px;
+      }
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 12px;
+      }
+      .top-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .global-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .recording-controls {
+        flex-wrap: wrap;
+      }
+      .custom-video-controls {
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 8px;
+      }
+      .volume-slider-wrapper input[type="range"] {
+        width: 40px;
+      }
+      .video-player-container {
+        height: 40vh;
+        min-height: 220px;
+      }
+      #floatingLog {
+        width: 90%;
+        right: 5%;
+        bottom: 10px;
+        max-height: 250px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== FLOATING LOG ===== -->
+  <div id="floatingLog" style="display:block;">
+    <div class="log-header">
+      <span>📋 Log</span>
+      <button class="log-toggle-btn" id="logToggleBtn" title="Thu nhỏ / Mở rộng">➖</button>
+    </div>
+    <div class="log-body" id="logBody"></div>
+  </div>
+
+  <!-- ===== TOP BAR ===== -->
+  <div class="app-container">
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <span style="font-size:1.5rem;">🇨🇳</span>
+        <button id="btnToggleLibrary" class="btn btn-secondary" style="padding:6px 12px; font-size:0.85rem;">📚 Thư Viện Video</button>
+        <button id="btnOpenVocabHub" class="btn btn-secondary" style="padding:6px 12px; font-size:0.85rem;">📓 Sổ Từ Vựng</button>
+      </div>
+      <div class="top-bar-right">
+        <button id="themeToggle" class="theme-switch-btn" title="Chuyển đổi Giao diện">
+          <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2" />
+            <path d="M12 20v2" />
+            <path d="m4.93 4.93 1.41 1.41" />
+            <path d="m17.66 17.66 1.41 1.41" />
+            <path d="M2 12h2" />
+            <path d="M20 12h2" />
+            <path d="m6.34 17.66-1.41 1.41" />
+            <path d="m19.07 4.93-1.41 1.41" />
+          </svg>
+          <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+          </svg>
+        </button>
+        <button id="btnOpenUploadModal" class="btn btn-primary">➕ Tải Video Mới</button>
+      </div>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+      <div class="header-title-wrap">
+        <h1>Short Video Shadowing</h1>
+      </div>
+      <p id="headerSubtitle">Hệ thống luyện nói & lồng tiếng tiếng Trung trên nền tảng Video ngắn</p>
+    </header>
+
+    <!-- MAIN LAYOUT -->
+    <main class="main-layout library-collapsed" id="mainLayout">
+      <!-- LIBRARY -->
+      <aside class="library-section dashboard-card">
+        <h2 id="libraryTitle">📚 Thư Viện Video</h2>
+        <div id="videoLibraryList" class="library-list"></div>
+      </aside>
+
+      <!-- VIDEO SECTION -->
+      <section class="video-section dashboard-card">
+        <h2 id="currentVideoTitle">Chọn một video để học</h2>
+        <div class="video-player-container">
+          <video id="mainVideo" crossorigin="anonymous"></video>
+          <div class="loading-overlay hidden" id="videoLoadingOverlay"><span class="loading-spinner"></span></div>
+          <div class="custom-video-controls" id="customVideoControls">
+            <button id="btnPlayPause" class="ctrl-btn" title="Phát / Tạm dừng">▶</button>
+            <div class="timeline-container"><input type="range" id="videoTimeline" min="0" max="100" value="0" step="0.1" class="timeline-slider" /></div>
+            <span id="timeDisplay" class="time-display">00:00 / 00:00</span>
+            <div class="speed-selector-wrapper">
+              <select id="videoSpeed" class="speed-selector" title="Tốc độ phát">
+                <option value="0.5">0.5x</option>
+                <option value="0.75">0.75x</option>
+                <option value="1.0" selected>1.0x</option>
+                <option value="1.25">1.25x</option>
+                <option value="1.5">1.5x</option>
+              </select>
+            </div>
+            <div class="volume-slider-wrapper">
+              <span class="volume-icon">🔊</span>
+              <input type="range" id="videoVolumeSlider" min="0" max="100" value="100" title="Âm lượng video">
+            </div>
+            <button id="btnLoopSentence" class="ctrl-btn-toggle" title="Tự động lặp lại câu thoại đang chọn">🔁 Lặp Câu</button>
+          </div>
+        </div>
+
+        <!-- Waveforms -->
+        <div class="visualizers-wrapper" style="display:flex; flex-direction:column; gap:6px;">
+          <div class="visualizer-container">
+            <div class="visualizer-header">
+              <span class="visualizer-status">📊 Mẫu Gốc (Original)</span>
+              <span style="font-size:0.65rem; color:var(--text-muted);">Kéo ngang xem chi tiết</span>
+            </div>
+            <div class="waveform-scroll-wrapper" id="originalWaveformWrapper">
+              <canvas id="waveformOriginalCanvas" height="40"></canvas>
+            </div>
+          </div>
+          <div class="visualizer-container">
+            <div class="visualizer-header">
+              <span class="visualizer-status" id="visualizerUserStatus">🎤 Giọng Của Bạn (Your Recording)</span>
+            </div>
+            <div class="waveform-scroll-wrapper" id="userWaveformWrapper">
+              <canvas id="waveformUserCanvas" height="40"></canvas>
+            </div>
+          </div>
+          <div id="visualizerStatus" style="font-size:0.75rem; color:var(--text-secondary); text-align:center; font-weight:600;">Sóng âm: Sẵn sàng so sánh</div>
+        </div>
+
+        <!-- Global Controls -->
+        <div class="global-controls">
+          <div class="recording-controls">
+            <button id="btnRecordFullVideo" class="btn btn-danger">🎙️ Thu Âm Cả Bài</button>
+            <span id="recordTimer" class="record-timer">00:00</span>
+            <button id="btnPauseRecord" class="btn-pause-record" style="display:none;" title="Tạm dừng / Tiếp tục ghi âm">⏸️ Tạm dừng</button>
+          </div>
+          <div class="dubbing-controls">
+            <button id="btnPlayFullDubbing" class="btn btn-accent" disabled>▶️ Nghe Bản Lồng Tiếng</button>
+            <button id="btnStopDubbing" class="btn-stop-dubbing" style="display:none;" title="Dừng phát bản ghi âm">⏹️ Dừng</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRACTICE SECTION -->
+      <section class="practice-section dashboard-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+          <h2 style="margin:0; border:none; padding:0;" id="practiceTitle">💬 Câu Thoại Chi Tiết</h2>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <div id="listeningControls" style="display:none; align-items:center; gap:6px;">
+              <span style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">Ẩn:</span>
+              <select id="selectListeningHideMode" class="speed-selector" style="padding:4px 8px; font-size:0.8rem; height:32px;">
+                <option value="hanzi" selected>Chữ Hán</option>
+                <option value="vietnamese">Dịch Nghĩa</option>
+              </select>
+            </div>
+            <button id="btnToggleDisplayMode" class="btn btn-secondary" style="padding:6px 12px; font-size:0.8rem;">👁️ Hiển Thị: Đầy Đủ</button>
+            <button id="btnEditCurrentSubtitles" class="btn btn-secondary" style="display:none; padding:6px 12px; font-size:0.8rem;">✏️ Sửa Phụ Đề</button>
+          </div>
+        </div>
+        <div class="sentence-list-wrapper" id="sentenceListWrapper">
+          <div class="focus-window-overlay"></div>
+          <div id="sentenceList" class="sentence-list"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===== MODALS ===== -->
+  <!-- Upload Modal -->
+  <div id="uploadModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2 id="modalTitle">Tải Video Mới & Tạo Phụ Đề</h2>
+      <form id="uploadForm" style="margin-top:0; display:flex; flex-direction:column; flex:1; overflow:hidden;">
+        <input type="hidden" id="editVideoId" value="" />
+        <div class="modal-body-scroll">
+          <!-- Video preview -->
+          <div class="modal-video-preview">
+            <video id="modalPreviewVideo" style="width:100%; height:100%; object-fit:contain;" controls></video>
+            <div class="placeholder" id="modalVideoPlaceholder">
+              <span>📹</span>
+              <span>Chọn tệp video để xem trước</span>
+            </div>
+          </div>
+
+          <!-- Time info & controls -->
+          <div style="background:var(--bg-input); padding:12px; border-radius:var(--radius-md); border:1px solid var(--border); margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between;">
+              <span style="font-size:0.8rem; font-weight:700; color:var(--text-secondary);">Thời gian hiện tại:</span>
+              <span id="modalVideoTimeDisplay" style="font-family:monospace; font-size:1.1rem; font-weight:bold; color:var(--primary);">0.0s</span>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <button type="button" id="btnModalRewind" class="btn btn-secondary" style="flex:1; padding:6px; font-size:0.75rem;">⏪ Tua lại 1s</button>
+              <button type="button" id="btnModalForward" class="btn btn-secondary" style="flex:1; padding:6px; font-size:0.75rem;">⏩ Tua đi 1s</button>
+            </div>
+          </div>
+
+          <!-- Form fields -->
+          <div class="form-group"><label>Tên bài học / Video:</label><input type="text" id="inputVideoTitle" placeholder="Ví dụ: Luyện chào hỏi hàng ngày" /></div>
+          <div class="form-group"><label>Chọn File Video (MP4):</label><input type="file" id="inputVideoFile" accept="video/mp4,video/*" /></div>
+          <hr style="border:0; border-top:1px solid var(--border); margin:8px 0;" />
+          <div class="form-group file-import-box" style="padding:8px 12px; background:rgba(56,189,248,0.05); border:1px dashed rgba(56,189,248,0.2); border-radius:var(--radius-md);">
+            <label style="font-size:0.8rem;">📁 Nhập nhanh câu thoại bằng File phụ đề (.txt, .csv, .srt):</label>
+            <input type="file" id="inputSubtitleFile" accept=".txt,.csv,.srt" style="margin-top:4px; font-size:0.8rem;" />
+          </div>
+          <div><h3 style="font-size:1rem; font-weight:700; margin:0 0 8px 0;">Danh Sách Câu Thoại</h3></div>
+          <div id="subtitleInputsContainer" style="max-height:260px; overflow-y:auto; padding-right:5px; margin-bottom:8px;"></div>
+          <div style="display:flex; gap:10px; margin-bottom:12px;">
+            <button type="button" id="btnAddSubtitleRow" class="btn btn-secondary" style="flex:1; padding:8px;">➕ Thêm Câu Thủ Công</button>
+            <button type="button" id="btnClearSubtitles" class="btn btn-secondary" style="background:rgba(244,63,94,0.1); border-color:rgba(244,63,94,0.2); color:var(--danger); flex:1; padding:8px;">🗑️ Xóa Hết Câu</button>
+          </div>
+          <div id="formError" class="inline-error"></div>
+          <button type="submit" id="btnSubmitForm" class="btn btn-success" style="width:100%; padding:12px; font-size:1rem;">💾 Lưu Vào Thư Viện</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Vocab Popups -->
+  <div id="vocabFloatingPopup" class="vocab-popup" style="display:none; position:absolute; z-index:10000; pointer-events:auto; flex-direction:column; align-items:stretch; padding:12px 16px; min-width:250px; gap:6px;">
+    <div style="display:flex; align-items:center; gap:8px;"><span style="font-weight:700; font-size:0.95rem; min-width:60px;">Từ:</span><span id="vocabWordDisplay" style="font-weight:700; color:var(--primary); font-size:1.1rem; font-family:'Noto Sans SC',sans-serif;"></span></div>
+    <div style="display:flex; align-items:center; gap:8px;"><label style="font-size:0.8rem; font-weight:600; min-width:60px;">Pinyin:</label><input type="text" id="vocabPinyinInput" placeholder="Tự động" style="flex:1; background:var(--bg-input); border:1px solid var(--border); border-radius:4px; padding:4px 8px; color:var(--text-primary); font-size:0.85rem;" /></div>
+    <div style="display:flex; align-items:center; gap:8px;"><label style="font-size:0.8rem; font-weight:600; min-width:60px;">Nghĩa:</label><input type="text" id="vocabMeaningInput" placeholder="Tự động (nếu có)" style="flex:1; background:var(--bg-input); border:1px solid var(--border); border-radius:4px; padding:4px 8px; color:var(--text-primary); font-size:0.85rem;" /></div>
+    <div style="display:flex; gap:6px; margin-top:4px; justify-content:flex-end;"><button id="btnCancelVocab" class="btn btn-secondary" style="padding:4px 12px; font-size:0.75rem;">Hủy</button><button id="btnSaveVocab" class="btn btn-primary" style="padding:4px 12px; font-size:0.75rem;">💾 Lưu từ vựng</button></div>
+  </div>
+
+  <div id="vocabInfoPopup" style="display:none; position:fixed; z-index:10001; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); padding:14px 18px; min-width:200px; max-width:300px; box-shadow:0 10px 30px rgba(0,0,0,0.5); backdrop-filter:var(--glass-blur); pointer-events:auto; flex-direction:column; gap:6px;">
+    <div style="display:flex; justify-content:space-between;"><span id="infoWordDisplay" style="font-size:1.2rem; font-weight:700; color:var(--primary); font-family:'Noto Sans SC',sans-serif;"></span><button class="btn-close-popup" id="btnCloseInfoPopup" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:1.1rem;">✕</button></div>
+    <div><span class="info-label">Pinyin:</span> <span id="infoPinyinValue" style="color:var(--text-primary);">-</span></div>
+    <div><span class="info-label">Nghĩa:</span> <span id="infoMeaningValue" style="color:var(--text-primary);">-</span></div>
+    <div style="margin-top:4px; display:flex; gap:8px; justify-content:flex-end;"><button id="btnInfoViewDetail" class="btn btn-secondary" style="padding:4px 12px; font-size:0.75rem;">📓 Xem chi tiết</button></div>
+  </div>
+
+  <!-- Vocab Modal -->
+  <div id="vocabModal" class="modal">
+    <div class="modal-content" style="max-width:800px; width:90%;">
+      <span class="close-modal" id="btnCloseVocabModal">&times;</span>
+      <h2>📓 Sổ Từ Vựng Tích Lũy</h2>
+      <div style="max-height:400px; overflow-y:auto; border:1px solid var(--border); border-radius:var(--radius-md);">
+        <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.9rem;">
+          <thead>
+            <tr style="border-bottom:2px solid var(--border); background:var(--bg-input);">
+              <th style="padding:12px 10px;">Từ vựng</th>
+              <th style="padding:12px 10px;">Pinyin</th>
+              <th style="padding:12px 10px;">Ngữ cảnh</th>
+              <th style="padding:12px 10px;">Giải nghĩa</th>
+              <th style="padding:12px 10px; text-align:center; width:60px;">Xóa</th>
+            </tr>
+          </thead>
+          <tbody id="vocabTableBody"></tbody>
+        </table>
+        <div id="vocabEmptyMessage" style="text-align:center; color:var(--text-muted); padding:40px 10px; display:none;">
+          <p style="font-size:1.1rem; font-weight:bold;">📓 Sổ từ vựng đang trống!</p>
+          <p style="font-size:0.85rem;">Hãy bôi đen các từ chữ Hán để lưu lại.</p>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; border-top:1px solid var(--border); padding-top:16px; margin-top:16px;">
+        <div class="import-export-buttons"><button id="btnExportAllData" class="btn btn-secondary">📦 Xuất tất cả dữ liệu</button><button id="btnImportAllData" class="btn btn-secondary">📂 Nhập dữ liệu</button><input type="file" id="importFileInput" accept=".json" style="display:none;" /></div>
+        <div style="display:flex; gap:12px;"><button id="btnExportVocab" class="btn btn-secondary">📥 Xuất CSV</button><button id="btnCloseVocabHubAction" class="btn btn-primary">Đóng</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    /**
+     * =====================================================================
+     * 0.  FLOATING LOG
+     * =====================================================================
+     */
+    const logContainer = document.getElementById('floatingLog');
+    const logBody = document.getElementById('logBody');
+    const logToggleBtn = document.getElementById('logToggleBtn');
+
+    function addLog(message, type = 'info') {
+      if (!logBody) return;
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      const time = new Date().toLocaleTimeString();
+      entry.innerHTML = `<span class="time">${time}</span>${message}`;
+      logBody.appendChild(entry);
+      logBody.scrollTop = logBody.scrollHeight;
+      if (logBody.children.length > 150) {
+        logBody.removeChild(logBody.children[0]);
+      }
+      logContainer.style.display = 'block';
+      console.log(`[${time}] ${message}`);
+    }
+
+    let logCollapsed = false;
+    logToggleBtn.addEventListener('click', function() {
+      logCollapsed = !logCollapsed;
+      logContainer.classList.toggle('collapsed', logCollapsed);
+      this.textContent = logCollapsed ? '➕' : '➖';
+    });
+
+    // =====================================================================
+    // 1.  DB HELPER
+    // =====================================================================
+    const DB_NAME = "ChineseShadowingDB_v3";
+    const DB_VERSION = 3;
+    const STORE_NAME = "videos";
+    const VOCAB_STORE_NAME = "vocabulary";
+
+    let dbInstance = null;
+
+    function openDB() {
+      if (dbInstance) return Promise.resolve(dbInstance);
+      return new Promise((resolve, reject) => {
+        try {
+          if (!window.indexedDB) throw new Error("IndexedDB is not supported.");
+          const request = indexedDB.open(DB_NAME, DB_VERSION);
+          request.onupgradeneeded = (evt) => {
+            const db = evt.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+              db.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
+            }
+            if (!db.objectStoreNames.contains(VOCAB_STORE_NAME)) {
+              db.createObjectStore(VOCAB_STORE_NAME, { keyPath: "id", autoIncrement: true });
+            }
+          };
+          request.onsuccess = (evt) => {
+            dbInstance = evt.target.result;
+            dbInstance.onversionchange = () => { dbInstance.close();
+              dbInstance = null; };
+            resolve(dbInstance);
+          };
+          request.onerror = (evt) => reject(evt.target.error);
+        } catch (error) { reject(error); }
+      });
+    }
+
+    function executeTransaction(storeName, mode, callback) {
+      return openDB().then(db => {
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction([storeName], mode);
+          const store = tx.objectStore(storeName);
+          const result = callback(store);
+          tx.onerror = () => reject(tx.error);
+          tx.onabort = () => reject(new Error("Transaction aborted"));
+          if (result && typeof result.then === 'function') {
+            result.then(resolve).catch(reject);
+          } else {
+            resolve(result);
+          }
+        });
+      });
+    }
+
+    function getAllVideos() {
+      return executeTransaction(STORE_NAME, "readonly", store => {
+        return new Promise((resolve, reject) => {
+          const req = store.getAll();
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      });
+    }
+
+    function getVideo(id) {
+      return executeTransaction(STORE_NAME, "readonly", store => {
+        return new Promise((resolve, reject) => {
+          const req = store.get(id);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      });
+    }
+
+    function addVideo(videoData) {
+      return executeTransaction(STORE_NAME, "readwrite", store => {
+        return new Promise((resolve, reject) => {
+          const req = store.add(videoData);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      });
+    }
+
+    function updateVideo(videoData) {
+      return executeTransaction(STORE_NAME, "readwrite", store => {
+        return new Promise((resolve, reject) => {
+          const req = store.put(videoData);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      });
+    }
+
+    function deleteVideo(id) {
+      return executeTransaction(STORE_NAME, "readwrite", store => {
+        return new Promise((resolve, reject) => {
+          const req = store.delete(id);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      });
+    }
+
+    function getAllVocab() {
+      return executeTransaction(VOCAB_STORE_NAME, "readonly", store => {
+        return new Promise((resolve, reject) => {
+          const req = store.getAll();
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      });
+    }
+
+    function addVocab(vocabItem) {
+      return executeTransaction(VOCAB_STORE_NAME, "readwrite", store => {
+        return new Promise((resolve, reject) => {
+          const req = store.add(vocabItem);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      });
+    }
+
+    function updateVocab(vocabItem) {
+      return executeTransaction(VOCAB_STORE_NAME, "readwrite", store => {
+        return new Promise((resolve, reject) => {
+          const req = store.put(vocabItem);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      });
+    }
+
+    function deleteVocab(id) {
+      return executeTransaction(VOCAB_STORE_NAME, "readwrite", store => {
+        return new Promise((resolve, reject) => {
+          const req = store.delete(id);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      });
+    }
+
+    function clearAllData() {
+      return openDB().then(db => {
+        return Promise.all([STORE_NAME, VOCAB_STORE_NAME].map(storeName =>
+          new Promise((resolve, reject) => {
+            const tx = db.transaction([storeName], "readwrite");
+            const store = tx.objectStore(storeName);
+            const req = store.clear();
+            req.onsuccess = () => resolve();
+            req.onerror = () => reject(req.error);
+            tx.onerror = () => reject(tx.error);
+          })
+        ));
+      });
+    }
+
+    function getAllDataForExport() {
+      return openDB().then(db => {
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction([STORE_NAME, VOCAB_STORE_NAME], "readonly");
+          let videos, vocabulary;
+          tx.objectStore(STORE_NAME).getAll().onsuccess = (e) => { videos = e.target.result;
+            checkDone(); };
+          tx.objectStore(VOCAB_STORE_NAME).getAll().onsuccess = (e) => { vocabulary = e.target.result;
+            checkDone(); };
+          const checkDone = () => { if (videos !== undefined && vocabulary !== undefined) resolve({ videos,
+                vocabulary }); };
+          tx.onerror = () => reject(tx.error);
+        });
+      });
+    }
+
+    // =====================================================================
+    // 2.  SUBTITLE PARSER
+    // =====================================================================
+    function parseCSVorTXT(text) {
+      const normalized = text.replace(/\r\n/g, '\n');
+      const lines = normalized.split('\n');
+      const sentences = [];
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        const parts = trimmed.includes('|') ? trimmed.split('|') : trimmed.split(',');
+        if (parts.length >= 3) {
+          sentences.push({
+            startTime: parseFloat(parts[0].trim()) || 0,
+            endTime: parseFloat(parts[1].trim()) || 0,
+            hanzi: parts[2]?.trim() || '',
+            pinyin: parts[3]?.trim() || '',
+            vietnamese: parts[4]?.trim() || ''
+          });
+        }
+      }
+      return sentences;
+    }
+
+    function parseSRT(data) {
+      const normalized = data.replace(/\r\n/g, '\n');
+      const pattern = /(\d+)\n(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})\n([\s\S]*?)(?=\n\n|\n*$)/g;
+      const sentences = [];
+
+      function timeToSeconds(str) {
+        const parts = str.split(':');
+        const secParts = parts[2].split(',');
+        return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(secParts[0]) + parseInt(secParts[1]) / 1000;
+      }
+      let match;
+      while ((match = pattern.exec(normalized)) !== null) {
+        const start = timeToSeconds(match[2]);
+        const end = timeToSeconds(match[3]);
+        const textLines = match[4].split('\n').map(l => l.trim()).filter(l => l);
+        sentences.push({
+          startTime: parseFloat(start.toFixed(1)),
+          endTime: parseFloat(end.toFixed(1)),
+          hanzi: textLines[0] || '',
+          pinyin: textLines[1] || '',
+          vietnamese: textLines[2] || ''
+        });
+      }
+      return sentences;
+    }
+
+    // =====================================================================
+    // 3.  AUDIO ENGINE
+    // =====================================================================
+    const WAVEFORM_SAMPLES = 1000;
+    const WAVEFORM_HEIGHT = 40;
+    const WAVEFORM_COLOR_ORIG = '#6366f1';
+    const WAVEFORM_COLOR_USER = '#a855f7';
+    const CURSOR_COLOR_ORIG = '#f59e0b';
+    const CURSOR_COLOR_USER = '#10b981';
+
+    let audioCtx = null;
+    let animationFrameId = null;
+    let currentSource = null;
+    let currentAnalyser = null;
+    let liveStream = null;
+    let isAudioSetup = false;
+    let originalWaveformData = null;
+    let userWaveformData = null;
+
+    function getAudioContext() {
+      if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === "suspended") audioCtx.resume().catch(e => addLog("⚠️ Không thể resume AudioContext: " + e
+        .message, 'warning'));
+      return audioCtx;
+    }
+
+    function createAnalyser(ctx) {
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 512;
+      analyser.smoothingTimeConstant = 0.8;
+      return analyser;
+    }
+
+    function setupVideoAudio(videoElement) {
+      if (isAudioSetup) return;
+      try {
+        const ctx = getAudioContext();
+        const source = ctx.createMediaElementSource(videoElement);
+        const analyser = createAnalyser(ctx);
+        source.connect(analyser);
+        analyser.connect(ctx.destination);
+        window.videoSource = source;
+        window.videoAnalyser = analyser;
+        isAudioSetup = true;
+        addLog("✅ Đã setup audio cho video", 'success');
+      } catch (e) {
+        addLog("⚠️ Lỗi setup audio: " + e.message, 'warning');
+        videoElement.addEventListener('loadedmetadata', function onLoad() {
+          videoElement.removeEventListener('loadedmetadata', onLoad);
+          try {
+            const ctx = getAudioContext();
+            const source = ctx.createMediaElementSource(videoElement);
+            const analyser = createAnalyser(ctx);
+            source.connect(analyser);
+            analyser.connect(ctx.destination);
+            window.videoSource = source;
+            window.videoAnalyser = analyser;
+            isAudioSetup = true;
+            addLog("✅ Setup audio thành công (sau load)", 'success');
+          } catch (err) { addLog("❌ Vẫn không thể setup audio: " + err.message, 'error'); }
+        });
+      }
+    }
+
+    function getVideoAnalyser() {
+      if (!window.videoAnalyser || !isAudioSetup) {
+        setupVideoAudio(document.getElementById('mainVideo'));
+      }
+      return window.videoAnalyser;
+    }
+
+    function drawStaticWaveform(canvas, waveformData, color = WAVEFORM_COLOR_ORIG, bgColor = '#0f172a') {
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width,
+        h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, w, h);
+      if (!waveformData || waveformData.length === 0) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, h / 2);
+        ctx.lineTo(w, h / 2);
+        ctx.stroke();
+        return;
+      }
+      const amp = h * 0.42;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      for (let i = 0; i < w; i++) {
+        const idx = Math.floor((i / w) * waveformData.length);
+        if (idx >= waveformData.length) break;
+        const val = waveformData[idx];
+        const y = h / 2 - val * amp;
+        if (i === 0) ctx.moveTo(i, y);
+        else ctx.lineTo(i, y);
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = color;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
+    function drawHighline(canvas, progress, color = CURSOR_COLOR_ORIG) {
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width,
+        h = canvas.height;
+      const x = progress * w;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.5;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = color;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, h);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
+    function drawWaveformWithCursor(canvas, waveformData, progress, color = WAVEFORM_COLOR_ORIG, cursorColor = CURSOR_COLOR_ORIG,
+      bgColor = '#0f172a') {
+      drawStaticWaveform(canvas, waveformData, color, bgColor);
+      if (progress >= 0 && progress <= 1) drawHighline(canvas, progress, cursorColor);
+    }
+
+    async function generateWaveform(blob, canvas) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          try {
+            const arrayBuffer = e.target.result;
+            const audioContext = new(window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, 1, 44100);
+            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+            const channelData = audioBuffer.getChannelData(0);
+            const step = Math.max(1, Math.floor(channelData.length / WAVEFORM_SAMPLES));
+            const data = [];
+            for (let i = 0; i < channelData.length; i += step) {
+              let sum = 0;
+              for (let j = 0; j < step && i + j < channelData.length; j++) sum += Math.abs(channelData[i + j]);
+              data.push(sum / step);
+            }
+            const max = Math.max(...data);
+            if (max > 0)
+              for (let i = 0; i < data.length; i++) data[i] = data[i] / max;
+            resolve(data);
+          } catch (err) { reject(err); }
+        };
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(blob);
+      });
+    }
+
+    function visualizeMicrophone(stream, canvas, envelopeArray = null) {
+      stopVisualization();
+      const ctx = getAudioContext();
+      currentAnalyser = createAnalyser(ctx);
+      const source = ctx.createMediaStreamSource(stream);
+      source.connect(currentAnalyser);
+      liveStream = stream;
+      drawWaveform(currentAnalyser, canvas, envelopeArray, 'bar');
+    }
+
+    function drawWaveform(analyser, canvas, envelopeArray = null, style = 'bar') {
+      if (!analyser) return;
+      const ctx = canvas.getContext('2d');
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      if (animationFrameId) { cancelAnimationFrame(animationFrameId);
+        animationFrameId = null; }
+
+      function draw() {
+        animationFrameId = requestAnimationFrame(draw);
+        const width = canvas.width,
+          height = canvas.height;
+        const isDark = document.documentElement.classList.contains("dark") || !document.documentElement.classList.contains(
+          "light");
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = isDark ? "rgba(15,23,42,0.95)" : "rgba(248,250,252,0.9)";
+        ctx.fillRect(0, 0, width, height);
+        if (style === 'frequency') analyser.getByteFrequencyData(dataArray);
+        else analyser.getByteTimeDomainData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < bufferLength; i++) { const dev = (dataArray[i] - 128) / 128;
+          sum += dev * dev; }
+        const rms = Math.sqrt(sum / bufferLength);
+        const amp = Math.min(rms * 4.0, 1.0) + 0.1;
+        if (envelopeArray) envelopeArray.push(rms);
+        ctx.strokeStyle = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, height / 2);
+        ctx.lineTo(width, height / 2);
+        ctx.stroke();
+        const color = (canvas.id === 'waveformOriginalCanvas') ? (isDark ? "rgba(99,102,241,0.9)" :
+          "rgba(79,70,229,0.8)") :
+          (isDark ? "rgba(168,85,247,0.9)" : "rgba(124,58,237,0.8)");
+        ctx.shadowBlur = isDark ? 10 : 5;
+        ctx.shadowColor = color;
+        if (style === 'bar') {
+          const barWidth = width / bufferLength;
+          ctx.lineWidth = Math.max(2, barWidth * 1.5);
+          ctx.strokeStyle = color;
+          for (let i = 0; i < bufferLength; i++) {
+            const norm = (dataArray[i] - 128) / 128;
+            const val = norm * amp * (height * 0.45);
+            const x = i * barWidth + barWidth / 2;
+            const yCenter = height / 2;
+            ctx.beginPath();
+            ctx.moveTo(x, yCenter - val);
+            ctx.lineTo(x, yCenter + val);
+            ctx.stroke();
+          }
+        } else if (style === 'waveform') {
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          for (let i = 0; i < bufferLength; i++) {
+            const norm = (dataArray[i] - 128) / 128;
+            const val = norm * amp * (height * 0.45);
+            const x = (i / bufferLength) * width;
+            const y = height / 2 + val;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        } else if (style === 'frequency') {
+          const barWidth = width / bufferLength;
+          ctx.lineWidth = Math.max(2, barWidth * 1.5);
+          ctx.strokeStyle = color;
+          for (let i = 0; i < bufferLength; i++) {
+            const val = (dataArray[i] / 255) * (height * 0.8) + height * 0.1;
+            const x = i * barWidth + barWidth / 2;
+            const yTop = height - val;
+            ctx.beginPath();
+            ctx.moveTo(x, yTop);
+            ctx.lineTo(x, height);
+            ctx.stroke();
+          }
+        } else if (style === 'combined') {
+          const barWidth = width / bufferLength;
+          ctx.lineWidth = Math.max(2, barWidth * 1.2);
+          ctx.strokeStyle = color;
+          ctx.globalAlpha = 0.3;
+          for (let i = 0; i < bufferLength; i++) {
+            const norm = (dataArray[i] - 128) / 128;
+            const val = norm * amp * (height * 0.45);
+            const x = i * barWidth + barWidth / 2;
+            const yCenter = height / 2;
+            ctx.beginPath();
+            ctx.moveTo(x, yCenter - val);
+            ctx.lineTo(x, yCenter + val);
+            ctx.stroke();
+          }
+          ctx.globalAlpha = 1.0;
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          for (let i = 0; i < bufferLength; i++) {
+            const norm = (dataArray[i] - 128) / 128;
+            const val = norm * amp * (height * 0.45);
+            const x = (i / bufferLength) * width;
+            const y = height / 2 + val;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+          ctx.globalAlpha = 1.0;
+        }
+        ctx.shadowBlur = 0;
+      }
+      draw();
+    }
+
+    function stopVisualization() {
+      if (animationFrameId) { cancelAnimationFrame(animationFrameId);
+        animationFrameId = null; }
+      if (currentSource) { try { currentSource.disconnect(); } catch (e) {} currentSource = null; }
+      if (currentAnalyser) { try { currentAnalyser.disconnect(); } catch (e) {} currentAnalyser = null; }
+    }
+
+    function resizeWaveformCanvas(canvas, wrapper) {
+      if (!canvas || !wrapper) return;
+      const rect = wrapper.getBoundingClientRect();
+      const width = rect.width || 600;
+      canvas.width = Math.max(width, 1000);
+      canvas.height = WAVEFORM_HEIGHT;
+    }
+
+    // =====================================================================
+    // 4.  AUDIO RECORDER
+    // =====================================================================
+    class AudioRecorder {
+      constructor() {
+        this.mediaRecorder = null;
+        this.chunks = [];
+        this.stream = null;
+        this.isPaused = false;
+        this.recordStartTime = 0;
+        this.pausedDuration = 0;
+        this.timerInterval = null;
+        this._isStopped = false;
+      }
+      async start(canvasToVisualize = null, envelopeArray = null) {
+        this.chunks = [];
+        this.isPaused = false;
+        this.pausedDuration = 0;
+        this.recordStartTime = Date.now();
+        this._isStopped = false;
+        if (!this.stream || !this.stream.active || this.stream.getAudioTracks().length === 0 || this.stream
+          .getAudioTracks()[0].readyState === 'ended') {
+          this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        }
+        if (canvasToVisualize) visualizeMicrophone(this.stream, canvasToVisualize, envelopeArray);
+        const mimeTypes = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/ogg'];
+        let mimeType = null;
+        for (let mt of mimeTypes) { if (MediaRecorder.isTypeSupported(mt)) { mimeType = mt;
+            break; } }
+        try { this.mediaRecorder = new MediaRecorder(this.stream, { mimeType: mimeType || '' }); } catch (e) { this
+            .mediaRecorder = new MediaRecorder(this.stream); }
+        this.mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) this.chunks.push(e.data); };
+        this.mediaRecorder.start(1000);
+        return new Promise(resolve => { this.mediaRecorder.onstart = () => resolve(); });
+      }
+      pause() {
+        if (this.mediaRecorder && this.mediaRecorder.state === "recording" && !this.isPaused) {
+          this.mediaRecorder.pause();
+          this.isPaused = true;
+          this.pausedDuration += Date.now() - this.recordStartTime;
+          return true;
+        }
+        return false;
+      }
+      resume() {
+        if (this.mediaRecorder && this.mediaRecorder.state === "paused" && this.isPaused) {
+          this.mediaRecorder.resume();
+          this.isPaused = false;
+          this.recordStartTime = Date.now();
+          return true;
+        }
+        return false;
+      }
+      stop() {
+        return new Promise((resolve, reject) => {
+          if (!this.mediaRecorder || this.mediaRecorder.state === "inactive") { reject(new Error(
+              "Recording was not active")); return; }
+          this._isStopped = true;
+          const finalDuration = this.pausedDuration + (this.isPaused ? 0 : Date.now() - this.recordStartTime);
+          this.mediaRecorder.requestData();
+          this.mediaRecorder.onstop = () => {
+            stopVisualization();
+            let audioBlob;
+            try { audioBlob = new Blob(this.chunks, { type: 'audio/webm' }); } catch (e) { audioBlob = new Blob(this
+                .chunks, { type: 'audio/webm' }); }
+            if (audioBlob.size === 0) { reject(new Error("No audio data recorded")); } else { resolve({ blob: audioBlob,
+                duration: finalDuration }); }
+          };
+          const timeout = setTimeout(() => { if (this.chunks.length === 0) reject(new Error(
+              "No audio chunks received")); }, 3000);
+          this.mediaRecorder.stop();
+          const orig = this.mediaRecorder.onstop;
+          this.mediaRecorder.onstop = () => { clearTimeout(timeout); if (orig) orig.call(this.mediaRecorder); };
+        });
+      }
+      get state() { return this.mediaRecorder ? this.mediaRecorder.state : "inactive"; }
+      get isPausedState() { return this.isPaused; }
+      getDuration() { return this.isPaused ? this.pausedDuration : this.pausedDuration + (Date.now() - this
+          .recordStartTime); }
+    }
+
+    // =====================================================================
+    // 5.  DICTIONARY
+    // =====================================================================
+    const DICT_ZH = {
+      '什么': { pinyin: 'shén me', meaning: 'gì, cái gì' },
+      '男': { pinyin: 'nán', meaning: 'nam, con trai' },
+      '女': { pinyin: 'nǚ', meaning: 'nữ, con gái' },
+      '人': { pinyin: 'rén', meaning: 'người' },
+      '我': { pinyin: 'wǒ', meaning: 'tôi, ta' },
+      '你': { pinyin: 'nǐ', meaning: 'bạn, anh/chị' },
+      '他': { pinyin: 'tā', meaning: 'anh ấy, ông ấy' },
+      '她': { pinyin: 'tā', meaning: 'chị ấy, bà ấy' },
+      '我们': { pinyin: 'wǒ men', meaning: 'chúng tôi, chúng ta' },
+      '你们': { pinyin: 'nǐ men', meaning: 'các bạn, các anh/chị' },
+      '他们': { pinyin: 'tā men', meaning: 'họ (nam)' },
+      '她们': { pinyin: 'tā men', meaning: 'họ (nữ)' },
+      '是': { pinyin: 'shì', meaning: 'là' },
+      '不': { pinyin: 'bù', meaning: 'không' },
+      '好': { pinyin: 'hǎo', meaning: 'tốt, hay' },
+      '大': { pinyin: 'dà', meaning: 'to, lớn' },
+      '小': { pinyin: 'xiǎo', meaning: 'nhỏ, bé' },
+      '多': { pinyin: 'duō', meaning: 'nhiều' },
+      '少': { pinyin: 'shǎo', meaning: 'ít' },
+      '有': { pinyin: 'yǒu', meaning: 'có' },
+      '在': { pinyin: 'zài', meaning: 'ở, tại' },
+      '中国': { pinyin: 'Zhōng guó', meaning: 'Trung Quốc' },
+      '越南': { pinyin: 'Yuè nán', meaning: 'Việt Nam' },
+      '学生': { pinyin: 'xué sheng', meaning: 'học sinh' },
+      '老师': { pinyin: 'lǎo shī', meaning: 'giáo viên' },
+      '朋友': { pinyin: 'péng you', meaning: 'bạn bè' },
+      '喜欢': { pinyin: 'xǐ huān', meaning: 'thích' },
+      '爱': { pinyin: 'ài', meaning: 'yêu' },
+      '学': { pinyin: 'xué', meaning: 'học' },
+      '习': { pinyin: 'xí', meaning: 'tập, luyện' },
+      '说': { pinyin: 'shuō', meaning: 'nói' },
+      '话': { pinyin: 'huà', meaning: 'lời nói' },
+      '书': { pinyin: 'shū', meaning: 'sách' },
+      '看': { pinyin: 'kàn', meaning: 'xem' },
+      '见': { pinyin: 'jiàn', meaning: 'gặp' },
+      '家': { pinyin: 'jiā', meaning: 'gia đình, nhà' },
+      '校': { pinyin: 'xiào', meaning: 'trường' },
+      '年': { pinyin: 'nián', meaning: 'năm' },
+      '天': { pinyin: 'tiān', meaning: 'ngày, trời' },
+      '今天': { pinyin: 'jīn tiān', meaning: 'hôm nay' },
+      '明天': { pinyin: 'míng tiān', meaning: 'ngày mai' },
+      '昨天': { pinyin: 'zuó tiān', meaning: 'hôm qua' },
+      '现在': { pinyin: 'xiàn zài', meaning: 'bây giờ' },
+      '时间': { pinyin: 'shí jiān', meaning: 'thời gian' },
+      '名字': { pinyin: 'míng zi', meaning: 'tên' },
+      '同学': { pinyin: 'tóng xué', meaning: 'bạn cùng lớp' },
+      '大家': { pinyin: 'dà jiā', meaning: 'mọi người' },
+      '谢谢': { pinyin: 'xiè xie', meaning: 'cảm ơn' },
+      '对不起': { pinyin: 'duì bu qǐ', meaning: 'xin lỗi' },
+      '再见': { pinyin: 'zài jiàn', meaning: 'tạm biệt' },
+      '你好': { pinyin: 'nǐ hǎo', meaning: 'xin chào' },
+      '你好吗': { pinyin: 'nǐ hǎo ma', meaning: 'bạn khỏe không?' },
+      '学习': { pinyin: 'xué xí', meaning: 'học tập' },
+      '汉语': { pinyin: 'hàn yǔ', meaning: 'tiếng Hán' },
+      '英语': { pinyin: 'yīng yǔ', meaning: 'tiếng Anh' },
+      '越南语': { pinyin: 'yuè nán yǔ', meaning: 'tiếng Việt' }
+    };
+
+    // =====================================================================
+    // 6.  APP - STATE & DOM REFS
+    // =====================================================================
+    (function() {
+      "use strict";
+
+      // ---------- STATE ----------
+      let currentVideoData = null;
+      const userRecordings = {};
+      let fullVideoAudioBlob = null;
+      let fullVideoDuration = 0;
+      let currentPracticeMode = 'speaking';
+      let listeningHideTarget = 'hanzi';
+      const listeningAnswers = {};
+      let isLoopSentenceEnabled = false;
+      let isPlayingFullVideo = false;
+      let isDubbingPlaying = false;
+      let isSentenceMode = false;
+      let isFullRecording = false;
+      let activeUserAudio = null;
+      let lastActiveSentenceId = null;
+      let videoSyncInterval = null;
+      let sentenceTimingInterval = null;
+      let recordTimerInterval = null;
+      let activeLoopInterval = null;
+      let vocabWords = [];
+      let currentInfoWord = null;
+      let selectedWord = "";
+      let ignoreHide = false;
+      let selectionTimeout = null;
+      let sentenceIdForPopup = null;
+      let renderTimeout = null;
+      let videoLoaded = false;
+
+      // ---------- DOM REFS ----------
+      const video = document.getElementById('mainVideo');
+      const sentenceListContainer = document.getElementById('sentenceList');
+      const videoLibraryList = document.getElementById('videoLibraryList');
+      const currentVideoTitle = document.getElementById('currentVideoTitle');
+      const btnRecordFullVideo = document.getElementById('btnRecordFullVideo');
+      const btnPauseRecord = document.getElementById('btnPauseRecord');
+      const recordTimer = document.getElementById('recordTimer');
+      const btnPlayFullDubbing = document.getElementById('btnPlayFullDubbing');
+      const btnStopDubbing = document.getElementById('btnStopDubbing');
+      const btnEditCurrentSubtitles = document.getElementById('btnEditCurrentSubtitles');
+      const btnToggleDisplayMode = document.getElementById('btnToggleDisplayMode');
+      const btnToggleLibrary = document.getElementById('btnToggleLibrary');
+      const mainLayout = document.getElementById('mainLayout');
+      const listeningControls = document.getElementById('listeningControls');
+      const selectListeningHideMode = document.getElementById('selectListeningHideMode');
+      const btnPlayPause = document.getElementById('btnPlayPause');
+      const videoTimeline = document.getElementById('videoTimeline');
+      const timeDisplay = document.getElementById('timeDisplay');
+      const videoSpeed = document.getElementById('videoSpeed');
+      const btnLoopSentence = document.getElementById('btnLoopSentence');
+      const waveformOriginalCanvas = document.getElementById('waveformOriginalCanvas');
+      const waveformUserCanvas = document.getElementById('waveformUserCanvas');
+      const originalWrapper = document.getElementById('originalWaveformWrapper');
+      const userWrapper = document.getElementById('userWaveformWrapper');
+      const visualizerStatus = document.getElementById('visualizerStatus');
+      const themeToggle = document.getElementById('themeToggle');
+      const modal = document.getElementById('uploadModal');
+      const btnOpenUploadModal = document.getElementById('btnOpenUploadModal');
+      const closeModal = document.querySelector('.close-modal');
+      const btnAddSubtitleRow = document.getElementById('btnAddSubtitleRow');
+      const btnClearSubtitles = document.getElementById('btnClearSubtitles');
+      const uploadForm = document.getElementById('uploadForm');
+      const inputSubtitleFile = document.getElementById('inputSubtitleFile');
+      const subtitleInputsContainer = document.getElementById('subtitleInputsContainer');
+      const formError = document.getElementById('formError');
+      const videoVolumeSlider = document.getElementById('videoVolumeSlider');
+
+      // Vocab DOM
+      const vocabPopup = document.getElementById('vocabFloatingPopup');
+      const vocabWordDisplay = document.getElementById('vocabWordDisplay');
+      const vocabPinyinInput = document.getElementById('vocabPinyinInput');
+      const vocabMeaningInput = document.getElementById('vocabMeaningInput');
+      const btnCancelVocab = document.getElementById('btnCancelVocab');
+      const btnSaveVocab = document.getElementById('btnSaveVocab');
+      const infoPopup = document.getElementById('vocabInfoPopup');
+      const infoWordDisplay = document.getElementById('infoWordDisplay');
+      const infoPinyinValue = document.getElementById('infoPinyinValue');
+      const infoMeaningValue = document.getElementById('infoMeaningValue');
+      const btnCloseInfoPopup = document.getElementById('btnCloseInfoPopup');
+      const btnInfoViewDetail = document.getElementById('btnInfoViewDetail');
+      const btnOpenVocab = document.getElementById('btnOpenVocabHub');
+      const vocabModalEl = document.getElementById('vocabModal');
+      const btnCloseVocab = document.getElementById('btnCloseVocabModal');
+      const btnCloseVocabAction = document.getElementById('btnCloseVocabHubAction');
+      const btnExport = document.getElementById('btnExportVocab');
+      const btnExportAll = document.getElementById('btnExportAllData');
+      const btnImportAll = document.getElementById('btnImportAllData');
+      const importFileInput = document.getElementById('importFileInput');
+
+      const audioRecorder = new AudioRecorder();
+
+      // ---------- UTILITIES ----------
+      function formatTime(seconds) {
+        if (isNaN(seconds) || seconds === Infinity) return "00:00";
+        const m = Math.floor(seconds / 60);
+        const s = Math.floor(seconds % 60);
+        return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      }
+
+      function formatDuration(ms) {
+        const seconds = Math.floor(ms / 1000);
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      }
+
+      function updateVisualizerStatus(msg) { if (visualizerStatus) visualizerStatus.innerText = msg; }
+
+      function sanitizeHTML(str) {
+        if (!str) return '';
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return str.replace(/[&<>"']/g, m => map[m]);
+      }
+
+      function showLoading(show) {
+        const overlay = document.getElementById('videoLoadingOverlay');
+        if (overlay) overlay.classList.toggle('hidden', !show);
+      }
+
+      // ---------- DISPLAY MODE & THEME ----------
+      function getThemePreference() { try { return localStorage.getItem('theme') || 'dark'; } catch (e) { return 'dark'; } }
+
+      function setThemePreference(t) { try { localStorage.setItem('theme', t); } catch (e) {} }
+
+      function initTheme() {
+        const saved = getThemePreference();
+        if (themeToggle) {
+          const sun = themeToggle.querySelector('.sun-icon');
+          const moon = themeToggle.querySelector('.moon-icon');
+          if (saved === 'light') {
+            document.documentElement.classList.add('light');
+            if (sun) sun.style.display = 'none';
+            if (moon) moon.style.display = 'block';
+          } else {
+            document.documentElement.classList.remove('light');
+            if (sun) sun.style.display = 'block';
+            if (moon) moon.style.display = 'none';
+          }
+        }
+      }
+
+      function getDisplayModePreference() { try { return localStorage.getItem('displayMode') || 'full'; } catch (e) { return 'full'; } }
+
+      function setDisplayModePreference(m) { try { localStorage.setItem('displayMode', m); } catch (e) {} }
+
+      function initDisplayMode() {
+        const mode = getDisplayModePreference();
+        if (sentenceListContainer && btnToggleDisplayMode) {
+          if (mode === 'compact') {
+            sentenceListContainer.classList.add('compact-mode');
+            btnToggleDisplayMode.innerText = "🙈 Hiển Thị: Chữ Hán";
+          } else {
+            sentenceListContainer.classList.remove('compact-mode');
+            btnToggleDisplayMode.innerText = "👁️ Hiển Thị: Đầy Đủ";
+          }
+        }
+      }
+
+      // ---------- VIDEO SYNC & HIGHLINE ----------
+      function startVideoSyncLoop() {
+        clearInterval(videoSyncInterval);
+        if (!isPlayingFullVideo && !isDubbingPlaying) return;
+        videoSyncInterval = setInterval(() => {
+          if (video && !video.paused && !video.ended && isPlayingFullVideo && !isSentenceMode) {
+            const progress = video.duration > 0 ? video.currentTime / video.duration : 0;
+            updateOriginalHighline(progress);
+          }
+          if (video && !video.paused && !video.ended) {
+            highlightActiveSentence(video.currentTime);
+          }
+          if (isDubbingPlaying && activeUserAudio && !activeUserAudio.paused && !activeUserAudio.ended) {
+            const progress = activeUserAudio.duration > 0 ? activeUserAudio.currentTime / activeUserAudio.duration : 0;
+            updateUserHighline(progress);
+          }
+        }, 30);
+      }
+
+      function stopVideoSyncLoop() { clearInterval(videoSyncInterval); }
+
+      function updateOriginalHighline(progress) {
+        if (originalWaveformData) {
+          drawWaveformWithCursor(waveformOriginalCanvas, originalWaveformData, progress, WAVEFORM_COLOR_ORIG,
+            CURSOR_COLOR_ORIG);
+        }
+      }
+
+      function updateUserHighline(progress) {
+        if (userWaveformData) {
+          drawWaveformWithCursor(waveformUserCanvas, userWaveformData, progress, WAVEFORM_COLOR_USER, CURSOR_COLOR_USER);
+        }
+      }
+
+      function resetHighlines() {
+        updateOriginalHighline(0);
+        updateUserHighline(0);
+      }
+
+      // ---------- STOP ALL PLAYBACK ----------
+      function stopAllPlayback() {
+        isPlayingFullVideo = false;
+        isDubbingPlaying = false;
+        // Không reset isSentenceMode và không reset highlight
+        // Chỉ dừng các timer và audio
+        if (activeLoopInterval) { clearInterval(activeLoopInterval);
+          activeLoopInterval = null; }
+        clearInterval(sentenceTimingInterval);
+        stopVideoSyncLoop();
+        if (activeUserAudio) { try { activeUserAudio.pause(); } catch (e) {} activeUserAudio = null; }
+        // Không reset highlines, không xóa active class
+        if (btnStopDubbing) btnStopDubbing.style.display = 'none';
+        // Không xóa active class
+        // lastActiveSentenceId giữ nguyên
+        updateVisualizerStatus("Sóng âm: Sẵn sàng so sánh");
+      }
+
+      function stopDubbing() {
+        if (activeUserAudio) { activeUserAudio.pause();
+          activeUserAudio.currentTime = 0; }
+        if (video) { video.pause();
+          video.muted = false; }
+        isDubbingPlaying = false;
+        isPlayingFullVideo = false;
+        // Không reset isSentenceMode
+        stopVideoSyncLoop();
+        if (btnStopDubbing) btnStopDubbing.style.display = 'none';
+        if (btnPlayFullDubbing) btnPlayFullDubbing.disabled = false;
+        // Không reset highlines
+        updateVisualizerStatus("Đã dừng phát bản lồng tiếng");
+      }
+
+      // ---------- SENTENCE PLAYBACK ----------
+      function playSentence(id) {
+        // Dừng tất cả, nhưng giữ nguyên highlight
+        stopAllPlayback();
+
+        const sentence = currentVideoData.sentences.find(s => s.id === id);
+        if (!sentence || !video) return;
+        if (!videoLoaded) {
+          addLog("⚠️ Video chưa sẵn sàng, thử lại sau...", 'warning');
+          setTimeout(() => playSentence(id), 500);
+          return;
+        }
+        isSentenceMode = true;
+        // Đánh dấu câu đang phát
+        lastActiveSentenceId = id;
+        // Đảm bảo câu được highlight
+        document.querySelectorAll('.sentence-card').forEach(c => c.classList.remove('active'));
+        const card = document.getElementById(`card-${id}`);
+        if (card) card.classList.add('active');
+
+        getAudioContext();
+        const analyser = getVideoAnalyser();
+        if (!analyser) {
+          addLog("⚠️ Không thể lấy analyser, thử lại...", 'warning');
+          setTimeout(() => playSentence(id), 500);
+          return;
+        }
+        // Vẽ waveform tĩnh
+        drawStaticWaveform(waveformOriginalCanvas, originalWaveformData, WAVEFORM_COLOR_ORIG);
+
+        video.currentTime = sentence.startTime;
+        video.muted = false;
+        video.volume = parseFloat(videoVolumeSlider.value) / 100 || 1.0;
+        if (videoSpeed) video.playbackRate = parseFloat(videoSpeed.value);
+        video.play().catch(e => addLog("❌ Lỗi phát câu: " + e.message, 'error'));
+
+        updateVisualizerStatus(`🔊 Phát mẫu: Câu ${id}`);
+        isPlayingFullVideo = true;
+        startVideoSyncLoop();
+
+        // Khi kết thúc câu, chỉ dừng video, không reset highlight
+        sentenceTimingInterval = setInterval(() => {
+          if (video.currentTime >= sentence.endTime || video.paused) {
+            if (video.paused) {
+              clearInterval(sentenceTimingInterval);
+              isPlayingFullVideo = false;
+              stopVideoSyncLoop();
+              updateVisualizerStatus("Đã tạm dừng phát câu");
+            } else {
+              video.pause();
+              clearInterval(sentenceTimingInterval);
+              stopVideoSyncLoop();
+              isPlayingFullVideo = false;
+              updateVisualizerStatus("Đã phát xong câu mẫu.");
+              // Không reset highlines, vẫn giữ active
+            }
+          }
+        }, 50);
+      }
+
+      // ---------- HIGHLIGHT ACTIVE SENTENCE ----------
+      function highlightActiveSentence(currentTime) {
+        // Nếu đang ở chế độ phát câu, giữ nguyên câu đang active, không thay đổi
+        if (isSentenceMode && lastActiveSentenceId !== null) {
+          // Đảm bảo câu đó vẫn được active, các câu khác không active
+          document.querySelectorAll('.sentence-card').forEach(c => {
+            const cardId = parseInt(c.id.replace('card-', ''));
+            if (cardId === lastActiveSentenceId) {
+              c.classList.add('active');
+            } else {
+              c.classList.remove('active');
+            }
+          });
+          // Cập nhật wrapper state
+          const wrapper = document.getElementById('sentenceListWrapper');
+          if (wrapper) wrapper.classList.add('has-active');
+          return;
+        }
+
+        if (!currentVideoData || !currentVideoData.sentences) return;
+        let activeSentence = null;
+        for (const s of currentVideoData.sentences) {
+          const card = document.getElementById(`card-${s.id}`);
+          if (!card) continue;
+          if (currentTime >= s.startTime && currentTime <= s.endTime) {
+            card.classList.add('active');
+            activeSentence = s;
+            if (lastActiveSentenceId !== s.id) {
+              lastActiveSentenceId = s.id;
+              const containerHeight = sentenceListContainer.clientHeight;
+              const cardTop = card.offsetTop;
+              const cardHeight = card.clientHeight;
+              sentenceListContainer.scrollTop = cardTop - (containerHeight * 0.35) + (cardHeight / 2);
+            }
+          } else {
+            card.classList.remove('active');
+          }
+        }
+        const wrapper = document.getElementById('sentenceListWrapper');
+        if (activeSentence) wrapper.classList.add('has-active');
+        else wrapper.classList.remove('has-active');
+
+        if (isLoopSentenceEnabled && activeSentence && video && !video.paused) {
+          if (currentTime >= activeSentence.endTime - 0.1) {
+            video.currentTime = activeSentence.startTime;
+          }
+        }
+      }
+
+      // ---------- RENDER SENTENCES ----------
+      function highlightVocabInText(text) {
+        if (!text || vocabWords.length === 0) return text;
+        let result = text;
+        const sorted = [...vocabWords].sort((a, b) => b.word.length - a.word.length);
+        for (const item of sorted) {
+          const word = item.word;
+          if (!word) continue;
+          const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const regex = new RegExp(escaped, 'g');
+          result = result.replace(regex, (match) =>
+            `<span class="vocab-highlight-word" data-word="${sanitizeHTML(match)}">${sanitizeHTML(match)}</span>`);
+        }
+        return result;
+      }
+
+      function renderSentences() {
+        if (!sentenceListContainer) return;
+        if (renderTimeout) { cancelAnimationFrame(renderTimeout);
+          renderTimeout = null; }
+        renderTimeout = requestAnimationFrame(() => {
+          const isListening = currentPracticeMode === 'listening';
+          const isHanziHidden = isListening && listeningHideTarget === 'hanzi';
+          const isVietnameseHidden = isListening && listeningHideTarget === 'vietnamese';
+
+          if (!currentVideoData || !currentVideoData.sentences) {
+            sentenceListContainer.innerHTML =
+              '<p style="color:var(--text-muted);padding:20px;text-align:center;">Chưa có câu thoại cho video này.</p>';
+            return;
+          }
+
+          const fragment = document.createDocumentFragment();
+          for (const sentence of currentVideoData.sentences) {
+            const isCompleted = isListening ? (listeningAnswers[sentence.id]?.correct || false) : !!userRecordings[
+            sentence.id];
+            const completedClass = isCompleted ? 'completed' : '';
+            const pinyinHTML = sentence.pinyin ? `<div class="sub-pinyin">${sanitizeHTML(sentence.pinyin)}</div>` : '';
+
+            let chineseHTML = '';
+            if (isHanziHidden) {
+              const userAns = listeningAnswers[sentence.id]?.text || '';
+              const statusClass = listeningAnswers[sentence.id]?.correct ? 'correct' : (userAns ? 'incorrect' : '');
+              const feedbackIcon = listeningAnswers[sentence.id]?.correct ? '✅' : (userAns ? '❌' : '');
+              chineseHTML =
+                `<div class="listening-input-wrapper"><input type="text" class="listening-input ${statusClass}" data-sentence-id="${sentence.id}" placeholder="Nhập chữ Hán..." value="${sanitizeHTML(userAns)}"><span class="listening-feedback-icon">${feedbackIcon}</span></div>`;
+            } else {
+              const highlighted = highlightVocabInText(sentence.hanzi);
+              chineseHTML = `<div class="sub-chinese">${highlighted}</div>`;
+            }
+
+            let vietHTML = '';
+            if (isVietnameseHidden) {
+              const userAns = listeningAnswers[sentence.id]?.text || '';
+              const statusClass = listeningAnswers[sentence.id]?.correct ? 'correct' : (userAns ? 'incorrect' : '');
+              const feedbackIcon = listeningAnswers[sentence.id]?.correct ? '✅' : (userAns ? '❌' : '');
+              vietHTML =
+                `<div class="listening-input-wrapper"><input type="text" class="listening-input ${statusClass}" data-sentence-id="${sentence.id}" placeholder="Nhập dịch nghĩa..." value="${sanitizeHTML(userAns)}"><span class="listening-feedback-icon">${feedbackIcon}</span></div>`;
+            } else {
+              vietHTML = sentence.vietnamese ? `<div class="sub-vietnamese">${sanitizeHTML(sentence.vietnamese)}</div>` : '';
+            }
+
+            let controlsHTML = '';
+            if (isListening) {
+              controlsHTML =
+                `<div class="controls-group"><button class="btn btn-primary btn-play-sen" title="Nghe câu thoại">🔊</button></div>`;
+            } else {
+              controlsHTML =
+                `<div class="controls-group">
+              <button class="btn btn-primary btn-play-sen" title="Nghe Mẫu">🔊</button>
+              <button class="btn btn-danger btn-rec-sen" title="Ghi Âm">🎙️</button>
+              <button class="btn btn-success btn-user-sen" title="Nghe Giọng Mình" ${!userRecordings[sentence.id] ? 'disabled' : ''}>▶️</button>
+              <button class="btn btn-warning btn-para-sen" title="Phát Song Song" ${!userRecordings[sentence.id] ? 'disabled' : ''}>🔀</button>
+            </div>`;
+            }
+
+            const card = document.createElement('div');
+            card.className = `sentence-card ${completedClass}`;
+            card.id = `card-${sentence.id}`;
+            card.innerHTML = chineseHTML + pinyinHTML + vietHTML + controlsHTML;
+            fragment.appendChild(card);
+          }
+
+          sentenceListContainer.innerHTML = '';
+          sentenceListContainer.appendChild(fragment);
+
+          // Bind events
+          sentenceListContainer.querySelectorAll('.btn-play-sen').forEach(btn => {
+            const card = btn.closest('.sentence-card');
+            if (card) {
+              const id = parseInt(card.id.replace('card-', ''));
+              btn.addEventListener('click', () => playSentence(id));
+            }
+          });
+
+          if (!isListening) {
+            sentenceListContainer.querySelectorAll('.btn-rec-sen').forEach(btn => {
+              const card = btn.closest('.sentence-card');
+              if (card) {
+                const id = parseInt(card.id.replace('card-', ''));
+                btn.addEventListener('click', () => toggleRecord(id));
+              }
+            });
+            sentenceListContainer.querySelectorAll('.btn-user-sen').forEach(btn => {
+              const card = btn.closest('.sentence-card');
+              if (card) {
+                const id = parseInt(card.id.replace('card-', ''));
+                btn.addEventListener('click', () => playOnlyUserAudio(id));
+              }
+            });
+            sentenceListContainer.querySelectorAll('.btn-para-sen').forEach(btn => {
+              const card = btn.closest('.sentence-card');
+              if (card) {
+                const id = parseInt(card.id.replace('card-', ''));
+                btn.addEventListener('click', () => playParallel(id));
+              }
+            });
+          } else {
+            sentenceListContainer.querySelectorAll('.listening-input').forEach(input => {
+              input.addEventListener('input', function(e) {
+                const sid = parseInt(this.dataset.sentenceId);
+                const val = this.value;
+                checkListeningAnswer(sid, val, this);
+              });
+            });
+          }
+
+          sentenceListContainer.querySelectorAll('.vocab-highlight-word').forEach(el => {
+            el.addEventListener('click', function(e) {
+              e.stopPropagation();
+              const word = this.dataset.word;
+              if (word) showVocabInfo(word, e);
+            });
+          });
+
+          renderTimeout = null;
+        });
+      }
+
+      // ---------- LISTENING CHECK ----------
+      function normalizeText(text) {
+        if (!text) return '';
+        return text.toLowerCase().replace(/[\s\p{P}\p{S}]/gu, '');
+      }
+
+      function checkListeningAnswer(sentenceId, value, inputElement) {
+        const sentence = currentVideoData.sentences.find(s => s.id === sentenceId);
+        if (!sentence) return;
+        const correctText = listeningHideTarget === 'hanzi' ? sentence.hanzi : sentence.vietnamese;
+        const normalizedInput = normalizeText(value);
+        const normalizedCorrect = normalizeText(correctText);
+        const wrapper = inputElement.parentElement;
+        const feedbackIcon = wrapper.querySelector('.listening-feedback-icon');
+        const card = document.getElementById(`card-${sentenceId}`);
+        if (!value.trim()) {
+          inputElement.className = 'listening-input';
+          if (feedbackIcon) feedbackIcon.innerText = '';
+          if (card) card.classList.remove('completed');
+          listeningAnswers[sentenceId] = { correct: false, text: '' };
+          return;
+        }
+        const isCorrect = normalizedInput !== '' && normalizedInput === normalizedCorrect;
+        listeningAnswers[sentenceId] = { correct: isCorrect, text: value };
+        if (isCorrect) {
+          inputElement.className = 'listening-input correct';
+          if (feedbackIcon) feedbackIcon.innerText = '✅';
+          if (card) card.classList.add('completed');
+        } else {
+          inputElement.className = 'listening-input incorrect';
+          if (feedbackIcon) feedbackIcon.innerText = '❌';
+          if (card) card.classList.remove('completed');
+        }
+      }
+
+      // ---------- RECORD SENTENCE ----------
+      async function toggleRecord(id) {
+        const card = document.getElementById(`card-${id}`);
+        if (!card) return;
+        const btnRecord = card.querySelector('.btn-rec-sen');
+
+        if (audioRecorder.state === "recording" || audioRecorder.state === "paused") {
+          try {
+            const result = await audioRecorder.stop();
+            userRecordings[id] = result.blob;
+            btnRecord.innerHTML = "🎙️";
+            btnRecord.classList.remove("recording-active");
+            const userBtn = card.querySelector('.btn-user-sen');
+            const paraBtn = card.querySelector('.btn-para-sen');
+            if (userBtn) userBtn.disabled = false;
+            if (paraBtn) paraBtn.disabled = false;
+            card.classList.add('completed');
+            const data = await generateWaveform(result.blob, waveformUserCanvas);
+            userWaveformData = data;
+            drawStaticWaveform(waveformUserCanvas, data, WAVEFORM_COLOR_USER);
+            updateVisualizerStatus(`✅ Thu âm câu ${id} xong. Thời gian: ${formatDuration(result.duration)}`);
+            addLog(`✅ Thu âm câu ${id} thành công`, 'success');
+          } catch (err) {
+            addLog("❌ Lỗi khi dừng ghi âm: " + err.message, 'error');
+            updateVisualizerStatus("Lỗi khi dừng ghi âm");
+          }
+          return;
+        }
+
+        stopAllPlayback();
+        updateVisualizerStatus(`🎙️ Đang ghi âm câu ${id}... Nói ngay khi nghe âm mẫu!`);
+        try {
+          const ctx = getAudioContext();
+          const analyser = ctx.createAnalyser();
+          analyser.fftSize = 512;
+          await audioRecorder.start();
+          const source = ctx.createMediaStreamSource(audioRecorder.stream);
+          source.connect(analyser);
+          drawWaveform(analyser, waveformUserCanvas, null, 'bar');
+          btnRecord.innerHTML = "⏹️";
+          btnRecord.classList.add("recording-active");
+
+          // KHÔNG PHÁT VIDEO KHI GHI ÂM
+          // Chỉ thu âm, không phát âm thanh gốc
+          // Nếu muốn nghe âm thanh trước, người dùng bấm phát mẫu
+
+          // Không phát video
+          addLog("🎤 Đang ghi âm (không phát video)", 'info');
+        } catch (err) {
+          alert("Không thể truy cập Micro để ghi âm!");
+          updateVisualizerStatus("Lỗi Micro");
+          addLog("❌ Lỗi Micro: " + err.message, 'error');
+        }
+      }
+
+      // ---------- PLAY USER AUDIO (sentence) ----------
+      function playOnlyUserAudio(id) {
+        stopAllPlayback();
+        const blob = userRecordings[id];
+        if (!blob) return;
+        if (video) video.pause();
+        const userAudio = new Audio(URL.createObjectURL(blob));
+        activeUserAudio = userAudio;
+        if (userWaveformData) {
+          drawWaveformWithCursor(waveformUserCanvas, userWaveformData, 0, WAVEFORM_COLOR_USER, CURSOR_COLOR_USER);
+        } else {
+          generateWaveform(blob, waveformUserCanvas).then(data => {
+            userWaveformData = data;
+            drawWaveformWithCursor(waveformUserCanvas, data, 0, WAVEFORM_COLOR_USER, CURSOR_COLOR_USER);
+          });
+        }
+        updateVisualizerStatus(`🔊 Nghe giọng mình: Câu ${id}`);
+        userAudio.play();
+        isDubbingPlaying = true;
+        startVideoSyncLoop();
+        userAudio.onended = () => {
+          isDubbingPlaying = false;
+          stopVideoSyncLoop();
+          if (userWaveformData) drawWaveformWithCursor(waveformUserCanvas, userWaveformData, 1, WAVEFORM_COLOR_USER,
+            CURSOR_COLOR_USER);
+          updateVisualizerStatus("Sóng âm: Sẵn sàng so sánh");
+        };
+      }
+
+      // ---------- PLAY PARALLEL ----------
+      function playParallel(id) {
+        stopAllPlayback();
+        const sentence = currentVideoData.sentences.find(s => s.id === id);
+        const blob = userRecordings[id];
+        if (!sentence || !blob || !video) return;
+        const userAudio = new Audio(URL.createObjectURL(blob));
+        activeUserAudio = userAudio;
+        // Phát video từ đầu câu
+        video.muted = false;
+        video.volume = 0.3;
+        video.currentTime = sentence.startTime;
+        if (videoSpeed) video.playbackRate = parseFloat(videoSpeed.value);
+        updateVisualizerStatus(`🔀 Phát song song: Câu ${id}`);
+        video.play();
+        userAudio.play();
+        isPlayingFullVideo = true;
+        isDubbingPlaying = true;
+        startVideoSyncLoop();
+        if (originalWaveformData) drawWaveformWithCursor(waveformOriginalCanvas, originalWaveformData, 0,
+          WAVEFORM_COLOR_ORIG, CURSOR_COLOR_ORIG);
+        if (userWaveformData) drawWaveformWithCursor(waveformUserCanvas, userWaveformData, 0, WAVEFORM_COLOR_USER,
+          CURSOR_COLOR_USER);
+        sentenceTimingInterval = setInterval(() => {
+          if (video.currentTime >= sentence.endTime || userAudio.ended) {
+            video.pause();
+            userAudio.pause();
+            video.volume = parseFloat(videoVolumeSlider.value) / 100 || 1.0;
+            clearInterval(sentenceTimingInterval);
+            stopVideoSyncLoop();
+            isPlayingFullVideo = false;
+            isDubbingPlaying = false;
+            if (originalWaveformData) drawWaveformWithCursor(waveformOriginalCanvas, originalWaveformData, 1,
+              WAVEFORM_COLOR_ORIG, CURSOR_COLOR_ORIG);
+            if (userWaveformData) drawWaveformWithCursor(waveformUserCanvas, userWaveformData, 1,
+              WAVEFORM_COLOR_USER, CURSOR_COLOR_USER);
+            updateVisualizerStatus("Sóng âm: Sẵn sàng so sánh");
+          }
+        }, 50);
+      }
+
+      // ---------- FULL RECORDING ----------
+      function updateRecordTimer() {
+        if (isFullRecording) {
+          const duration = audioRecorder.getDuration();
+          recordTimer.textContent = formatDuration(duration);
+          recordTimer.classList.add('recording');
+        }
+      }
+
+      function startFullRecording() {
+        if (isFullRecording) return;
+        if (!currentVideoData) { alert("Vui lòng chọn một video trước khi ghi âm!"); return; }
+        stopAllPlayback();
+        isFullRecording = true;
+        fullVideoAudioBlob = null;
+        fullVideoDuration = 0;
+        if (btnPlayFullDubbing) btnPlayFullDubbing.disabled = true;
+        const vol = parseFloat(videoVolumeSlider.value) / 100 || 1.0;
+        if (video) { video.volume = vol;
+          video.muted = false; }
+        recordTimer.textContent = "00:00";
+        recordTimer.classList.add('recording');
+        btnRecordFullVideo.innerHTML = "⏹️ Dừng thu";
+        btnRecordFullVideo.classList.add('recording-active');
+        btnPauseRecord.style.display = 'inline-block';
+        btnPauseRecord.textContent = "⏸️ Tạm dừng";
+        btnPauseRecord.classList.remove('paused');
+        updateVisualizerStatus("🎙️ Đang thu âm cả bài (có nghe video gốc)...");
+        addLog("🔴 Bắt đầu ghi âm full", 'info');
+
+        try {
+          const ctx = getAudioContext();
+          const micAnalyser = ctx.createAnalyser();
+          micAnalyser.fftSize = 512;
+          audioRecorder.start(waveformUserCanvas, userWaveformData)
+            .then(() => {
+              addLog("🎙️ AudioRecorder started", 'info');
+              const micSource = ctx.createMediaStreamSource(audioRecorder.stream);
+              micSource.connect(micAnalyser);
+              drawWaveform(micAnalyser, waveformUserCanvas, null, 'bar');
+              if (recordTimerInterval) clearInterval(recordTimerInterval);
+              recordTimerInterval = setInterval(updateRecordTimer, 200);
+              if (video && videoLoaded) {
+                isPlayingFullVideo = true;
+                video.currentTime = 0;
+                video.muted = false;
+                video.volume = vol;
+                if (videoSpeed) video.playbackRate = parseFloat(videoSpeed.value);
+                video.play().catch(e => addLog("⚠️ Lỗi phát video khi ghi full: " + e.message, 'warning'));
+                startVideoSyncLoop();
+              }
+            })
+            .catch(err => {
+              alert("Không thể truy cập Micro để ghi âm!");
+              updateVisualizerStatus("Lỗi Micro");
+              addLog("❌ Lỗi start: " + err.message, 'error');
+              stopFullRecording();
+            });
+        } catch (err) {
+          alert("Không thể truy cập Micro để ghi âm!");
+          updateVisualizerStatus("Lỗi Micro");
+          addLog("❌ Lỗi: " + err.message, 'error');
+          stopFullRecording();
+        }
+      }
+
+      function pauseFullRecording() {
+        if (!isFullRecording) return;
+        if (audioRecorder.state === "recording") {
+          audioRecorder.pause();
+          btnPauseRecord.textContent = "▶️ Tiếp tục";
+          btnPauseRecord.classList.add('paused');
+          updateVisualizerStatus("⏸️ Đã tạm dừng ghi âm");
+          if (video) video.pause();
+          addLog("⏸️ Pause recording", 'info');
+        } else if (audioRecorder.state === "paused") {
+          audioRecorder.resume();
+          btnPauseRecord.textContent = "⏸️ Tạm dừng";
+          btnPauseRecord.classList.remove('paused');
+          updateVisualizerStatus("🎙️ Đang thu âm cả bài...");
+          if (video && isPlayingFullVideo) video.play().catch(e => addLog("⚠️ Lỗi resume video: " + e.message,
+            'warning'));
+          addLog("▶️ Resume recording", 'info');
+        }
+      }
+
+      async function stopFullRecording() {
+        if (!isFullRecording) return;
+        isFullRecording = false;
+        addLog("⏹️ Đang dừng ghi âm...", 'info');
+        if (recordTimerInterval) { clearInterval(recordTimerInterval);
+          recordTimerInterval = null; }
+        try {
+          if (audioRecorder.state === "recording" || audioRecorder.state === "paused") {
+            const result = await audioRecorder.stop();
+            if (result.blob && result.blob.size > 0) {
+              fullVideoAudioBlob = result.blob;
+              fullVideoDuration = result.duration;
+              if (btnPlayFullDubbing) btnPlayFullDubbing.disabled = false;
+              const data = await generateWaveform(result.blob, waveformUserCanvas);
+              userWaveformData = data;
+              drawStaticWaveform(waveformUserCanvas, data, WAVEFORM_COLOR_USER);
+              updateVisualizerStatus(`✅ Đã ghi âm xong cả bài! Thời lượng: ${formatDuration(result.duration)}`);
+              addLog(`✅ Lưu blob thành công, size: ${fullVideoAudioBlob.size} bytes`, 'success');
+            } else {
+              fullVideoAudioBlob = null;
+              fullVideoDuration = 0;
+              updateVisualizerStatus("⚠️ Bản ghi âm bị rỗng, vui lòng thử lại.");
+              addLog("❌ Blob rỗng!", 'error');
+              alert("Bản ghi âm không có dữ liệu. Hãy thử lại và nói to hơn.");
+            }
+          }
+        } catch (err) {
+          addLog("❌ Lỗi stop: " + err.message, 'error');
+          fullVideoAudioBlob = null;
+          alert("Lỗi khi dừng ghi âm: " + err.message);
+        }
+        btnRecordFullVideo.innerHTML = "🎙️ Thu Âm Cả Bài";
+        btnRecordFullVideo.classList.remove("recording-active");
+        btnPauseRecord.style.display = 'none';
+        btnPauseRecord.textContent = "⏸️ Tạm dừng";
+        btnPauseRecord.classList.remove('paused');
+        recordTimer.classList.remove('recording');
+        if (video) {
+          video.muted = false;
+          video.volume = parseFloat(videoVolumeSlider.value) / 100 || 1.0;
+          video.pause();
+          video.onended = null;
+          stopVideoSyncLoop();
+          isPlayingFullVideo = false;
+        }
+        if (userWaveformData) drawWaveformWithCursor(waveformUserCanvas, userWaveformData, 0);
+      }
+
+      function toggleFullRecording() { if (isFullRecording) stopFullRecording();
+        else startFullRecording(); }
+
+      // ---------- PLAY FULL DUBBING ----------
+      function playFullDubbing() {
+        if (!fullVideoAudioBlob || fullVideoAudioBlob.size === 0) {
+          alert("❌ Chưa có bản ghi âm lồng tiếng hoặc file ghi âm bị lỗi. Hãy thu âm lại.");
+          addLog("❌ Không có blob hoặc blob rỗng", 'error');
+          return;
+        }
+        if (isFullRecording) stopFullRecording();
+        stopAllPlayback();
+        if (btnStopDubbing) btnStopDubbing.style.display = 'inline-flex';
+        const audioUrl = URL.createObjectURL(fullVideoAudioBlob);
+        const fullAudio = new Audio(audioUrl);
+        activeUserAudio = fullAudio;
+        fullAudio.volume = 1.0;
+        fullAudio.muted = false;
+        fullAudio.play().catch(e => addLog("❌ Lỗi play audio: " + e.message, 'error'));
+        isPlayingFullVideo = true;
+        video.currentTime = 0;
+        video.muted = true;
+        if (videoSpeed) video.playbackRate = parseFloat(videoSpeed.value);
+        video.play().catch(e => addLog("⚠️ Lỗi phát video khi dubbing: " + e.message, 'warning'));
+        if (originalWaveformData) drawWaveformWithCursor(waveformOriginalCanvas, originalWaveformData, 0,
+          WAVEFORM_COLOR_ORIG, CURSOR_COLOR_ORIG);
+        if (userWaveformData) drawWaveformWithCursor(waveformUserCanvas, userWaveformData, 0, WAVEFORM_COLOR_USER,
+          CURSOR_COLOR_USER);
+        else generateWaveform(fullVideoAudioBlob, waveformUserCanvas).then(data => {
+          userWaveformData = data;
+          drawWaveformWithCursor(waveformUserCanvas, data, 0, WAVEFORM_COLOR_USER, CURSOR_COLOR_USER);
+        });
+        updateVisualizerStatus("🔊 Phát bản lồng tiếng cả bài (sóng gốc + lồng tiếng)");
+        isDubbingPlaying = true;
+        startVideoSyncLoop();
+        fullAudio.onended = () => {
+          video.pause();
+          video.muted = false;
+          stopVideoSyncLoop();
+          isPlayingFullVideo = false;
+          isDubbingPlaying = false;
+          if (originalWaveformData) drawWaveformWithCursor(waveformOriginalCanvas, originalWaveformData, 1,
+            WAVEFORM_COLOR_ORIG, CURSOR_COLOR_ORIG);
+          if (userWaveformData) drawWaveformWithCursor(waveformUserCanvas, userWaveformData, 1,
+            WAVEFORM_COLOR_USER, CURSOR_COLOR_USER);
+          updateVisualizerStatus("Sóng âm: Sẵn sàng so sánh");
+          URL.revokeObjectURL(audioUrl);
+          if (btnStopDubbing) btnStopDubbing.style.display = 'none';
+        };
+        video.onended = () => {
+          if (!fullAudio.paused) fullAudio.pause();
+          video.muted = false;
+          stopVideoSyncLoop();
+          isPlayingFullVideo = false;
+          isDubbingPlaying = false;
+          if (originalWaveformData) drawWaveformWithCursor(waveformOriginalCanvas, originalWaveformData, 1,
+            WAVEFORM_COLOR_ORIG, CURSOR_COLOR_ORIG);
+          if (userWaveformData) drawWaveformWithCursor(waveformUserCanvas, userWaveformData, 1,
+            WAVEFORM_COLOR_USER, CURSOR_COLOR_USER);
+          updateVisualizerStatus("Sóng âm: Sẵn sàng so sánh");
+          URL.revokeObjectURL(audioUrl);
+          if (btnStopDubbing) btnStopDubbing.style.display = 'none';
+        };
+      }
+
+      // ---------- VOCAB INFO ----------
+      function showVocabInfo(word, event) {
+        const item = vocabWords.find(v => v.word === word);
+        const pinyin = item ? item.pinyin : (DICT_ZH[word] ? DICT_ZH[word].pinyin : '');
+        const meaning = item ? (item.meaning || item.note) : (DICT_ZH[word] ? DICT_ZH[word].meaning : '');
+        currentInfoWord = word;
+        infoWordDisplay.textContent = word;
+        infoPinyinValue.textContent = pinyin || '-';
+        infoMeaningValue.textContent = meaning || '-';
+        const rect = event.target.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top - 10;
+        infoPopup.style.display = 'flex';
+        infoPopup.style.left = x + 'px';
+        infoPopup.style.top = y + 'px';
+        infoPopup.style.transform = 'translateX(-50%) translateY(-100%)';
+        const popupRect = infoPopup.getBoundingClientRect();
+        if (popupRect.left < 10) { infoPopup.style.left = '10px';
+          infoPopup.style.transform = 'translateX(0)'; }
+        if (popupRect.right > window.innerWidth - 10) { infoPopup.style.right = '10px';
+          infoPopup.style.left = 'auto';
+          infoPopup.style.transform = 'translateX(0)'; }
+        if (popupRect.top < 10) { infoPopup.style.top = (rect.bottom + 10) + 'px';
+          infoPopup.style.transform = 'translateX(-50%)'; }
+      }
+
+      function hideVocabInfo() { infoPopup.style.display = 'none';
+        currentInfoWord = null; }
+
+      // ---------- LIBRARY ----------
+      async function loadLibrary() {
+        try {
+          const videos = await getAllVideos();
+          if (!videoLibraryList) return;
+          videoLibraryList.innerHTML = '';
+          if (videos.length === 0) {
+            videoLibraryList.innerHTML =
+              '<p style="color:var(--text-muted); font-size:0.85rem; padding:10px;">Chưa có video nào. Hãy bấm nút Tải Video Mới!</p>';
+            return;
+          }
+          for (const item of videos) {
+            const div = document.createElement('div');
+            div.className = `library-item ${currentVideoData && currentVideoData.id === item.id ? 'active' : ''}`;
+            div.innerHTML = `
+              <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+                <span class="video-title-span" title="${sanitizeHTML(item.title)}" style="font-weight:600;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px;">📹 ${sanitizeHTML(item.title)}</span>
+                <div class="library-item-menu-container">
+                  <button class="btn-menu-trigger" title="Tùy chọn">⋮</button>
+                  <div class="library-item-dropdown">
+                    <button class="dropdown-item btn-edit-lib" title="Chỉnh sửa phụ đề">✏️ Chỉnh sửa</button>
+                    <button class="dropdown-item btn-delete-lib" title="Xóa video">❌ Xóa video</button>
+                  </div>
+                </div>
+              </div>
+              <div class="library-item-modes">
+                <button class="btn-mode btn-mode-speaking ${currentVideoData && currentVideoData.id === item.id && currentPracticeMode === 'speaking' ? 'active' : ''}" title="Luyện Nói & Lồng Tiếng">🎙️ Luyện Nói</button>
+                <button class="btn-mode btn-mode-listening ${currentVideoData && currentVideoData.id === item.id && currentPracticeMode === 'listening' ? 'active' : ''}" title="Luyện Nghe & Điền Từ">🎧 Luyện Nghe</button>
+              </div>
+            `;
+            const trigger = div.querySelector('.btn-menu-trigger');
+            const dropdown = div.querySelector('.library-item-dropdown');
+            trigger.addEventListener('click', (e) => {
+              e.stopPropagation();
+              document.querySelectorAll('.library-item-dropdown').forEach(d => { if (d !== dropdown) d.style
+                  .display = 'none'; });
+              dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            });
+            div.querySelector('.btn-edit-lib').addEventListener('click', (e) => {
+              e.stopPropagation();
+              dropdown.style.display = 'none';
+              openEditModal(e, item.id);
+            });
+            div.querySelector('.btn-delete-lib').addEventListener('click', (e) => {
+              e.stopPropagation();
+              dropdown.style.display = 'none';
+              handleDeleteVideo(e, item.id);
+            });
+            const titleSpan = div.querySelector('.video-title-span');
+            const speakingBtn = div.querySelector('.btn-mode-speaking');
+            const listeningBtn = div.querySelector('.btn-mode-listening');
+            titleSpan.addEventListener('click', () => { selectVideo(item);
+              switchPracticeMode('speaking'); });
+            speakingBtn.addEventListener('click', (e) => { e.stopPropagation();
+              selectVideo(item);
+              switchPracticeMode('speaking'); });
+            listeningBtn.addEventListener('click', (e) => { e.stopPropagation();
+              selectVideo(item);
+              switchPracticeMode('listening'); });
+            videoLibraryList.appendChild(div);
+          }
+          if (!currentVideoData && videos.length > 0) selectVideo(videos[0]);
+        } catch (err) { addLog("❌ Lỗi tải thư viện: " + err.message, 'error'); }
+      }
+
+      async function selectVideoById(id) {
+        try { const item = await getVideo(id); if (item) { selectVideo(item); return item; } return null; } catch (e) {
+          addLog("❌ Lỗi tải video: " + e.message, 'error');
+          return null; }
+      }
+
+      function jumpToSentence(sentenceId) {
+        document.querySelectorAll('.sentence-card.vocab-highlight').forEach(c => c.classList.remove('vocab-highlight'));
+        if (!sentenceId) return;
+        const card = document.getElementById(`card-${sentenceId}`);
+        if (!card) return;
+        card.classList.add('vocab-highlight');
+        if (sentenceListContainer) {
+          const cardTop = card.offsetTop;
+          const containerHeight = sentenceListContainer.clientHeight;
+          const cardHeight = card.clientHeight;
+          sentenceListContainer.scrollTop = cardTop - (containerHeight * 0.35) + (cardHeight / 2);
+        }
+      }
+
+      // ========== SELECT VIDEO ==========
+      async function selectVideo(videoItem) {
+        addLog(`📺 Đang chọn video: "${videoItem.title}"`, 'info');
+        // Reset trạng thái nhưng giữ lại các cài đặt cần thiết
+        stopAllPlayback();
+        if (isFullRecording) stopFullRecording();
+
+        // Reset chế độ câu
+        isSentenceMode = false;
+        lastActiveSentenceId = null;
+
+        currentVideoData = videoItem;
+        fullVideoAudioBlob = null;
+        fullVideoDuration = 0;
+        if (btnPlayFullDubbing) btnPlayFullDubbing.disabled = true;
+        if (currentVideoTitle) currentVideoTitle.innerText = videoItem.title;
+        originalWaveformData = null;
+        userWaveformData = null;
+        drawStaticWaveform(waveformOriginalCanvas, []);
+        drawStaticWaveform(waveformUserCanvas, []);
+        videoLoaded = false;
+        showLoading(true);
+
+        if (!videoItem.videoBlob) {
+          const msg = "❌ videoBlob không tồn tại!";
+          addLog(msg, 'error');
+          alert(msg);
+          showLoading(false);
+          return;
+        }
+        if (videoItem.videoBlob.size === 0) {
+          const msg = "❌ videoBlob rỗng (size=0)!";
+          addLog(msg, 'error');
+          alert(msg);
+          showLoading(false);
+          return;
+        }
+        addLog(`📹 videoBlob size: ${videoItem.videoBlob.size} bytes, type: ${videoItem.videoBlob.type}`, 'info');
+
+        if (!video) return;
+        let url = null;
+        try {
+          url = URL.createObjectURL(videoItem.videoBlob);
+          addLog(`✅ Đã tạo URL: ${url.substring(0, 30)}...`, 'success');
+
+          video.pause();
+          video.removeAttribute('src');
+          video.load();
+          video.src = url;
+          video.load();
+
+          video.onerror = null;
+          video.onloadedmetadata = null;
+          video.oncanplay = null;
+          video.oncanplaythrough = null;
+
+          video.onerror = function() {
+            const err = video.error;
+            let msg = `❌ Lỗi tải video: code=${err ? err.code : 'unknown'}`;
+            if (err) {
+              if (err.code === 4) msg += ' (Không tìm thấy định dạng)';
+              else if (err.code === 3) msg += ' (Lỗi giải mã)';
+              else if (err.code === 2) msg += ' (Lỗi mạng)';
+              else if (err.code === 1) msg += ' (Người dùng hủy)';
+              else msg += ` (${err.message})`;
+            }
+            addLog(msg, 'error');
+            alert(msg + '\nVui lòng kiểm tra định dạng file video.');
+            showLoading(false);
+            if (url) { URL.revokeObjectURL(url);
+              url = null; }
+            videoLoaded = false;
+          };
+
+          video.onloadedmetadata = function() {
+            addLog(`✅ Metadata loaded, duration: ${video.duration}s`, 'success');
+            if (videoTimeline) videoTimeline.max = 100;
+            if (timeDisplay) timeDisplay.innerText = `00:00 / ${formatTime(video.duration)}`;
+          };
+
+          video.oncanplay = function() {
+            addLog("✅ Video canplay - sẵn sàng phát", 'success');
+            videoLoaded = true;
+            showLoading(false);
+            video.play().catch(err => {
+              addLog(`⚠️ Autoplay bị chặn: ${err.message}. Người dùng cần bấm nút play.`, 'warning');
+              updateVisualizerStatus("⚠️ Nhấn nút Play để phát video");
+            });
+          };
+
+          video.oncanplaythrough = function() {
+            addLog("✅ Video canplaythrough - sẵn sàng phát mượt", 'success');
+            videoLoaded = true;
+            showLoading(false);
+          };
+
+          setupVideoAudio(video);
+
+          try {
+            const data = await generateWaveform(videoItem.videoBlob, waveformOriginalCanvas);
+            originalWaveformData = data;
+            drawStaticWaveform(waveformOriginalCanvas, data, WAVEFORM_COLOR_ORIG);
+            addLog("✅ Đã tạo waveform tĩnh cho video", 'success');
+          } catch (waveErr) {
+            addLog("⚠️ Không thể tạo waveform: " + waveErr.message, 'warning');
+          }
+
+          video.volume = parseFloat(videoVolumeSlider.value) / 100 || 1.0;
+          video.muted = false;
+
+          setTimeout(() => {
+            if (!videoLoaded) {
+              addLog("⚠️ Video vẫn chưa sẵn sàng sau 5 giây, kiểm tra file.", 'warning');
+              showLoading(false);
+            }
+          }, 5000);
+
+        } catch (err) {
+          addLog(`❌ Lỗi khi tạo URL hoặc load video: ${err.message}`, 'error');
+          alert(`Lỗi: ${err.message}`);
+          showLoading(false);
+          if (url) { URL.revokeObjectURL(url);
+            url = null; }
+          videoLoaded = false;
+        }
+
+        if (mainLayout && !mainLayout.classList.contains('library-collapsed')) {
+          mainLayout.classList.add('library-collapsed');
+          if (btnToggleLibrary) {
+            btnToggleLibrary.innerText = "📚 Hiện Thư Viện";
+            btnToggleLibrary.classList.remove('btn-primary');
+            btnToggleLibrary.classList.add('btn-secondary');
+          }
+        }
+
+        for (const key in userRecordings) delete userRecordings[key];
+        for (const key in listeningAnswers) delete listeningAnswers[key];
+        if (btnEditCurrentSubtitles) btnEditCurrentSubtitles.style.display = 'inline-block';
+        if (videoTimeline) videoTimeline.value = 0;
+        if (timeDisplay) timeDisplay.innerText = "00:00 / 00:00";
+
+        switchPracticeMode(currentPracticeMode);
+        await loadVocabWords();
+        renderSentences();
+        loadLibrary();
+        document.querySelectorAll('.sentence-card.vocab-highlight').forEach(c => c.classList.remove('vocab-highlight'));
+      }
+
+      async function handleDeleteVideo(e, id) {
+        e.stopPropagation();
+        if (!confirm("Bạn có chắc muốn xóa video này?")) return;
+        try {
+          await deleteVideo(id);
+          if (currentVideoData && currentVideoData.id === id) {
+            currentVideoData = null;
+            if (video) video.src = "";
+            if (currentVideoTitle) currentVideoTitle.innerText = "Chọn một video để học";
+            if (sentenceListContainer) sentenceListContainer.innerHTML = "";
+            if (btnEditCurrentSubtitles) btnEditCurrentSubtitles.style.display = 'none';
+            stopAllPlayback();
+            drawStaticWaveform(waveformOriginalCanvas, []);
+            drawStaticWaveform(waveformUserCanvas, []);
+            originalWaveformData = null;
+            userWaveformData = null;
+            videoLoaded = false;
+          }
+          loadLibrary();
+          addLog(`🗑️ Đã xóa video ID ${id}`, 'info');
+        } catch (err) { alert("Không thể xóa video: " + err.message);
+          addLog("❌ Lỗi xóa video: " + err.message, 'error'); }
+      }
+
+      // ---------- SWITCH PRACTICE MODE ----------
+      function switchPracticeMode(mode) {
+        currentPracticeMode = mode;
+        if (mainLayout) {
+          if (mode === 'listening') {
+            mainLayout.classList.add('mode-listening');
+            if (listeningControls) listeningControls.style.display = 'flex';
+            if (btnToggleDisplayMode) btnToggleDisplayMode.style.display = 'none';
+          } else {
+            mainLayout.classList.remove('mode-listening');
+            if (listeningControls) listeningControls.style.display = 'none';
+            if (btnToggleDisplayMode) btnToggleDisplayMode.style.display = 'block';
+          }
+        }
+        document.querySelectorAll('.library-item').forEach(el => {
+          const speaking = el.querySelector('.btn-mode-speaking');
+          const listening = el.querySelector('.btn-mode-listening');
+          if (el.classList.contains('active')) {
+            if (speaking) speaking.classList.toggle('active', mode === 'speaking');
+            if (listening) listening.classList.toggle('active', mode === 'listening');
+          } else {
+            if (speaking) speaking.classList.remove('active');
+            if (listening) listening.classList.remove('active');
+          }
+        });
+        renderSentences();
+      }
+
+      // ---------- VOCAB LOAD ----------
+      async function loadVocabWords() {
+        try { const items = await getAllVocab();
+          vocabWords = items || [];
+          if (currentVideoData) renderSentences(); } catch (e) { addLog("⚠️ Không thể tải từ vựng: " + e.message,
+            'warning'); }
+      }
+
+      // ---------- VOCAB POPUP LOGIC ----------
+      function getWordInfo(word) {
+        if (DICT_ZH[word]) return { pinyin: DICT_ZH[word].pinyin, meaning: DICT_ZH[word].meaning };
+        let pinyin = '';
+        try {
+          if (typeof window.pinyin !== 'undefined') {
+            if (typeof window.pinyin.pro === 'function') pinyin = window.pinyin.pro(word, { toneType: 'symbol' });
+            else if (typeof window.pinyin === 'function') pinyin = window.pinyin(word, { toneType: 'symbol' });
+          }
+          if (!pinyin && typeof window.pinyinPro !== 'undefined' && typeof window.pinyinPro === 'function') pinyin =
+            window.pinyinPro(word, { toneType: 'symbol' });
+          if (!pinyin && typeof window.pinyin_pro !== 'undefined' && typeof window.pinyin_pro === 'function') pinyin =
+            window.pinyin_pro(word, { toneType: 'symbol' });
+        } catch (e) { pinyin = ''; }
+        return { pinyin: pinyin, meaning: '' };
+      }
+
+      function findSentenceIdFromRange(range) {
+        const cards = document.querySelectorAll('.sentence-card');
+        for (const card of cards) {
+          if (card.contains(range.commonAncestorContainer)) {
+            return parseInt(card.id.replace('card-', ''));
+          }
+        }
+        return null;
+      }
+
+      function showVocabPopup(word, x, y, sentenceId = null) {
+        selectedWord = word;
+        sentenceIdForPopup = sentenceId;
+        vocabWordDisplay.innerText = word;
+        const info = getWordInfo(word);
+        vocabPinyinInput.value = info.pinyin || '';
+        vocabMeaningInput.value = info.meaning || '';
+        vocabPopup.style.display = 'flex';
+        vocabPopup.style.left = x + 'px';
+        vocabPopup.style.top = y + 'px';
+        vocabPopup.style.transform = 'translateX(-50%)';
+        ignoreHide = true;
+        setTimeout(() => { ignoreHide = false; }, 500);
+        setTimeout(() => vocabMeaningInput.focus(), 150);
+      }
+
+      function hideVocabPopup() {
+        vocabPopup.style.display = 'none';
+        vocabPinyinInput.value = '';
+        vocabMeaningInput.value = '';
+        selectedWord = '';
+        sentenceIdForPopup = null;
+        ignoreHide = false;
+        if (selectionTimeout) { clearTimeout(selectionTimeout);
+          selectionTimeout = null; }
+      }
+
+      function handleTextSelection() {
+        if (selectionTimeout) { clearTimeout(selectionTimeout);
+          selectionTimeout = null; }
+        const selection = window.getSelection();
+        const selectedText = selection.toString().trim();
+        if (!selectedText || !/[\u4e00-\u9fa5]/.test(selectedText) || selectedText.length === 0 || selectedText.length >
+          30) {
+          if (!ignoreHide && vocabPopup.style.display === 'flex') {
+            selectionTimeout = setTimeout(() => { if (!ignoreHide) hideVocabPopup();
+              selectionTimeout = null; }, 100);
+          }
+          return;
+        }
+        try {
+          const range = selection.getRangeAt(0);
+          const container = document.getElementById('sentenceList');
+          if (!container || !container.contains(range.commonAncestorContainer)) {
+            if (!ignoreHide && vocabPopup.style.display === 'flex') {
+              selectionTimeout = setTimeout(() => { if (!ignoreHide) hideVocabPopup();
+                selectionTimeout = null; }, 100);
+            }
+            return;
+          }
+          const sid = findSentenceIdFromRange(range);
+          const rect = range.getBoundingClientRect();
+          if (rect.width === 0 && rect.height === 0) return;
+          const x = rect.left + rect.width / 2;
+          const y = rect.top + window.scrollY - 10;
+          selectionTimeout = setTimeout(() => {
+            if (selectedWord !== selectedText || vocabPopup.style.display !== 'flex') {
+              showVocabPopup(selectedText, x, y, sid);
+            } else {
+              vocabPopup.style.left = x + 'px';
+              vocabPopup.style.top = y + 'px';
+              if (sid !== sentenceIdForPopup) sentenceIdForPopup = sid;
+            }
+            selectionTimeout = null;
+          }, 300);
+        } catch (e) {}
+      }
+
+      async function saveVocabFromPopup() {
+        if (!selectedWord) return;
+        const pinyin = vocabPinyinInput.value.trim();
+        const meaning = vocabMeaningInput.value.trim();
+        try {
+          const allItems = await getAllVocab();
+          if (allItems.some(item => item.word === selectedWord)) { alert(`⚠️ Từ "${selectedWord}" đã có trong sổ từ vựng!`);
+            return; }
+          const vocabItem = {
+            word: selectedWord,
+            pinyin: pinyin || '',
+            meaning: meaning || '',
+            videoTitle: currentVideoData ? currentVideoData.title : "Không rõ video",
+            videoId: currentVideoData ? currentVideoData.id : null,
+            sentenceId: sentenceIdForPopup || null,
+            timestamp: Date.now(),
+            note: meaning || ''
+          };
+          await addVocab(vocabItem);
+          await loadVocabWords();
+          renderSentences();
+          hideVocabPopup();
+          alert(`✅ Đã thêm từ vựng: "${selectedWord}"`);
+        } catch (err) { alert("Lỗi khi lưu từ vựng: " + err.message);
+          addLog("❌ Lỗi lưu từ vựng: " + err.message, 'error'); }
+      }
+
+      function cancelVocab() { hideVocabPopup(); }
+
+      // ---------- VOCAB TABLE ----------
+      async function loadVocabTable() {
+        const tbody = document.getElementById('vocabTableBody');
+        const emptyMsg = document.getElementById('vocabEmptyMessage');
+        if (!tbody || !emptyMsg) return;
+        tbody.innerHTML = '';
+        emptyMsg.style.display = 'none';
+        try {
+          const items = await getAllVocab();
+          if (!items || items.length === 0) { emptyMsg.style.display = 'block'; return; }
+          items.sort((a, b) => {
+            const pA = (a.pinyin || '').toLowerCase();
+            const pB = (b.pinyin || '').toLowerCase();
+            if (!pA && !pB) return 0;
+            if (!pA) return 1;
+            if (!pB) return -1;
+            return pA.localeCompare(pB);
+          });
+          for (const item of items) {
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = '1px solid var(--border)';
+            tr.innerHTML = `
+              <td style="padding:12px 10px;font-weight:700;color:var(--primary);font-size:1.15rem;font-family:'Noto Sans SC',sans-serif;">${sanitizeHTML(item.word)}</td>
+              <td style="padding:12px 10px;" class="editable-cell" data-field="pinyin" data-id="${item.id}"><span class="cell-display">${sanitizeHTML(item.pinyin || '')}</span></td>
+              <td style="padding:12px 10px;"><span class="context-cell ${item.videoId ? '' : 'no-context'}" data-videoid="${item.videoId || ''}" data-sentenceid="${item.sentenceId || ''}" title="${item.videoId ? 'Nhấp đúp để mở video tương ứng' : 'Không có video'}">📹 ${sanitizeHTML(item.videoTitle || 'Không rõ')}</span></td>
+              <td style="padding:12px 10px;" class="editable-cell" data-field="meaning" data-id="${item.id}"><span class="cell-display">${sanitizeHTML(item.meaning || item.note || '')}</span></td>
+              <td style="padding:12px 10px;text-align:center;"><button class="btn-delete-vocab" data-id="${item.id}" style="background:transparent;border:none;cursor:pointer;color:var(--danger);font-size:0.95rem;padding:4px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;transition:background 0.2s;">❌</button></td>
+            `;
+            // Editable cells
+            tr.querySelectorAll('.editable-cell').forEach(cell => {
+              const display = cell.querySelector('.cell-display');
+              cell.addEventListener('dblclick', function(e) {
+                e.stopPropagation();
+                const currentValue = display.textContent;
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = currentValue;
+                input.className = 'vocab-edit-input';
+                input.style.width = '100%';
+                input.style.padding = '4px 6px';
+                input.style.background = 'var(--bg-input)';
+                input.style.border = '1px solid var(--border)';
+                input.style.borderRadius = '4px';
+                input.style.color = 'var(--text-primary)';
+                input.style.fontSize = '0.85rem';
+                input.style.outline = 'none';
+                cell.replaceChild(input, display);
+                input.focus();
+                input.select();
+                input.addEventListener('blur', async function() {
+                  const newVal = this.value.trim();
+                  const id = parseInt(cell.dataset.id);
+                  const field = cell.dataset.field;
+                  try {
+                    const allItems = await getAllVocab();
+                    const found = allItems.find(it => it.id === id);
+                    if (found) {
+                      if (field === 'pinyin') found.pinyin = newVal;
+                      else if (field === 'meaning') { found.meaning = newVal;
+                        found.note = newVal; }
+                      await updateVocab(found);
+                      await loadVocabWords();
+                      renderSentences();
+                      const newDisplay = document.createElement('span');
+                      newDisplay.className = 'cell-display';
+                      newDisplay.textContent = newVal;
+                      cell.replaceChild(newDisplay, this);
+                    } else {
+                      const oldDisplay = document.createElement('span');
+                      oldDisplay.className = 'cell-display';
+                      oldDisplay.textContent = currentValue;
+                      cell.replaceChild(oldDisplay, this);
+                    }
+                  } catch (err) { alert('Lỗi khi cập nhật: ' + err.message);
+                    const oldDisplay = document.createElement('span');
+                    oldDisplay.className = 'cell-display';
+                    oldDisplay.textContent = currentValue;
+                    cell.replaceChild(oldDisplay, this); }
+                });
+                input.addEventListener('keydown', function(e) {
+                  if (e.key === 'Enter') { e.preventDefault();
+                    this.blur(); }
+                  if (e.key === 'Escape') { e.preventDefault();
+                    const oldDisplay = document.createElement('span');
+                    oldDisplay.className = 'cell-display';
+                    oldDisplay.textContent = currentValue;
+                    this.parentNode.replaceChild(oldDisplay, this); }
+                });
+              });
+            });
+            // Context
+            const contextSpan = tr.querySelector('.context-cell');
+            if (contextSpan && !contextSpan.classList.contains('no-context')) {
+              contextSpan.addEventListener('dblclick', async function(e) {
+                e.stopPropagation();
+                const videoId = this.dataset.videoid;
+                const sentenceId = this.dataset.sentenceid ? parseInt(this.dataset.sentenceid) : null;
+                if (!videoId || videoId === 'null' || videoId === 'undefined' || videoId === '') {
+                  alert('Không có thông tin video.');
+                  return;
+                }
+                const vid = parseInt(videoId);
+                if (isNaN(vid)) { alert('ID video không hợp lệ.'); return; }
+                if (vocabModalEl) vocabModalEl.classList.remove('show');
+                const videoItem = await selectVideoById(vid);
+                if (videoItem && sentenceId) {
+                  let attempts = 0;
+                  const interval = setInterval(() => {
+                    const card = document.getElementById(`card-${sentenceId}`);
+                    if (card) { clearInterval(interval);
+                      jumpToSentence(sentenceId); }
+                    attempts++;
+                    if (attempts >= 30) { clearInterval(interval); }
+                  }, 200);
+                }
+              });
+            }
+            // Delete
+            tr.querySelector('.btn-delete-vocab').addEventListener('click', async function(e) {
+              e.stopPropagation();
+              const id = parseInt(this.dataset.id);
+              if (confirm(`Xóa từ "${item.word}"?`)) {
+                await deleteVocab(id);
+                await loadVocabWords();
+                renderSentences();
+                loadVocabTable();
+              }
+            });
+            tbody.appendChild(tr);
+          }
+        } catch (err) { addLog("❌ Lỗi tải bảng từ vựng: " + err.message, 'error'); }
+      }
+
+      function exportVocabToCSV() {
+        getAllVocab().then(items => {
+          if (!items || items.length === 0) { alert("Sổ từ vựng rỗng!"); return; }
+          items.sort((a, b) => {
+            const pA = (a.pinyin || '').toLowerCase();
+            const pB = (b.pinyin || '').toLowerCase();
+            if (!pA && !pB) return 0;
+            if (!pA) return 1;
+            if (!pB) return -1;
+            return pA.localeCompare(pB);
+          });
+          let csv = "\ufeffTừ vựng,Pinyin,Ngữ cảnh video,Ghi chú giải nghĩa,Ngày thêm\n";
+          for (const item of items) {
+            const date = new Date(item.timestamp).toLocaleDateString();
+            csv +=
+              `"${item.word.replace(/"/g,'""')}","${(item.pinyin||'').replace(/"/g,'""')}","${(item.videoTitle||'').replace(/"/g,'""')}","${(item.meaning||item.note||'').replace(/"/g,'""')}",${date}\n`;
+          }
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = `So_Tu_Vung_${new Date().toISOString().slice(0,10)}.csv`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+      }
+
+      // ---------- SETUP VOCAB EVENTS ----------
+      function setupVocabEventListeners() {
+        document.addEventListener('selectionchange', handleTextSelection);
+        document.addEventListener('dblclick', function(e) {
+          const selection = window.getSelection();
+          const selectedText = selection.toString().trim();
+          if (!selectedText || !/[\u4e00-\u9fa5]/.test(selectedText) || selectedText.length === 0 || selectedText.length >
+            30) return;
+          const container = document.getElementById('sentenceList');
+          if (!container || !container.contains(e.target)) return;
+          try {
+            const range = selection.getRangeAt(0);
+            const sid = findSentenceIdFromRange(range);
+            const rect = range.getBoundingClientRect();
+            if (rect.width === 0 && rect.height === 0) return;
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + window.scrollY - 10;
+            if (selectionTimeout) { clearTimeout(selectionTimeout);
+              selectionTimeout = null; }
+            showVocabPopup(selectedText, x, y, sid);
+          } catch (e) {}
+        });
+        document.addEventListener('mousedown', (e) => {
+          if (vocabPopup && !vocabPopup.contains(e.target)) {
+            if (ignoreHide) return;
+            const active = document.activeElement;
+            if (active && (active.id === 'vocabPinyinInput' || active.id === 'vocabMeaningInput')) return;
+            if (selectionTimeout) { clearTimeout(selectionTimeout);
+              selectionTimeout = null; }
+            hideVocabPopup();
+          }
+        });
+        if (btnCancelVocab) btnCancelVocab.addEventListener('click', cancelVocab);
+        if (btnSaveVocab) btnSaveVocab.addEventListener('click', saveVocabFromPopup);
+        if (vocabMeaningInput) vocabMeaningInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') { e.preventDefault();
+            saveVocabFromPopup(); }
+        });
+        if (vocabPinyinInput) vocabPinyinInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') { e.preventDefault();
+            vocabMeaningInput.focus(); }
+        });
+        if (btnCloseInfoPopup) btnCloseInfoPopup.addEventListener('click', hideVocabInfo);
+        if (btnInfoViewDetail) btnInfoViewDetail.addEventListener('click', function() {
+          if (currentInfoWord) { if (vocabModalEl) { loadVocabTable();
+              vocabModalEl.classList.add('show'); }
+            hideVocabInfo(); }
+        });
+        document.addEventListener('click', function(e) {
+          if (infoPopup.style.display === 'flex' && !infoPopup.contains(e.target) && !e.target.classList.contains(
+              'vocab-highlight-word')) { hideVocabInfo(); }
+        });
+      }
+
+      // ---------- MODAL ----------
+      function addSubtitleRow(data = {}) {
+        if (!subtitleInputsContainer) return;
+        const div = document.createElement("div");
+        div.className = "subtitle-row";
+        div.innerHTML = `
+          <button type="button" class="btn-remove-row" title="Xóa dòng thoại này">❌</button>
+          <div class="time-inputs">
+            <div style="display:flex;gap:4px;align-items:center;">
+              <input type="number" step="0.1" placeholder="Bắt đầu (s)" class="sub-start" value="${data.startTime ?? ''}" style="flex:1;">
+              <button type="button" class="btn-capture-start" style="background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);color:#38bdf8;border-radius:4px;padding:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex-shrink:0;font-size:0.75rem;">🎯</button>
+            </div>
+            <span style="color:var(--text-muted);font-size:0.85rem;">~</span>
+            <div style="display:flex;gap:4px;align-items:center;">
+              <input type="number" step="0.1" placeholder="Kết thúc (s)" class="sub-end" value="${data.endTime ?? ''}" style="flex:1;">
+              <button type="button" class="btn-capture-end" style="background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);color:#38bdf8;border-radius:4px;padding:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex-shrink:0;font-size:0.75rem;">🎯</button>
+            </div>
+          </div>
+          <input type="text" placeholder="Chữ Hán (bắt buộc)" class="sub-hanzi" value="${sanitizeHTML(data.hanzi ?? '')}">
+          <input type="text" placeholder="Pinyin (tùy chọn)" class="sub-pinyin" value="${sanitizeHTML(data.pinyin ?? '')}">
+          <input type="text" placeholder="Dịch nghĩa (tùy chọn)" class="sub-viet" value="${sanitizeHTML(data.vietnamese ?? '')}">
+          <div class="row-actions">
+            <button type="button" class="btn-merge" title="Gộp câu này với câu tiếp theo">🔗 Gộp xuống</button>
+            <button type="button" class="btn-split" title="Tách câu này thành hai">✂️ Tách</button>
+          </div>
+        `;
+        div.querySelector('.btn-remove-row').addEventListener('click', () => div.remove());
+        const modalVideo = document.getElementById("modalPreviewVideo");
+        div.querySelector('.btn-capture-start').addEventListener('click', () => {
+          const inp = div.querySelector('.sub-start');
+          if (modalVideo && inp) inp.value = modalVideo.currentTime.toFixed(1);
+        });
+        div.querySelector('.btn-capture-end').addEventListener('click', () => {
+          const inp = div.querySelector('.sub-end');
+          if (modalVideo && inp) inp.value = modalVideo.currentTime.toFixed(1);
+        });
+        div.querySelector('.btn-merge').addEventListener('click', function() {
+          const currentRow = div;
+          const nextRow = currentRow.nextElementSibling;
+          if (!nextRow || !nextRow.classList.contains('subtitle-row')) { alert('Không có câu phía dưới để gộp!');
+            return; }
+          const start1 = currentRow.querySelector('.sub-start');
+          const end1 = currentRow.querySelector('.sub-end');
+          const hanzi1 = currentRow.querySelector('.sub-hanzi');
+          const pinyin1 = currentRow.querySelector('.sub-pinyin');
+          const viet1 = currentRow.querySelector('.sub-viet');
+          const start2 = nextRow.querySelector('.sub-start');
+          const end2 = nextRow.querySelector('.sub-end');
+          const hanzi2 = nextRow.querySelector('.sub-hanzi');
+          const pinyin2 = nextRow.querySelector('.sub-pinyin');
+          const viet2 = nextRow.querySelector('.sub-viet');
+          const newHanzi = (hanzi1.value.trim() + ' ' + hanzi2.value.trim()).trim();
+          const newPinyin = (pinyin1.value.trim() + ' ' + pinyin2.value.trim()).trim();
+          const newViet = (viet1.value.trim() + ' ' + viet2.value.trim()).trim();
+          end1.value = end2.value;
+          hanzi1.value = newHanzi;
+          pinyin1.value = newPinyin;
+          viet1.value = newViet;
+          nextRow.remove();
+        });
+        div.querySelector('.btn-split').addEventListener('click', function() {
+          const currentRow = div;
+          const startInput = currentRow.querySelector('.sub-start');
+          const endInput = currentRow.querySelector('.sub-end');
+          const hanziInput = currentRow.querySelector('.sub-hanzi');
+          const currentStart = parseFloat(startInput.value) || 0;
+          const currentEnd = parseFloat(endInput.value) || 0;
+          const text = hanziInput.value.trim();
+          if (!text) { alert('Không có nội dung để tách!'); return; }
+          const input = prompt('Nhập thời gian tách (giây) hoặc vị trí ký tự (số nguyên).\nVí dụ: 2.5 hoặc 5', '');
+          if (input === null) return;
+          const val = parseFloat(input);
+          if (isNaN(val) || val <= 0) { alert('Giá trị không hợp lệ!'); return; }
+          let splitTime = null,
+            splitPos = null;
+          if (val < text.length && Number.isInteger(val)) splitPos = Math.floor(val);
+          else splitTime = val;
+          if (splitTime !== null) {
+            if (splitTime <= currentStart || splitTime >= currentEnd) { alert('Thời gian tách phải nằm giữa!');
+              return; }
+            const newText2 = prompt('Nhập nội dung cho câu thứ hai (phần sau khi tách):', text);
+            if (newText2 === null) return;
+            const newText1 = prompt('Nhập nội dung cho câu thứ nhất (phần trước khi tách):', text);
+            if (newText1 === null) return;
+            endInput.value = splitTime.toFixed(1);
+            hanziInput.value = newText1.trim();
+            const data = { startTime: splitTime, endTime: currentEnd, hanzi: newText2.trim(), pinyin: '',
+              vietnamese: '' };
+            addSubtitleRow(data);
+            const rows = subtitleInputsContainer.querySelectorAll('.subtitle-row');
+            const lastRow = rows[rows.length - 1];
+            if (lastRow) {
+              lastRow.querySelector('.sub-start').value = splitTime.toFixed(1);
+              lastRow.querySelector('.sub-end').value = currentEnd.toFixed(1);
+              lastRow.querySelector('.sub-hanzi').value = newText2.trim();
+              lastRow.querySelector('.sub-pinyin').value = '';
+              lastRow.querySelector('.sub-viet').value = '';
+              currentRow.parentNode.insertBefore(lastRow, currentRow.nextSibling);
+            }
+          } else if (splitPos !== null) {
+            if (splitPos <= 0 || splitPos >= text.length) { alert('Vị trí tách không hợp lệ!'); return; }
+            const part1 = text.substring(0, splitPos).trim();
+            const part2 = text.substring(splitPos).trim();
+            if (!part1 || !part2) { alert('Một phần rỗng!'); return; }
+            const ratio = splitPos / text.length;
+            const splitTimeVal = currentStart + (currentEnd - currentStart) * ratio;
+            endInput.value = splitTimeVal.toFixed(1);
+            hanziInput.value = part1;
+            const data = { startTime: splitTimeVal, endTime: currentEnd, hanzi: part2, pinyin: '',
+              vietnamese: '' };
+            addSubtitleRow(data);
+            const rows = subtitleInputsContainer.querySelectorAll('.subtitle-row');
+            const lastRow = rows[rows.length - 1];
+            if (lastRow) {
+              lastRow.querySelector('.sub-start').value = splitTimeVal.toFixed(1);
+              lastRow.querySelector('.sub-end').value = currentEnd.toFixed(1);
+              lastRow.querySelector('.sub-hanzi').value = part2;
+              lastRow.querySelector('.sub-pinyin').value = '';
+              lastRow.querySelector('.sub-viet').value = '';
+              currentRow.parentNode.insertBefore(lastRow, currentRow.nextSibling);
+            }
+          }
+        });
+        subtitleInputsContainer.appendChild(div);
+      }
+
+      async function openEditModal(e, id) {
+        if (e) e.stopPropagation();
+        try {
+          const item = await getVideo(id);
+          if (!item || !modal) return;
+          document.getElementById("modalTitle").innerText = "Chỉnh Sửa Phụ Đề Video";
+          document.getElementById("editVideoId").value = item.id;
+          document.getElementById("inputVideoTitle").value = item.title;
+          const modalVideo = document.getElementById("modalPreviewVideo");
+          const placeholder = document.getElementById("modalVideoPlaceholder");
+          if (modalVideo && item.videoBlob) {
+            modalVideo.src = URL.createObjectURL(item.videoBlob);
+            if (placeholder) placeholder.style.display = "none";
+          } else if (modalVideo) {
+            modalVideo.removeAttribute("src");
+            modalVideo.load();
+            if (placeholder) placeholder.style.display = "flex";
+          }
+          if (subtitleInputsContainer) {
+            subtitleInputsContainer.innerHTML = "";
+            for (const s of item.sentences) addSubtitleRow(s);
+          }
+          modal.classList.add("show");
+        } catch (err) { addLog("❌ Lỗi tải thông tin chỉnh sửa: " + err.message, 'error'); }
+      }
+
+      function setupModalEventListeners() {
+        const modalVideo = document.getElementById("modalPreviewVideo");
+        const placeholder = document.getElementById("modalVideoPlaceholder");
+        const timeDisplayModal = document.getElementById("modalVideoTimeDisplay");
+        if (btnOpenUploadModal && modal) {
+          btnOpenUploadModal.addEventListener("click", () => {
+            document.getElementById("modalTitle").innerText = "Tải Video Mới & Tạo Phụ Đề";
+            document.getElementById("editVideoId").value = "";
+            if (uploadForm) uploadForm.reset();
+            if (subtitleInputsContainer) { subtitleInputsContainer.innerHTML = "";
+              addSubtitleRow(); }
+            if (modalVideo) { modalVideo.removeAttribute("src");
+              modalVideo.load(); }
+            if (placeholder) placeholder.style.display = "flex";
+            if (timeDisplayModal) timeDisplayModal.innerText = "0.0s";
+            modal.classList.add("show");
+          });
+        }
+        if (btnEditCurrentSubtitles) btnEditCurrentSubtitles.addEventListener("click", () => {
+          if (currentVideoData) openEditModal(null, currentVideoData.id);
+        });
+        const inputVideoFile = document.getElementById("inputVideoFile");
+        if (inputVideoFile) inputVideoFile.addEventListener("change", (e) => {
+          const file = e.target.files[0];
+          if (file && modalVideo) { modalVideo.src = URL.createObjectURL(file);
+            if (placeholder) placeholder.style.display = "none"; }
+        });
+        if (modalVideo && timeDisplayModal) modalVideo.addEventListener("timeupdate", () => {
+          timeDisplayModal.innerText = modalVideo.currentTime.toFixed(1) + "s";
+        });
+        document.getElementById("btnModalRewind").addEventListener("click", () => {
+          if (modalVideo) modalVideo.currentTime = Math.max(0, modalVideo.currentTime - 1.0);
+        });
+        document.getElementById("btnModalForward").addEventListener("click", () => {
+          if (modalVideo) modalVideo.currentTime = Math.min(modalVideo.duration || 9999, modalVideo.currentTime +
+            1.0);
+        });
+        const hideModal = () => {
+          if (modal) modal.classList.remove("show");
+          if (modalVideo) { modalVideo.pause();
+            modalVideo.removeAttribute("src");
+            modalVideo.load(); }
+          if (formError) { formError.classList.remove('visible');
+            formError.innerText = ''; }
+        };
+        if (closeModal) closeModal.addEventListener("click", hideModal);
+        window.addEventListener("click", (e) => {
+          if (e.target === modal) hideModal();
+          document.querySelectorAll('.library-item-dropdown').forEach(d => d.style.display = 'none');
+        });
+        if (btnAddSubtitleRow) btnAddSubtitleRow.addEventListener("click", () => addSubtitleRow());
+        if (btnClearSubtitles) btnClearSubtitles.addEventListener("click", () => {
+          if (subtitleInputsContainer) subtitleInputsContainer.innerHTML = "";
+        });
+        if (inputSubtitleFile) {
+          inputSubtitleFile.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+              const text = ev.target.result;
+              const ext = file.name.split('.').pop().toLowerCase();
+              if (subtitleInputsContainer) subtitleInputsContainer.innerHTML = "";
+              const sentences = ext === 'srt' ? parseSRT(text) : parseCSVorTXT(text);
+              for (const s of sentences) addSubtitleRow(s);
+            };
+            reader.readAsText(file);
+          });
+        }
+
+        // ========== UPLOAD BUTTON ==========
+        const btnSubmit = document.getElementById("btnSubmitForm");
+        if (btnSubmit) {
+          btnSubmit.addEventListener("click", async (e) => {
+            e.preventDefault();
+            if (formError) { formError.classList.remove('visible');
+              formError.innerText = ''; }
+            const editId = document.getElementById("editVideoId").value.trim();
+            const title = document.getElementById("inputVideoTitle").value.trim();
+            const fileInput = document.getElementById("inputVideoFile");
+            const videoFile = fileInput ? fileInput.files[0] : null;
+            if (!title) {
+              if (formError) { formError.innerText = "⚠️ Vui lòng nhập tên bài học / video!";
+                formError.classList.add('visible'); }
+              return;
+            }
+            if (!editId && !videoFile) {
+              if (formError) { formError.innerText = "⚠️ Vui lòng chọn một tệp video (MP4)!";
+                formError.classList.add('visible'); }
+              return;
+            }
+            const rows = document.querySelectorAll(".subtitle-row");
+            if (rows.length === 0) {
+              if (formError) { formError.innerText = "⚠️ Vui lòng thêm ít nhất một dòng phụ đề!";
+                formError.classList.add('visible'); }
+              return;
+            }
+            const sentences = [];
+            let hasError = false;
+            rows.forEach((row, idx) => {
+              if (hasError) return;
+              const start = row.querySelector(".sub-start")?.value;
+              const end = row.querySelector(".sub-end")?.value;
+              const hanzi = row.querySelector(".sub-hanzi")?.value.trim();
+              if (!start || !end || !hanzi) {
+                if (formError) {
+                  formError.innerText = `⚠️ Dòng thoại số ${idx+1} chưa điền đầy đủ thông tin!`;
+                  formError.classList.add('visible');
+                }
+                hasError = true;
+                return;
+              }
+              const startNum = parseFloat(start);
+              const endNum = parseFloat(end);
+              if (isNaN(startNum) || isNaN(endNum)) {
+                if (formError) {
+                  formError.innerText = `⚠️ Dòng thoại số ${idx+1} có thời gian không hợp lệ!`;
+                  formError.classList.add('visible');
+                }
+                hasError = true;
+                return;
+              }
+              if (startNum >= endNum) {
+                if (formError) {
+                  formError.innerText = `⚠️ Dòng thoại số ${idx+1} có thời gian bắt đầu phải nhỏ hơn kết thúc!`;
+                  formError.classList.add('visible');
+                }
+                hasError = true;
+                return;
+              }
+              sentences.push({
+                id: idx + 1,
+                startTime: startNum,
+                endTime: endNum,
+                hanzi: hanzi,
+                pinyin: row.querySelector(".sub-pinyin")?.value.trim() || "",
+                vietnamese: row.querySelector(".sub-viet")?.value.trim() || ""
+              });
+            });
+            if (hasError) return;
+
+            try {
+              let newId = null;
+              if (editId) {
+                const existing = await getVideo(parseInt(editId));
+                if (!existing) throw new Error("Không tìm thấy video cần sửa.");
+                existing.title = title;
+                existing.sentences = sentences;
+                if (videoFile) existing.videoBlob = videoFile;
+                await updateVideo(existing);
+                newId = parseInt(editId);
+                addLog(`✅ Cập nhật video thành công ID: ${newId}`, 'success');
+              } else {
+                newId = await addVideo({ title, videoBlob: videoFile, sentences });
+                addLog(`✅ Thêm video mới thành công ID: ${newId}`, 'success');
+              }
+
+              if (uploadForm) uploadForm.reset();
+              if (subtitleInputsContainer) subtitleInputsContainer.innerHTML = "";
+              if (formError) { formError.classList.remove('visible');
+                formError.innerText = ''; }
+              modal.classList.remove("show");
+
+              await loadLibrary();
+              if (newId) {
+                const newVideo = await getVideo(newId);
+                if (newVideo) {
+                  addLog(`🔄 Tự động chọn video vừa thêm: "${newVideo.title}"`, 'info');
+                  await selectVideo(newVideo);
+                }
+              }
+              alert("✅ Video đã được lưu thành công!");
+            } catch (err) {
+              addLog("❌ Lỗi khi lưu video: " + err.message, 'error');
+              if (formError) {
+                formError.innerText = "Lỗi khi lưu video: " + err.message;
+                formError.classList.add('visible');
+              }
+            }
+          });
+        }
+      }
+
+      // ---------- EXPORT / IMPORT ----------
+      async function exportAllData() {
+        try {
+          const data = await getAllDataForExport();
+          const videosWithBase64 = await Promise.all(data.videos.map(async (video) => {
+            const blob = video.videoBlob;
+            if (!blob) return video;
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => { resolve({ ...video, videoBlobBase64: reader.result }); };
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            });
+          }));
+          const exportData = {
+            version: 2,
+            exportedAt: new Date().toISOString(),
+            videos: videosWithBase64.map(({ videoBlob, ...rest }) => rest),
+            vocabulary: data.vocabulary
+          };
+          const json = JSON.stringify(exportData, null, 2);
+          const blob = new Blob([json], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `ChineseShadowing_Backup_${new Date().toISOString().slice(0,10)}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          alert('✅ Đã xuất toàn bộ dữ liệu thành công!');
+        } catch (err) { alert('❌ Lỗi khi xuất: ' + err.message);
+          addLog("❌ Lỗi export: " + err.message, 'error'); }
+      }
+
+      async function importAllData(file) {
+        try {
+          const text = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = reject;
+            reader.readAsText(file);
+          });
+          const data = JSON.parse(text);
+          if (!data.version || (data.version !== 1 && data.version !== 2)) {
+            if (!confirm('File có thể không tương thích. Vẫn tiếp tục?')) return;
+          }
+          if (!data.videos || !data.vocabulary) throw new Error('File không đúng định dạng.');
+          if (!confirm('⚠️ Thao tác này sẽ xóa toàn bộ dữ liệu hiện tại trước khi nhập. Bạn có chắc?')) return;
+          await clearAllData();
+          for (const videoData of data.videos) {
+            const blobBase64 = videoData.videoBlobBase64;
+            if (!blobBase64) continue;
+            const response = await fetch(blobBase64);
+            const blob = await response.blob();
+            const { videoBlobBase64, ...rest } = videoData;
+            await addVideo({ ...rest, videoBlob: blob });
+          }
+          for (const vocabItem of data.vocabulary) await addVocab(vocabItem);
+          await loadVocabWords();
+          loadLibrary();
+          alert('✅ Đã nhập dữ liệu thành công!');
+        } catch (err) { alert('❌ Lỗi khi nhập: ' + err.message);
+          addLog("❌ Lỗi import: " + err.message, 'error'); }
+      }
+
+      // ---------- CUSTOM VIDEO PLAYER ----------
+      function setupCustomVideoPlayer() {
+        if (btnPlayPause) {
+          btnPlayPause.addEventListener('click', () => {
+            if (video && video.paused) {
+              if (!videoLoaded) {
+                addLog("⚠️ Video chưa sẵn sàng để phát", 'warning');
+                return;
+              }
+              // Khi bấm play toàn cục, nếu đang ở chế độ câu, vẫn giữ isSentenceMode?
+              // Ta sẽ tạm thời không reset isSentenceMode, nhưng nếu play toàn bộ thì nên tắt chế độ câu?
+              // Theo logic, bấm play toàn cục sẽ phát toàn bộ video, ta nên tắt isSentenceMode
+              isSentenceMode = false;
+              // Không reset lastActiveSentenceId, để vẫn highlight câu đang active
+              isPlayingFullVideo = true;
+              getAudioContext();
+              video.play().catch(e => addLog("❌ Lỗi phát video: " + e.message, 'error'));
+              startVideoSyncLoop();
+            } else if (video) {
+              video.pause();
+              stopVideoSyncLoop();
+              const progress = video.duration > 0 ? video.currentTime / video.duration : 0;
+              if (!isSentenceMode) updateOriginalHighline(progress);
+              isPlayingFullVideo = false;
+            }
+          });
+        }
+        if (video) {
+          video.addEventListener('play', () => {
+            if (btnPlayPause) btnPlayPause.innerText = "⏸";
+            isPlayingFullVideo = true;
+            startVideoSyncLoop();
+          });
+          video.addEventListener('pause', () => {
+            if (btnPlayPause) btnPlayPause.innerText = "▶";
+            stopVideoSyncLoop();
+            const progress = video.duration > 0 ? video.currentTime / video.duration : 0;
+            if (!isSentenceMode) updateOriginalHighline(progress);
+            isPlayingFullVideo = false;
+          });
+          video.addEventListener('ended', () => {
+            stopVideoSyncLoop();
+            if (!isSentenceMode) updateOriginalHighline(1);
+            else {
+              // Nếu ở chế độ câu, không reset highline
+            }
+            isPlayingFullVideo = false;
+            if (btnPlayPause) btnPlayPause.innerText = "▶";
+          });
+          video.addEventListener('timeupdate', () => {
+            if (!video.duration) return;
+            const pct = (video.currentTime / video.duration) * 100;
+            if (videoTimeline) videoTimeline.value = pct;
+            if (timeDisplay) timeDisplay.innerText = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+          });
+        }
+        if (videoTimeline) {
+          videoTimeline.addEventListener('input', () => {
+            if (video && video.duration) {
+              video.currentTime = (videoTimeline.value / 100) * video.duration;
+              const progress = video.duration > 0 ? video.currentTime / video.duration : 0;
+              if (!isSentenceMode) updateOriginalHighline(progress);
+            }
+          });
+        }
+        if (videoSpeed) {
+          videoSpeed.addEventListener('change', () => {
+            if (video) video.playbackRate = parseFloat(videoSpeed.value);
+          });
+        }
+        if (btnLoopSentence) {
+          btnLoopSentence.addEventListener('click', () => {
+            isLoopSentenceEnabled = !isLoopSentenceEnabled;
+            btnLoopSentence.classList.toggle('active', isLoopSentenceEnabled);
+          });
+        }
+        if (videoVolumeSlider && video) {
+          const vol = video.volume || 1.0;
+          videoVolumeSlider.value = vol * 100;
+          videoVolumeSlider.addEventListener('input', function() {
+            const val = parseFloat(this.value) / 100;
+            video.volume = val;
+          });
+          video.addEventListener('volumechange', function() {
+            const val = this.volume * 100;
+            videoVolumeSlider.value = val;
+          });
+        }
+      }
+
+      // ---------- RESIZE WAVEFORM ----------
+      function resizeAllWaveforms() {
+        resizeWaveformCanvas(waveformOriginalCanvas, originalWrapper);
+        resizeWaveformCanvas(waveformUserCanvas, userWrapper);
+        if (originalWaveformData) drawStaticWaveform(waveformOriginalCanvas, originalWaveformData, WAVEFORM_COLOR_ORIG);
+        if (userWaveformData) drawStaticWaveform(waveformUserCanvas, userWaveformData, WAVEFORM_COLOR_USER);
+      }
+
+      // ---------- GLOBAL EVENTS ----------
+      function setupGlobalEvents() {
+        if (btnPlayFullDubbing) btnPlayFullDubbing.addEventListener('click', playFullDubbing);
+        if (btnStopDubbing) btnStopDubbing.addEventListener('click', stopDubbing);
+        if (btnRecordFullVideo) btnRecordFullVideo.addEventListener('click', toggleFullRecording);
+        if (btnPauseRecord) btnPauseRecord.addEventListener('click', pauseFullRecording);
+
+        if (themeToggle) {
+          themeToggle.addEventListener('click', () => {
+            const isLight = document.documentElement.classList.toggle('light');
+            const sun = themeToggle.querySelector('.sun-icon');
+            const moon = themeToggle.querySelector('.moon-icon');
+            if (isLight) {
+              setThemePreference('light');
+              if (sun) sun.style.display = 'none';
+              if (moon) moon.style.display = 'block';
+            } else {
+              setThemePreference('dark');
+              if (sun) sun.style.display = 'block';
+              if (moon) moon.style.display = 'none';
+            }
+          });
+        }
+
+        if (btnToggleDisplayMode) {
+          btnToggleDisplayMode.addEventListener('click', () => {
+            const mode = getDisplayModePreference();
+            const next = mode === 'full' ? 'compact' : 'full';
+            setDisplayModePreference(next);
+            initDisplayMode();
+          });
+        }
+
+        if (btnToggleLibrary && mainLayout) {
+          btnToggleLibrary.addEventListener('click', () => {
+            const collapsed = mainLayout.classList.toggle('library-collapsed');
+            btnToggleLibrary.innerText = collapsed ? "📚 Hiện Thư Viện" : "📂 Ẩn Thư Viện";
+            btnToggleLibrary.classList.toggle('btn-primary', !collapsed);
+            btnToggleLibrary.classList.toggle('btn-secondary', collapsed);
+          });
+          btnToggleLibrary.innerText = "📚 Hiện Thư Viện";
+        }
+
+        if (selectListeningHideMode) {
+          selectListeningHideMode.addEventListener('change', () => {
+            listeningHideTarget = selectListeningHideMode.value;
+            for (const key in listeningAnswers) delete listeningAnswers[key];
+            renderSentences();
+          });
+        }
+
+        if (btnOpenVocab && vocabModalEl) {
+          btnOpenVocab.addEventListener('click', () => { loadVocabTable();
+            vocabModalEl.classList.add('show'); });
+        }
+        const hideVocabModal = () => { if (vocabModalEl) vocabModalEl.classList.remove('show'); };
+        if (btnCloseVocab) btnCloseVocab.addEventListener('click', hideVocabModal);
+        if (btnCloseVocabAction) btnCloseVocabAction.addEventListener('click', hideVocabModal);
+        if (btnExport) btnExport.addEventListener('click', exportVocabToCSV);
+        if (btnExportAll) btnExportAll.addEventListener('click', exportAllData);
+        if (btnImportAll && importFileInput) {
+          btnImportAll.addEventListener('click', () => importFileInput.click());
+          importFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) { importAllData(file);
+              importFileInput.value = ''; }
+          });
+        }
+        window.addEventListener('click', (e) => { if (e.target === vocabModalEl) hideVocabModal(); });
+      }
+
+      // ---------- INIT ----------
+      function init() {
+        initTheme();
+        initDisplayMode();
+        setupCustomVideoPlayer();
+        setupModalEventListeners();
+        setupVocabEventListeners();
+        setupGlobalEvents();
+        resizeAllWaveforms();
+        window.addEventListener('resize', resizeAllWaveforms);
+        setupVideoAudio(video);
+        loadVocabWords();
+        openDB().then(() => loadLibrary()).catch(err => {
+          addLog("❌ Không thể khởi động cơ sở dữ liệu: " + err.message, 'error');
+          alert("Lỗi IndexedDB: Ứng dụng không thể tải dữ liệu.");
+        });
+        addLog("✅ Ứng dụng đã khởi động", 'success');
+        logContainer.style.display = 'block';
+      }
+
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+      else init();
+    })();
+  </script>
+</body>
+</html>

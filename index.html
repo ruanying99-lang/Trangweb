@@ -1276,10 +1276,9 @@
             <div class="nav">
                 <a onclick="switchPage('home')" id="nav-home" class="active">🏠 Trang Chủ</a>
                 <a onclick="switchPage('games')" id="nav-games">🎮 Khóa Học</a>
-                <!-- Đã xóa nav-ranking -->
                 <a onclick="switchPage('profile')" id="nav-profile">👤 Hồ Sơ</a>
                 <a onclick="switchPage('documents')" id="nav-documents">📄 Tài Liệu</a>
-                <a onclick="switchPage('support')" id="nav-support">💬 Hỗ trợ</a>
+                <a onclick="switchPage('support')" id="nav-support">💬 Hỗ hỗ trợ</a>
                 <a onclick="switchPage('admin')" id="nav-admin" style="display:none;">⚙️ Quản Trị</a>
                 <a onclick="switchPage('students')" id="nav-students" style="display:none;">👥 Học Viên</a>
                 <a onclick="switchPage('admin-support')" id="nav-admin-support" style="display:none;">📩 Hỗ trợ HV</a>
@@ -1789,7 +1788,31 @@
     <div id="toast-container" class="toast-container"></div>
 
     <!-- ============================================================ -->
-    <!-- JAVASCRIPT -->
+    <!-- FIREBASE FIRESTORE SDK -->
+    <!-- ============================================================ -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, setDoc, doc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // 🔴 ĐÃ DÁN CẤU HÌNH DỰ ÁN HOCVIENNGONNGU CỦA BẠN
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHnUhPNokBrXgYLNqlW0kB9tJm3U0Un0I",
+            uthDomain: "hocvienngon.firebaseapp.com",
+            projectId: "hocvienngon",
+            storageBucket: "hocvienngon.firebasestorage.app",
+            messagingSenderId: "410660952284",
+            appId: "1:410660952284:web:ee5b5a98d12bef3d45bc19"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.fs = { collection, setDoc, doc, getDocs, deleteDoc };
+    </script>
+
+    <!-- ============================================================ -->
+    <!-- JAVASCRIPT CHÍNH (ĐÃ TÍCH HỢP FIREBASE FIRESTORE) -->
     <!-- ============================================================ -->
     <script>
         // ======================================================================
@@ -2023,8 +2046,7 @@
         function logout() {
             currentUser = null;
             clearSessionTimer();
-            if (chatRefreshInterval) { clearInterval(chatRefreshInterval);
-                chatRefreshInterval = null; }
+            if (chatRefreshInterval) { clearInterval(chatRefreshInterval); chatRefreshInterval = null; }
             document.getElementById('member-area').style.display = 'none';
             document.getElementById('auth-area').style.display = 'block';
             document.getElementById('nav-admin').style.display = 'none';
@@ -2046,14 +2068,11 @@
         }
 
         function clearSessionTimer() {
-            if (sessionTimer) { clearTimeout(sessionTimer);
-                sessionTimer = null; }
+            if (sessionTimer) { clearTimeout(sessionTimer); sessionTimer = null; }
         }
 
-        document.addEventListener('click', () => { if (currentUser) { clearSessionTimer();
-                startSessionTimer(); } });
-        document.addEventListener('keydown', () => { if (currentUser) { clearSessionTimer();
-                startSessionTimer(); } });
+        document.addEventListener('click', () => { if (currentUser) { clearSessionTimer(); startSessionTimer(); } });
+        document.addEventListener('keydown', () => { if (currentUser) { clearSessionTimer(); startSessionTimer(); } });
 
         // ======================================================================
         // 5. FORGOT / RESET PASSWORD
@@ -2062,11 +2081,9 @@
             const username = document.getElementById('forgot-username').value.trim();
             const errorEl = document.getElementById('forgot-error');
             errorEl.style.display = 'none';
-            if (!username) { errorEl.textContent = '❌ Vui lòng nhập tên đăng nhập!';
-                errorEl.style.display = 'block'; return; }
+            if (!username) { errorEl.textContent = '❌ Vui lòng nhập tên đăng nhập!'; errorEl.style.display = 'block'; return; }
             const user = getUser(username);
-            if (!user) { errorEl.textContent = '❌ Không tìm thấy tài khoản!';
-                errorEl.style.display = 'block'; return; }
+            if (!user) { errorEl.textContent = '❌ Không tìm thấy tài khoản!'; errorEl.style.display = 'block'; return; }
             document.getElementById('reset-username').value = username;
             document.getElementById('reset-password-box').style.display = 'block';
             document.getElementById('forgot-password-box').style.display = 'none';
@@ -2079,13 +2096,10 @@
             const confirm = document.getElementById('reset-pass-confirm').value.trim();
             const errorEl = document.getElementById('reset-error');
             errorEl.style.display = 'none';
-            if (password.length < 6) { errorEl.textContent = '❌ Mật khẩu phải có ít nhất 6 ký tự!';
-                errorEl.style.display = 'block'; return; }
-            if (password !== confirm) { errorEl.textContent = '❌ Mật khẩu xác nhận không khớp!';
-                errorEl.style.display = 'block'; return; }
+            if (password.length < 6) { errorEl.textContent = '❌ Mật khẩu phải có ít nhất 6 ký tự!'; errorEl.style.display = 'block'; return; }
+            if (password !== confirm) { errorEl.textContent = '❌ Mật khẩu xác nhận không khớp!'; errorEl.style.display = 'block'; return; }
             const user = getUser(username);
-            if (!user) { errorEl.textContent = '❌ Không tìm thấy tài khoản!';
-                errorEl.style.display = 'block'; return; }
+            if (!user) { errorEl.textContent = '❌ Không tìm thấy tài khoản!'; errorEl.style.display = 'block'; return; }
             user.password = await sha256(password);
             user.loginAttempts = 0;
             user.locked = false;
@@ -2106,15 +2120,11 @@
             const c = document.getElementById('reg-pass-confirm').value.trim();
             const errorEl = document.getElementById('register-error');
             errorEl.style.display = 'none';
-            if (!u || u.length < 3) { errorEl.textContent = '❌ Tên phải có ít nhất 3 ký tự!';
-                errorEl.style.display = 'block'; return; }
-            if (p.length < 6) { errorEl.textContent = '❌ Mật khẩu phải có ít nhất 6 ký tự!';
-                errorEl.style.display = 'block'; return; }
-            if (p !== c) { errorEl.textContent = '❌ Mật khẩu xác nhận không khớp!';
-                errorEl.style.display = 'block'; return; }
+            if (!u || u.length < 3) { errorEl.textContent = '❌ Tên phải có ít nhất 3 ký tự!'; errorEl.style.display = 'block'; return; }
+            if (p.length < 6) { errorEl.textContent = '❌ Mật khẩu phải có ít nhất 6 ký tự!'; errorEl.style.display = 'block'; return; }
+            if (p !== c) { errorEl.textContent = '❌ Mật khẩu xác nhận không khớp!'; errorEl.style.display = 'block'; return; }
             const users = getUsers();
-            if (users[u]) { errorEl.textContent = '❌ Tài khoản đã tồn tại!';
-                errorEl.style.display = 'block'; return; }
+            if (users[u]) { errorEl.textContent = '❌ Tài khoản đã tồn tại!'; errorEl.style.display = 'block'; return; }
             users[u] = {
                 password: await sha256(p),
                 isAdmin: false,
@@ -2182,20 +2192,12 @@
             const nav = document.getElementById('nav-' + id);
             if (nav) nav.classList.add('active');
             if (id === 'games') renderGames();
-            if (id === 'documents') { renderDocuments();
-                populateCourseSelects();
-                populateCategorySelects();
-                setupFileUpload(); }
+            if (id === 'documents') { renderDocuments(); populateCourseSelects(); populateCategorySelects(); setupFileUpload(); }
             if (id === 'profile') renderProfile();
             if (id === 'support') loadStudentChat();
             if (id === 'admin-support') loadAdminChat();
             if (id === 'students') renderStudentList();
-            if (id === 'admin') { renderStudents();
-                renderCourses();
-                renderVipKeys();
-                renderAdminDocuments();
-                renderCategories();
-                renderDashboardStats(); }
+            if (id === 'admin') { renderStudents(); renderCourses(); renderVipKeys(); renderAdminDocuments(); renderCategories(); renderDashboardStats(); }
             updateChatBadge();
         }
 
@@ -2247,15 +2249,13 @@
             if (panel) panel.style.display = 'block';
             if (tab === 'students') renderStudents();
             if (tab === 'courses') renderCourses();
-            if (tab === 'vip-keys') { renderVipKeys();
-                renderCourseCheckboxes('vip-course-checkboxes', []); }
+            if (tab === 'vip-keys') { renderVipKeys(); renderCourseCheckboxes('vip-course-checkboxes', []); }
             if (tab === 'documents') renderAdminDocuments();
-            if (tab === 'categories') { renderCategories();
-                populateCategorySelects(); }
+            if (tab === 'categories') { renderCategories(); populateCategorySelects(); }
         }
 
         // ======================================================================
-        // 10. DATA INIT
+        // 10. DATA INIT (ĐÃ HỖ TRỢ ĐỒNG BỘ FIRESTORE ĐÁM MÂY)
         // ======================================================================
         let courses = [];
         let documents = [];
@@ -2266,12 +2266,9 @@
             const data = getStorage('courses', null);
             if (data) return data;
             const defaultCourses = [
-                { id: 'course-en', icon: '🇬🇧', name: 'Từ Vựng Tiếng Anh', description: 'Học từ vựng tiếng Anh cơ bản',
-                    file: 'games/vocab-en.html', vip: false, status: 'hot' },
-                { id: 'course-zh', icon: '🇨🇳', name: 'Từ Vựng Tiếng Trung', description: 'Học từ vựng tiếng Trung thông dụng',
-                    file: 'games/vocab-zh.html', vip: false, status: 'new' },
-                { id: 'course-ja', icon: '🇯🇵', name: 'Từ Vựng Tiếng Nhật', description: 'Học từ vựng tiếng Nhật N5-N4',
-                    file: 'games/vocab-ja.html', vip: true, status: 'vip' }
+                { id: 'course-en', icon: '🇬🇧', name: 'Từ Vựng Tiếng Anh', description: 'Học từ vựng tiếng Anh cơ bản', file: 'games/vocab-en.html', vip: false, status: 'hot' },
+                { id: 'course-zh', icon: '🇨🇳', name: 'Từ Vựng Tiếng Trung', description: 'Học từ vựng tiếng Trung thông dụng', file: 'games/vocab-zh.html', vip: false, status: 'new' },
+                { id: 'course-ja', icon: '🇯🇵', name: 'Từ Vựng Tiếng Nhật', description: 'Học từ vựng tiếng Nhật N5-N4', file: 'games/vocab-ja.html', vip: true, status: 'vip' }
             ];
             setStorage('courses', defaultCourses);
             return defaultCourses;
@@ -2281,12 +2278,8 @@
             const data = getStorage('documents', null);
             if (data) return data;
             const defaultDocs = [
-                { id: 'doc-1', title: 'Giáo trình tiếng Anh cơ bản', description: 'Giáo trình đầy đủ', courseId: 'course-en',
-                    category: 'file-mau', uploadedBy: 'admin', status: 'approved', fileName: 'giaotrinh_en.pdf',
-                    fileSize: '2.5 MB', uploadDate: Date.now() - 86400000 },
-                { id: 'doc-2', title: 'Từ vựng tiếng Trung', description: '50 từ vựng thông dụng', courseId: 'course-zh',
-                    category: 'tu-vung', uploadedBy: 'admin', status: 'approved', fileName: 'tuvung_zh.pdf',
-                    fileSize: '1.2 MB', uploadDate: Date.now() - 172800000 }
+                { id: 'doc-1', title: 'Giáo trình tiếng Anh cơ bản', description: 'Giáo trình đầy đủ', courseId: 'course-en', category: 'file-mau', uploadedBy: 'admin', status: 'approved', fileName: 'giaotrinh_en.pdf', fileSize: '2.5 MB', uploadDate: Date.now() - 86400000 },
+                { id: 'doc-2', title: 'Từ vựng tiếng Trung', description: '50 từ vựng thông dụng', courseId: 'course-zh', category: 'tu-vung', uploadedBy: 'admin', status: 'approved', fileName: 'tuvung_zh.pdf', fileSize: '1.2 MB', uploadDate: Date.now() - 172800000 }
             ];
             setStorage('documents', defaultDocs);
             return defaultDocs;
@@ -2307,11 +2300,28 @@
             const data = getStorage('vip_keys', null);
             if (data) return data;
             const defaultKeys = [
-                { key: 'VIP-EN-999', courseIds: ['course-en'], duration: 30, maxUses: 5, usedCount: 0, createdAt: Date
-                    .now() }
+                { key: 'VIP-EN-999', courseIds: ['course-en'], duration: 30, maxUses: 5, usedCount: 0, createdAt: Date.now() }
             ];
             setStorage('vip_keys', defaultKeys);
             return defaultKeys;
+        }
+
+        // 🔥 HÀM TẢI DỮ LIỆU TỪ FIREBASE CLOUD VỀ
+        async function loadCoursesFromCloud() {
+            try {
+                if (!window.fs) return;
+                const querySnapshot = await window.fs.getDocs(window.fs.collection(window.db, "courses"));
+                let cloudData = [];
+                querySnapshot.forEach((doc) => { cloudData.push(doc.data()); });
+                if (cloudData.length > 0) {
+                    courses = cloudData;
+                    setStorage('courses', courses);
+                    renderCourses();
+                    renderGames();
+                }
+            } catch (e) {
+                console.log("Dùng dữ liệu local storage");
+            }
         }
 
         function initAdminData() {
@@ -2330,6 +2340,9 @@
             renderCourseCheckboxes('vip-course-checkboxes', []);
             renderCourseCheckboxes('edit-vip-course-checkboxes', []);
             setupFileUpload();
+
+            // Tự động tải từ Cloud sau 1s
+            setTimeout(loadCoursesFromCloud, 1000);
         }
 
         // ======================================================================
@@ -2346,8 +2359,7 @@
                 for (const g in keys) {
                     const kd = keys[g];
                     if (kd && kd.key) {
-                        if (kd.end) { const end = new Date(kd.end);
-                            end.setHours(23, 59, 59, 999); if (end >= today) return true; } else return true;
+                        if (kd.end) { const end = new Date(kd.end); end.setHours(23, 59, 59, 999); if (end >= today) return true; } else return true;
                     }
                 }
                 return false;
@@ -2374,8 +2386,7 @@
                 for (const g in keys) {
                     const kd = keys[g];
                     if (kd && kd.key) {
-                        if (kd.end) { const end = new Date(kd.end);
-                            end.setHours(23, 59, 59, 999); if (end >= today) return true; } else return true;
+                        if (kd.end) { const end = new Date(kd.end); end.setHours(23, 59, 59, 999); if (end >= today) return true; } else return true;
                     }
                 }
                 return false;
@@ -2387,8 +2398,7 @@
                 for (const g in keys) {
                     const kd = keys[g];
                     if (kd && kd.key) {
-                        if (kd.end) { const end = new Date(kd.end);
-                            end.setHours(23, 59, 59, 999); if (end >= today) return false; } else return false;
+                        if (kd.end) { const end = new Date(kd.end); end.setHours(23, 59, 59, 999); if (end >= today) return false; } else return false;
                     }
                 }
                 return true;
@@ -2410,18 +2420,13 @@
                 for (const g in keys) {
                     const kd = keys[g];
                     if (kd && kd.key) {
-                        if (kd.end) { const end = new Date(kd.end);
-                            end.setHours(23, 59, 59, 999); if (end >= today) { isVip = true;
-                                vipCourses.push(g); } } else { isVip = true;
-                            vipCourses.push(g); }
+                        if (kd.end) { const end = new Date(kd.end); end.setHours(23, 59, 59, 999); if (end >= today) { isVip = true; vipCourses.push(g); } } else { isVip = true; vipCourses.push(g); }
                     }
                 }
                 const status = s.locked ? '🔒 Khóa' : (isVip ? '⭐ VIP' : '📖 Free');
                 const statusClass = s.locked ? 'locked' : (isVip ? 'vip' : 'free');
-                const courseNames = vipCourses.map(id => courses.find(c => c.id === id)?.name || '').filter(Boolean).join(
-                ', ');
-                const expiry = s.vipExpiry ? new Date(s.vipExpiry).toLocaleDateString('vi-VN') : (isVip ? 'Vĩnh viễn' :
-                    '-');
+                const courseNames = vipCourses.map(id => courses.find(c => c.id === id)?.name || '').filter(Boolean).join(', ');
+                const expiry = s.vipExpiry ? new Date(s.vipExpiry).toLocaleDateString('vi-VN') : (isVip ? 'Vĩnh viễn' : '-');
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${i+1}</td>
@@ -2477,23 +2482,19 @@
             user.isVip = true;
             user.vipCourses = selected;
             user.vipExpiry = duration === 0 ? null : Date.now() + duration * 24 * 60 * 60 * 1000;
-            // Also update gameKeys for each selected course
+            
             user.gameKeys = user.gameKeys || {};
             selected.forEach(cid => {
                 if (!user.gameKeys[cid]) {
-                    user.gameKeys[cid] = { key: 'VIP-' + Date.now().toString(36).toUpperCase(), start: new Date()
-                            .toISOString().split('T')[0], end: duration === 0 ? null : new Date(Date.now() +
-                            duration * 24 * 60 * 60 * 1000).toISOString().split('T')[0] };
+                    user.gameKeys[cid] = { key: 'VIP-' + Date.now().toString(36).toUpperCase(), start: new Date().toISOString().split('T')[0], end: duration === 0 ? null : new Date(Date.now() + duration * 24 * 60 * 60 * 1000).toISOString().split('T')[0] };
                 } else {
                     if (duration > 0) {
-                        user.gameKeys[cid].end = new Date(Date.now() + duration * 24 * 60 * 60 * 1000)
-                            .toISOString().split('T')[0];
+                        user.gameKeys[cid].end = new Date(Date.now() + duration * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
                     } else {
                         user.gameKeys[cid].end = null;
                     }
                 }
             });
-            // Remove keys for courses not selected
             for (const cid in user.gameKeys) {
                 if (!selected.includes(cid)) {
                     delete user.gameKeys[cid];
@@ -2508,11 +2509,11 @@
         }
 
         // ======================================================================
-        // 14. COURSES
+        // 14. COURSES (ĐÃ TÍCH HỢP FIREBASE THÊM/SỬA/XÓA)
         // ======================================================================
         let editingCourseId = null;
 
-        function addCourse() {
+        async function addCourse() {
             const id = document.getElementById('course-id').value.trim();
             const icon = document.getElementById('course-icon').value.trim() || '📚';
             const name = document.getElementById('course-name').value.trim();
@@ -2522,10 +2523,23 @@
             const status = document.getElementById('course-status').value;
             if (!id || !name || !file) { showToast('❌ Vui lòng điền đầy đủ!', 'error'); return; }
             if (courses.some(c => c.id === id)) { showToast('❌ ID đã tồn tại!', 'error'); return; }
-            courses.push({ id, icon, name, description: desc, file, vip, status });
+            
+            const newCourse = { id, icon, name, description: desc, file, vip, status };
+            
+            courses.push(newCourse);
             setStorage('courses', courses);
+
+            // 🔥 ĐẨY LÊN FIREBASE FIRESTORE
+            try {
+                if (window.fs) {
+                    await window.fs.setDoc(window.fs.doc(window.db, "courses", id), newCourse);
+                    showToast(`✅ Đã lưu ${name} lên Đám mây!`, 'success');
+                }
+            } catch (err) {
+                console.error("Lỗi Firestore:", err);
+            }
+
             clearCourseForm();
-            showToast(`✅ Đã thêm khóa học: ${name}`, 'success');
             renderCourses();
             renderGames();
             renderDashboardStats();
@@ -2533,7 +2547,7 @@
             renderCourseCheckboxes('vip-course-checkboxes', []);
         }
 
-        function updateCourse() {
+        async function updateCourse() {
             const editId = document.getElementById('edit-course-id').value;
             if (!editId) { showToast('❌ Chọn khóa học cần sửa!', 'warning'); return; }
             const icon = document.getElementById('course-icon').value.trim() || '📚';
@@ -2545,12 +2559,24 @@
             if (!name || !file) { showToast('❌ Vui lòng điền đầy đủ!', 'error'); return; }
             const idx = courses.findIndex(c => c.id === editId);
             if (idx === -1) { showToast('❌ Không tìm thấy!', 'error'); return; }
-            courses[idx] = { ...courses[idx], icon, name, description: desc, file, vip, status };
+            
+            const updatedCourse = { id: editId, icon, name, description: desc, file, vip, status };
+            courses[idx] = updatedCourse;
             setStorage('courses', courses);
+
+            // 🔥 CẬP NHẬT LÊN FIREBASE
+            try {
+                if (window.fs) {
+                    await window.fs.setDoc(window.fs.doc(window.db, "courses", editId), updatedCourse);
+                    showToast(`✅ Đã cập nhật ${name} trên Đám mây!`, 'success');
+                }
+            } catch (err) {
+                console.error("Lỗi Firestore:", err);
+            }
+
             clearCourseForm();
             document.getElementById('edit-course-id').value = '';
             document.getElementById('course-id').readOnly = false;
-            showToast(`✅ Đã cập nhật: ${name}`, 'success');
             renderCourses();
             renderGames();
             renderDashboardStats();
@@ -2595,10 +2621,20 @@
 
         function deleteCourse(id) {
             const c = courses.find(c => c.id === id);
-            showConfirmModal(`Xóa khóa học "${c?.name}"?`, 'Hành động này không thể hoàn tác!', function() {
+            showConfirmModal(`Xóa khóa học "${c?.name}"?`, 'Hành động này không thể hoàn tác!', async function() {
                 courses = courses.filter(c => c.id !== id);
                 setStorage('courses', courses);
-                showToast(`Đã xóa: ${c?.name}`, 'info');
+
+                // 🔥 XÓA TRÊN FIREBASE
+                try {
+                    if (window.fs) {
+                        await window.fs.deleteDoc(window.fs.doc(window.db, "courses", id));
+                        showToast(`Đã xóa ${c?.name} trên Đám mây`, 'info');
+                    }
+                } catch (err) {
+                    console.error("Lỗi Firestore:", err);
+                }
+
                 renderCourses();
                 renderGames();
                 renderDashboardStats();
@@ -2612,8 +2648,7 @@
             const tbody = document.getElementById('courses-table-body');
             tbody.innerHTML = '';
             if (courses.length === 0) {
-                tbody.innerHTML =
-                '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999;">📚 Chưa có khóa học</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999;">📚 Chưa có khóa học</td></tr>';
                 return;
             }
             courses.forEach((c, i) => {
@@ -2663,13 +2698,11 @@
             const tbody = document.getElementById('vip-keys-table-body');
             tbody.innerHTML = '';
             if (vipKeys.length === 0) {
-                tbody.innerHTML =
-                    '<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">🔑 Chưa có mã VIP</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">🔑 Chưa có mã VIP</td></tr>';
                 return;
             }
             vipKeys.forEach((k, i) => {
-                const courseNames = (k.courseIds || []).map(id => courses.find(c => c.id === id)?.name || '')
-                    .filter(Boolean).join(', ');
+                const courseNames = (k.courseIds || []).map(id => courses.find(c => c.id === id)?.name || '').filter(Boolean).join(', ');
                 const isExpired = k.usedCount >= k.maxUses;
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -2705,8 +2738,7 @@
             const input = document.getElementById('doc-file-input');
             if (!area) return;
             area.onclick = () => input.click();
-            area.ondragover = (e) => { e.preventDefault();
-                area.classList.add('dragover'); };
+            area.ondragover = (e) => { e.preventDefault(); area.classList.add('dragover'); };
             area.ondragleave = () => area.classList.remove('dragover');
             area.ondrop = (e) => {
                 e.preventDefault();
@@ -2780,13 +2812,11 @@
             if (filterStatus !== 'all') filtered = filtered.filter(d => d.status === filterStatus);
             if (filterCategory !== 'all') filtered = filtered.filter(d => d.category === filterCategory);
             if (filterCourse !== 'all') filtered = filtered.filter(d => d.courseId === filterCourse);
-            if (searchTerm) filtered = filtered.filter(d => d.title.includes(searchTerm) || d.description.includes(
-            searchTerm));
+            if (searchTerm) filtered = filtered.filter(d => d.title.includes(searchTerm) || d.description.includes(searchTerm));
             filtered.sort((a, b) => b.uploadDate - a.uploadDate);
             container.innerHTML = '';
             if (filtered.length === 0) {
-                container.innerHTML =
-                    '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999;">📭 Không có tài liệu</div>';
+                container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999;">📭 Không có tài liệu</div>';
                 return;
             }
             filtered.forEach(doc => {
@@ -2826,12 +2856,10 @@
             const filterStatus = document.getElementById('admin-filter-doc-status')?.value || 'all';
             let filtered = documents;
             if (filterStatus !== 'all') filtered = filtered.filter(d => d.status === filterStatus);
-            if (searchTerm) filtered = filtered.filter(d => d.title.includes(searchTerm) || d.uploadedBy.includes(
-            searchTerm));
+            if (searchTerm) filtered = filtered.filter(d => d.title.includes(searchTerm) || d.uploadedBy.includes(searchTerm));
             tbody.innerHTML = '';
             if (filtered.length === 0) {
-                tbody.innerHTML =
-                    '<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">📄 Không có tài liệu</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">📄 Không có tài liệu</td></tr>';
                 return;
             }
             filtered.forEach((doc, i) => {
@@ -2949,8 +2977,7 @@
             categories.forEach(c => {
                 const tag = document.createElement('span');
                 tag.className = 'category-tag';
-                tag.innerHTML =
-                    `${c.name}${c.isDefault ? ' <span style="font-size:10px;color:#888;">(mặc định)</span>' : ''}${!c.isDefault ? ' <span class="remove" onclick="deleteCategory(\''+c.id+'\')">✕</span>' : ''}`;
+                tag.innerHTML = `${c.name}${c.isDefault ? ' <span style="font-size:10px;color:#888;">(mặc định)</span>' : ''}${!c.isDefault ? ' <span class="remove" onclick="deleteCategory(\''+c.id+'\')">✕</span>' : ''}`;
                 container.appendChild(tag);
             });
         }
@@ -2968,11 +2995,9 @@
             const filterStatus = document.getElementById('filter-game-status')?.value || 'all';
             let filtered = courses;
             if (filterStatus !== 'all') filtered = filtered.filter(c => c.status === filterStatus);
-            if (searchTerm) filtered = filtered.filter(c => c.name.includes(searchTerm) || c.description.includes(
-            searchTerm));
+            if (searchTerm) filtered = filtered.filter(c => c.name.includes(searchTerm) || c.description.includes(searchTerm));
             if (filtered.length === 0) {
-                container.innerHTML =
-                    `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999;">📭 Không có khóa học</div>`;
+                container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999;">📭 Không có khóa học</div>`;
                 return;
             }
             filtered.forEach(course => {
@@ -2990,8 +3015,7 @@
                         if (kd.end) {
                             const end = new Date(kd.end);
                             end.setHours(23, 59, 59, 999);
-                            if (end >= today) { hasAccess = true;
-                                expiry = kd.end; } else { hasAccess = false; }
+                            if (end >= today) { hasAccess = true; expiry = kd.end; } else { hasAccess = false; }
                         } else { hasAccess = true; }
                     }
                 }
@@ -3009,8 +3033,7 @@
                 } else {
                     const statusMap = { 'new': 'badge-new', 'hot': 'badge-hot', 'vip': 'badge-vip', 'free': 'badge-vip' };
                     badge.className = 'game-status-badge ' + (statusMap[course.status] || 'badge-vip');
-                    badge.textContent = course.status === 'new' ? '🆕 Mới' : course.status === 'hot' ? '🔥 Hot' : course
-                        .status === 'vip' ? '⭐ VIP' : '📖 Free';
+                    badge.textContent = course.status === 'new' ? '🆕 Mới' : course.status === 'hot' ? '🔥 Hot' : course.status === 'vip' ? '⭐ VIP' : '📖 Free';
                 }
                 card.appendChild(badge);
                 const title = document.createElement('h3');
@@ -3108,20 +3131,18 @@
             user.isVip = true;
             user.vipKey = key;
             user.vipExpiry = keyData.duration === 0 ? null : Date.now() + keyData.duration * 24 * 60 * 60 * 1000;
-            // Update gameKeys
+            
             user.gameKeys = user.gameKeys || {};
             newCourses.forEach(cid => {
                 if (!user.gameKeys[cid]) {
                     user.gameKeys[cid] = {
                         key: key,
                         start: new Date().toISOString().split('T')[0],
-                        end: keyData.duration === 0 ? null : new Date(Date.now() + keyData.duration * 24 * 60 *
-                            60 * 1000).toISOString().split('T')[0]
+                        end: keyData.duration === 0 ? null : new Date(Date.now() + keyData.duration * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
                     };
                 } else {
                     if (keyData.duration > 0) {
-                        user.gameKeys[cid].end = new Date(Date.now() + keyData.duration * 24 * 60 * 60 * 1000)
-                            .toISOString().split('T')[0];
+                        user.gameKeys[cid].end = new Date(Date.now() + keyData.duration * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
                     } else {
                         user.gameKeys[cid].end = null;
                     }
@@ -3154,9 +3175,7 @@
             for (const g in keys) {
                 const kd = keys[g];
                 if (kd && kd.key) {
-                    if (kd.end) { const end = new Date(kd.end);
-                        end.setHours(23, 59, 59, 999); if (end >= today) { hasValid = true; break; } } else { hasValid =
-                            true; break; }
+                    if (kd.end) { const end = new Date(kd.end); end.setHours(23, 59, 59, 999); if (end >= today) { hasValid = true; break; } } else { hasValid = true; break; }
                 }
             }
             const statusEl = document.getElementById('profile-status');
@@ -3300,15 +3319,13 @@
         function saveChatMessages(messages) { setStorage('chat_messages', messages); }
 
         function sendStudentMessage() {
-            if (!currentUser || currentUser === 'admin') { showToast('Vui lòng đăng nhập với tài khoản học viên!',
-                'warning'); return; }
+            if (!currentUser || currentUser === 'admin') { showToast('Vui lòng đăng nhập với tài khoản học viên!', 'warning'); return; }
             const input = document.getElementById('student-chat-input');
             const text = input.value.trim();
             if (!text) { showToast('Vui lòng nhập tin nhắn!', 'warning'); return; }
             const messages = getChatMessages();
             if (!messages[currentUser]) messages[currentUser] = [];
-            messages[currentUser].push({ from: currentUser, to: 'admin', text, time: new Date().toISOString(),
-                read: false });
+            messages[currentUser].push({ from: currentUser, to: 'admin', text, time: new Date().toISOString(), read: false });
             saveChatMessages(messages);
             input.value = '';
             loadStudentChat();
@@ -3323,8 +3340,7 @@
             if (!text) { showToast('Vui lòng nhập câu trả lời!', 'warning'); return; }
             const messages = getChatMessages();
             if (!messages[adminSelectedUser]) messages[adminSelectedUser] = [];
-            messages[adminSelectedUser].push({ from: 'admin', to: adminSelectedUser, text, time: new Date().toISOString(),
-                read: true });
+            messages[adminSelectedUser].push({ from: 'admin', to: adminSelectedUser, text, time: new Date().toISOString(), read: true });
             saveChatMessages(messages);
             input.value = '';
             loadAdminChat();
@@ -3339,8 +3355,7 @@
             const container = document.getElementById('student-chat-messages');
             if (!container) return;
             if (userMessages.length === 0) {
-                container.innerHTML =
-                    `<div class="chat-empty"><div class="icon">💬</div><p>Chưa có tin nhắn nào.<br>Hãy gửi câu hỏi của bạn cho Admin!</p></div>`;
+                container.innerHTML = `<div class="chat-empty"><div class="icon">💬</div><p>Chưa có tin nhắn nào.<br>Hãy gửi câu hỏi của bạn cho Admin!</p></div>`;
                 return;
             }
             let html = '';
@@ -3374,8 +3389,7 @@
             const sidebar = document.getElementById('admin-chat-users');
             if (!sidebar) return;
             if (users.length === 0) {
-                sidebar.innerHTML =
-                    `<div style="padding:20px;text-align:center;color:#999;"><div style="font-size:30px;">📭</div><p>Chưa có tin nhắn từ học viên</p></div>`;
+                sidebar.innerHTML = `<div style="padding:20px;text-align:center;color:#999;"><div style="font-size:30px;">📭</div><p>Chưa có tin nhắn từ học viên</p></div>`;
                 document.getElementById('admin-chat-input').disabled = true;
                 document.querySelector('#admin-chat-main .chat-input-area .btn-submit').disabled = true;
                 document.getElementById('admin-chat-input').placeholder = 'Vui lòng chọn học viên trước';
@@ -3400,12 +3414,10 @@
                 document.getElementById('admin-chat-header').textContent = '💬 Trò chuyện với: ' + adminSelectedUser;
                 document.getElementById('admin-chat-input').disabled = false;
                 document.querySelector('#admin-chat-main .chat-input-area .btn-submit').disabled = false;
-                document.getElementById('admin-chat-input').placeholder = 'Nhập câu trả lời cho ' + adminSelectedUser +
-                '...';
+                document.getElementById('admin-chat-input').placeholder = 'Nhập câu trả lời cho ' + adminSelectedUser + '...';
                 const container = document.getElementById('admin-chat-messages');
                 if (userMessages.length === 0) {
-                    container.innerHTML =
-                        `<div class="chat-empty"><div class="icon">💬</div><p>Chưa có tin nhắn từ học viên này</p></div>`;
+                    container.innerHTML = `<div class="chat-empty"><div class="icon">💬</div><p>Chưa có tin nhắn từ học viên này</p></div>`;
                 } else {
                     let html2 = '';
                     userMessages.forEach((msg, idx) => {
@@ -3430,8 +3442,7 @@
                 }
             } else {
                 document.getElementById('admin-chat-header').textContent = 'Chọn một học viên để xem tin nhắn';
-                document.getElementById('admin-chat-messages').innerHTML =
-                    `<div class="chat-empty"><div class="icon">👈</div><p>Chọn một học viên từ danh sách bên trái</p></div>`;
+                document.getElementById('admin-chat-messages').innerHTML = `<div class="chat-empty"><div class="icon">👈</div><p>Chọn một học viên từ danh sách bên trái</p></div>`;
                 document.getElementById('admin-chat-input').disabled = true;
                 document.querySelector('#admin-chat-main .chat-input-area .btn-submit').disabled = true;
                 document.getElementById('admin-chat-input').placeholder = 'Vui lòng chọn học viên trước';
@@ -3483,9 +3494,7 @@
                 filtered[name] = users[name];
             }
             const names = Object.keys(filtered);
-            let total = names.length,
-                vipCount = 0,
-                totalWords = 0;
+            let total = names.length, vipCount = 0, totalWords = 0;
             names.forEach(u => {
                 const d = filtered[u];
                 const keys = d.gameKeys || {};
@@ -3495,9 +3504,7 @@
                 for (const g in keys) {
                     const kd = keys[g];
                     if (kd && kd.key) {
-                        if (kd.end) { const end = new Date(kd.end);
-                            end.setHours(23, 59, 59, 999); if (end >= today) { has = true; break; } } else { has =
-                                true; break; }
+                        if (kd.end) { const end = new Date(kd.end); end.setHours(23, 59, 59, 999); if (end >= today) { has = true; break; } } else { has = true; break; }
                     }
                 }
                 if (has) vipCount++;
@@ -3523,8 +3530,7 @@
                     const kd = keys[g];
                     if (kd && kd.key) {
                         let valid = true;
-                        if (kd.end) { const end = new Date(kd.end);
-                            end.setHours(23, 59, 59, 999); if (end < today) valid = false; }
+                        if (kd.end) { const end = new Date(kd.end); end.setHours(23, 59, 59, 999); if (end < today) valid = false; }
                         if (valid) {
                             const timeInfo = kd.end ? '→' + kd.end : '♾️';
                             keyList.push(g + ':' + kd.key + ' (' + timeInfo + ')');
@@ -3535,15 +3541,9 @@
                 const item = document.createElement('div');
                 item.className = 'admin-list-item';
                 item.style.borderLeftColor = hasKey ? '#FFD700' : '#1565C0';
-                const statusHtml = hasKey ?
-                    '<span class="student-status vip">⭐ ' + keyList.length + ' game</span>' :
-                    '<span class="student-status free">Free</span>';
-                const keyDisplay = hasKey ?
-                    '<span style="font-size:11px;color:#1565C0;">🔑 ' + keyList.join('; ') + '</span>' :
-                    '<span style="font-size:11px;color:#999;">Chưa có mã</span>';
-                const courseDisplay = learned.length > 0 ?
-                    '<span style="font-size:13px;color:#2E7D32;">📚 ' + learned.length + ' khóa</span>' :
-                    '';
+                const statusHtml = hasKey ? '<span class="student-status vip">⭐ ' + keyList.length + ' game</span>' : '<span class="student-status free">Free</span>';
+                const keyDisplay = hasKey ? '<span style="font-size:11px;color:#1565C0;">🔑 ' + keyList.join('; ') + '</span>' : '<span style="font-size:11px;color:#999;">Chưa có mã</span>';
+                const courseDisplay = learned.length > 0 ? '<span style="font-size:13px;color:#2E7D32;">📚 ' + learned.length + ' khóa</span>' : '';
                 item.innerHTML = `
                     <div class="item-info">
                         <strong style="font-size:16px;">👤 ${username}</strong>
@@ -3608,12 +3608,8 @@
                 keyInput.disabled = false;
                 startInput.disabled = false;
                 endInput.disabled = false;
-                if (!keyInput.value) {
-                    keyInput.value = 'VIP-' + Date.now().toString(36).toUpperCase();
-                }
-                if (!startInput.value) {
-                    startInput.value = new Date().toISOString().split('T')[0];
-                }
+                if (!keyInput.value) { keyInput.value = 'VIP-' + Date.now().toString(36).toUpperCase(); }
+                if (!startInput.value) { startInput.value = new Date().toISOString().split('T')[0]; }
                 if (!endInput.value) {
                     const oneYear = new Date();
                     oneYear.setFullYear(oneYear.getFullYear() + 1);
@@ -3632,8 +3628,7 @@
         function generateGameKey2(gameId) {
             const key = 'VIP-' + Date.now().toString(36).toUpperCase();
             const input = document.getElementById('game-key2-' + gameId);
-            if (input) { input.value = key;
-                showToast('🎲 Đã tạo mã: ' + key, 'info'); }
+            if (input) { input.value = key; showToast('🎲 Đã tạo mã: ' + key, 'info'); }
             return key;
         }
 
@@ -3803,8 +3798,7 @@
         }
 
         function resetAllData() {
-            showConfirmModal('⚠️ Reset toàn bộ dữ liệu?', 'Hành động này xóa TẤT CẢ dữ liệu và không thể khôi phục!',
-            function() {
+            showConfirmModal('⚠️ Reset toàn bộ dữ liệu?', 'Hành động này xóa TẤT CẢ dữ liệu và không thể khôi phục!', function() {
                 localStorage.clear();
                 showToast('🗑️ Đã reset toàn bộ dữ liệu!', 'warning');
                 setTimeout(() => location.reload(), 1500);
@@ -3834,8 +3828,7 @@
             const allCheck = document.createElement('input');
             allCheck.type = 'checkbox';
             allCheck.onchange = function() {
-                container.querySelectorAll('input[type="checkbox"]:not(.select-all input)').forEach(cb => cb.checked =
-                    this.checked);
+                container.querySelectorAll('input[type="checkbox"]:not(.select-all input)').forEach(cb => cb.checked = this.checked);
             };
             allLabel.appendChild(allCheck);
             allLabel.appendChild(document.createTextNode('✅ Tất cả'));
@@ -3855,8 +3848,7 @@
         function getSelectedCourses(containerId) {
             const container = document.getElementById(containerId);
             if (!container) return [];
-            return Array.from(container.querySelectorAll('input[type="checkbox"]:checked:not(.select-all input)')).map(cb =>
-                cb.value);
+            return Array.from(container.querySelectorAll('input[type="checkbox"]:checked:not(.select-all input)')).map(cb => cb.value);
         }
 
         // ======================================================================
@@ -3921,18 +3913,8 @@
         // ======================================================================
         window.onload = async function() {
             await initAdminAccount();
-            courses = getCourses();
-            documents = getDocuments();
-            categories = getCategories();
-            vipKeys = getVIPKeys();
-            console.log('✅ HỌC VIỆN ĐỎ PRO - Bảo mật & Tích hợp');
-            console.log('🔐 Mật khẩu mã hóa SHA-256');
-            console.log('🔒 Khóa tài khoản sau 5 lần sai');
-            console.log('⏰ Session hết hạn sau 30 phút');
-            console.log('👑 Admin mặc định: admin / admin123');
-            console.log('💬 Chat hỗ trợ giữa HV và Admin');
-            console.log('📁 Quản lý tài liệu với duyệt');
-            console.log('🎮 Quản lý VIP theo từng game');
+            initAdminData();
+            console.log('✅ HỌC VIỆN ĐỎ PRO - Bảo mật & Tích hợp Cloud');
         };
     </script>
 </body>

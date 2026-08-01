@@ -194,14 +194,12 @@
         .status-badge.locked { background: #FFCDD2; color: #C62828; }
         .status-badge.pending { background: #FFA726; color: #fff; }
         .status-badge.approved { background: #66BB6A; color: #fff; }
-        .status-badge.rejected { background: #EF5350; color: #fff; }
 
         .btn-action { padding: 4px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; margin: 2px; }
         .btn-edit { background: #1565C0; color: #fff; }
         .btn-delete { background: #C62828; color: #fff; }
         .btn-download { background: #4CAF50; color: #fff; }
         .btn-approve { background: #66BB6A; color: #fff; }
-        .btn-reject { background: #EF5350; color: #fff; }
 
         .search-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
         .search-bar input, .search-bar select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; flex: 1; min-width: 150px; }
@@ -218,7 +216,6 @@
         .locked-banner { background: #FFEBEE; border: 2px dashed var(--danger); padding: 20px; border-radius: 10px; text-align: center; margin-top: 20px; }
         .course-checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; background: #f9f9f9; border-radius: 8px; border: 1px solid #e0e0e0; }
         .course-checkbox-group label { display: flex; align-items: center; gap: 5px; padding: 4px 12px; background: #fff; border-radius: 20px; border: 1px solid #ddd; cursor: pointer; font-size: 13px; }
-        .course-checkbox-group .select-all { background: var(--primary); color: #fff; border-color: var(--primary); }
 
         .file-upload-area { border: 2px dashed #ccc; border-radius: 8px; padding: 30px; text-align: center; cursor: pointer; background: #fafafa; }
         .document-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 14px; }
@@ -248,6 +245,7 @@
         .admin-chat-list { display: grid; grid-template-columns: 260px 1fr; height: 480px; background: #fff; border-radius: 10px; border: 1px solid #e0e0e0; overflow: hidden; }
         .admin-chat-sidebar { border-right: 1px solid #e0e0e0; background: #fafafa; overflow-y: auto; }
         .admin-chat-sidebar .chat-user-item { padding: 12px 16px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .admin-chat-sidebar .chat-user-item:hover { background: #f0f0f0; }
         .admin-chat-sidebar .chat-user-item.active { background: #E3F2FD; border-left: 4px solid var(--primary); }
         .admin-chat-sidebar .unread-badge { background: #FF1744; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
         .admin-chat-main { display: flex; flex-direction: column; min-width: 0; }
@@ -323,7 +321,7 @@
             <div class="nav">
                 <a onclick="switchPage('home')" id="nav-home" class="active">🏠 Trang Chủ</a>
                 <a onclick="switchPage('games')" id="nav-games">🎮 Khóa Học</a>
-                <a onclick="switchPage('profile')" id="nav-profile">👤 Hồ Sơ</a>
+                <a onclick="switchPage('profile')" id="nav-profile">👤 Sổ Từ Vựng</a>
                 <a onclick="switchPage('documents')" id="nav-documents">📄 Tài Liệu</a>
                 <a onclick="switchPage('support')" id="nav-support">💬 Hỗ Trợ</a>
                 <a onclick="switchPage('admin')" id="nav-admin" style="display:none;">⚙️ Quản Trị</a>
@@ -373,34 +371,26 @@
                 <div id="game-grid-container" class="grid"></div>
             </div>
 
-            <!-- PROFILE -->
+            <!-- PROFILE / SỔ TỪ VỰNG -->
             <div id="page-profile" class="page">
-                <div class="hero" style="background:linear-gradient(135deg,#1565C0,#0D47A1);">
-                    <h1>👤 Hồ Sơ Của Tôi</h1>
+                <div class="hero" style="background:linear-gradient(135deg,#2E7D32,#1B5E20);">
+                    <h1>📖 Sổ Từ Vựng Cá Nhân</h1>
                 </div>
-                <div class="profile-container">
-                    <div class="profile-sidebar">
-                        <div class="avatar">👤</div>
-                        <div class="username" id="profile-username">User</div>
-                        <div class="user-role">Học viên</div>
-                        <div class="user-status" id="profile-status"><span class="status-badge free">Free</span></div>
-                        <div style="margin-top:14px;font-size:13px;color:#666;"><span id="profile-courses-count">📚 0 khóa</span></div>
+                <div class="admin-panel">
+                    <h3>➕ Thêm từ mới vào Sổ tay cá nhân</h3>
+                    <div class="admin-form">
+                        <div class="form-group"><label>Từ mới (Word)</label><input type="text" id="my-word-input" placeholder="Ví dụ: Grateful"></div>
+                        <div class="form-group"><label>Nghĩa (Meaning)</label><input type="text" id="my-meaning-input" placeholder="Ví dụ: Biết ơn"></div>
+                        <div class="form-group full-width"><button class="btn-submit" onclick="addPersonalWord()" style="background:#2E7D32;">📌 Lưu Vào Sổ Cá Nhân</button></div>
                     </div>
-                    <div class="profile-content">
-                        <div class="profile-tabs">
-                            <button class="profile-tab active" data-tab="courses" onclick="switchProfileTab('courses')">📚 Khóa học đã mua</button>
-                            <button class="profile-tab" data-tab="password" onclick="switchProfileTab('password')">🔑 Đổi mật khẩu</button>
-                        </div>
-                        <div class="profile-tab-content active" id="tab-courses">
-                            <div id="course-list-container" class="course-list"></div>
-                        </div>
-                        <div class="profile-tab-content" id="tab-password">
-                            <div class="form-group"><label>Mật khẩu hiện tại</label><input type="password" id="profile-current-pass"></div>
-                            <div class="form-group"><label>Mật khẩu mới (≥6 ký tự)</label><input type="password" id="profile-new-pass"></div>
-                            <div class="form-group"><label>Xác nhận mật khẩu mới</label><input type="password" id="profile-confirm-pass"></div>
-                            <div id="profile-change-result" style="margin-top:10px;display:none;"></div>
-                            <button class="btn-submit" onclick="changeUserPasswordProfile()" style="width:auto;padding:10px 30px;">🔄 Đổi mật khẩu</button>
-                        </div>
+                </div>
+                <div class="admin-panel" style="margin-top:20px;">
+                    <h3>📚 Từ vựng của tôi</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>#</th><th>Từ mới</th><th>Nghĩa</th><th>Ngày lưu</th><th>Thao tác</th></tr></thead>
+                            <tbody id="my-vocab-table-body"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -419,7 +409,7 @@
                         <div class="form-group"><label>Danh mục</label><select id="doc-category"></select></div>
                         <div class="form-group full-width">
                             <label>Chọn file</label>
-                            <div class="file-upload-area" id="file-upload-area">
+                            <div class="file-upload-area" id="file-upload-area" onclick="document.getElementById('doc-file-input').click()">
                                 <span>📁 Nhấn để chọn file</span>
                                 <div id="selected-file-name" style="color:var(--primary);font-weight:bold;"></div>
                                 <input type="file" id="doc-file-input" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" style="display:none;">
@@ -442,7 +432,7 @@
             <!-- SUPPORT (HỌC VIÊN CHAT) -->
             <div id="page-support" class="page">
                 <div class="hero" style="background:linear-gradient(135deg,#1565C0,#0D47A1);">
-                    <h1>💬 Hỗ Trợ Học Viên</h1>
+                    <h1>💬 Trò Chuyện Với Admin</h1>
                 </div>
                 <div class="admin-panel">
                     <div class="chat-container">
@@ -541,17 +531,17 @@
                 <div class="admin-panel"><div id="student-list-container"></div></div>
             </div>
 
-            <!-- ADMIN SUPPORT (CHAT QUẢN TRỊ) -->
+            <!-- ADMIN SUPPORT (CHAT QUẢN TRỊ - HIỆN TẤT CẢ HỌC VIÊN ĐỂ PHÁT THÔNG BÁO) -->
             <div id="page-admin-support" class="page">
-                <div class="hero" style="background:linear-gradient(135deg,#E65100,#BF360C);"><h1>📩 Hỗ Trợ Học Viên</h1></div>
+                <div class="hero" style="background:linear-gradient(135deg,#E65100,#BF360C);"><h1>📩 Hỗ Trợ & Phát Thông Báo Học Viên</h1></div>
                 <div class="admin-panel">
                     <div class="admin-chat-list">
-                        <div class="admin-chat-sidebar" id="admin-chat-users"><div style="padding:15px;color:#888;">Đang tải...</div></div>
+                        <div class="admin-chat-sidebar" id="admin-chat-users"><div style="padding:15px;color:#888;">Đang tải danh sách học viên...</div></div>
                         <div class="admin-chat-main">
-                            <div class="admin-chat-header" id="admin-chat-header">Chọn học viên</div>
+                            <div class="admin-chat-header" id="admin-chat-header">Chọn một học viên bên trái để bắt đầu chat hoặc gửi thông báo</div>
                             <div class="chat-messages" id="admin-chat-messages"><div class="chat-empty"><p>Chọn học viên bên trái</p></div></div>
                             <div class="chat-input-area">
-                                <textarea id="admin-chat-input" placeholder="Nhập phản hồi..." rows="2" disabled></textarea>
+                                <textarea id="admin-chat-input" placeholder="Nhập tin nhắn hoặc thông báo..." rows="2" disabled></textarea>
                                 <button class="btn-submit" onclick="sendAdminReply()" disabled>📤 Gửi</button>
                             </div>
                         </div>
@@ -617,7 +607,6 @@
         let currentUser = null;
         let adminSelectedUser = null;
 
-        // CẦU NỐI DỮ LIỆU CHO CÁC CHƯƠNG TRÌNH CON (IFRAME)
         window.AppDataBridge = {
             async loadData(courseId, isGlobal, def = null) {
                 if (isGlobal && window.fs && window.db) {
@@ -659,7 +648,7 @@
         }
 
         // ======================================================================
-        // 💬 HỆ THỐNG CHAT CLOUD ĐÃ SỬA TRIỆT ĐỂ LỖI (ADMIN NHẬN TIN & SỐ 1 ĐỎ)
+        // 💬 HỆ THỐNG CHAT CLOUD & PHÁT THÔNG BÁO
         // ======================================================================
         async function sendStudentMessage() {
             if (!currentUser || currentUser === 'admin') return;
@@ -681,10 +670,10 @@
         }
 
         async function sendAdminReply() {
-            if (!adminSelectedUser) return;
+            if (!adminSelectedUser) { showToast('Vui lòng chọn học viên ở cột bên trái!', 'warning'); return; }
             const input = document.getElementById('admin-chat-input');
             const text = input.value.trim();
-            if (!text) { showToast('Vui lòng nhập phản hồi!', 'warning'); return; }
+            if (!text) { showToast('Vui lòng nhập nội dung thông báo/tin nhắn!', 'warning'); return; }
 
             const msgId = 'msg_' + Date.now();
             const msg = { id: msgId, from: 'admin', to: adminSelectedUser, text, time: new Date().toISOString(), read: false };
@@ -693,7 +682,7 @@
                 if (window.fs && window.db) {
                     await window.fs.setDoc(window.fs.doc(window.db, "chats", adminSelectedUser, "messages", msgId), msg);
                     input.value = '';
-                    showToast('✅ Đã phản hồi!', 'success');
+                    showToast(`✅ Đã gửi thông báo đến ${adminSelectedUser}!`, 'success');
                     await loadAdminChat();
                 }
             } catch(e) { console.error(e); }
@@ -711,7 +700,7 @@
                 list.sort((a, b) => new Date(a.time) - new Date(b.time));
 
                 if (list.length === 0) {
-                    container.innerHTML = `<div class="chat-empty"><p>Chưa có tin nhắn...</p></div>`;
+                    container.innerHTML = `<div class="chat-empty"><p>Chưa có tin nhắn...<br>Hãy gửi tin nhắn đầu tiên để liên hệ Admin!</p></div>`;
                     return;
                 }
 
@@ -736,9 +725,12 @@
             if (!sidebar) return;
 
             try {
+                // 🟢 LẤY TẤT CẢ TÀI KHOẢN HỌC VIÊN TRÊN HỆ THỐNG (HIỂN THỊ ĐỦ HỌC VIÊN)
                 const usersSnap = await window.fs.getDocs(window.fs.collection(window.db, "users"));
                 let users = [];
-                usersSnap.forEach(d => { if (d.id !== 'admin' && !d.data().isAdmin) users.push(d.id); });
+                usersSnap.forEach(d => {
+                    if (d.id !== 'admin' && !d.data().isAdmin) users.push(d.id);
+                });
 
                 if (users.length === 0) {
                     sidebar.innerHTML = `<div style="padding:15px;color:#888;">Chưa có học viên nào</div>`;
@@ -747,15 +739,17 @@
 
                 let sideHtml = '';
                 for (let u of users) {
+                    // Kiểm tra xem học viên này có tin nhắn chưa đọc không
                     const mSnap = await window.fs.getDocs(window.fs.collection(window.db, "chats", u, "messages"));
                     let unread = 0;
                     mSnap.forEach(m => { if (m.data().from === u && !m.data().read) unread++; });
+                    
                     sideHtml += `<div class="chat-user-item ${adminSelectedUser === u ? 'active' : ''}" onclick="selectChatUser('${u}')"><span>👤 ${u}</span>${unread > 0 ? `<span class="unread-badge">${unread}</span>` : ''}</div>`;
                 }
                 sidebar.innerHTML = sideHtml;
 
                 if (adminSelectedUser) {
-                    document.getElementById('admin-chat-header').textContent = '💬 Đang chat với: ' + adminSelectedUser;
+                    document.getElementById('admin-chat-header').textContent = '💬 Đang chat & phát thông báo tới: ' + adminSelectedUser;
                     document.getElementById('admin-chat-input').disabled = false;
                     document.querySelector('#admin-chat-main .chat-input-area .btn-submit').disabled = false;
 
@@ -765,17 +759,21 @@
                     list.sort((a, b) => new Date(a.time) - new Date(b.time));
 
                     const container = document.getElementById('admin-chat-messages');
-                    let html = '';
-                    for (let m of list) {
-                        const isSent = m.from === 'admin';
-                        if (m.from === adminSelectedUser && !m.read) {
-                            m.read = true;
-                            await window.fs.setDoc(window.fs.doc(window.db, "chats", adminSelectedUser, "messages", m.id), m);
+                    if (list.length === 0) {
+                        container.innerHTML = `<div class="chat-empty"><p>Chưa có lịch sử nhắn tin với học viên này.<br>Hãy nhập tin nhắn bên dưới để gửi thông báo chủ động!</p></div>`;
+                    } else {
+                        let html = '';
+                        for (let m of list) {
+                            const isSent = m.from === 'admin';
+                            if (m.from === adminSelectedUser && !m.read) {
+                                m.read = true;
+                                await window.fs.setDoc(window.fs.doc(window.db, "chats", adminSelectedUser, "messages", m.id), m);
+                            }
+                            html += `<div class="chat-message ${isSent ? 'sent' : 'received'}"><div class="msg-sender">${isSent ? 'Admin' : adminSelectedUser}</div><div class="msg-bubble">${m.text}</div></div>`;
                         }
-                        html += `<div class="chat-message ${isSent ? 'sent' : 'received'}"><div class="msg-sender">${isSent ? 'Admin' : adminSelectedUser}</div><div class="msg-bubble">${m.text}</div></div>`;
+                        container.innerHTML = html;
+                        container.scrollTop = container.scrollHeight;
                     }
-                    container.innerHTML = html;
-                    container.scrollTop = container.scrollHeight;
                 }
                 await updateChatBadge();
             } catch(e) {}
@@ -813,7 +811,7 @@
         }
 
         // ======================================================================
-        // CÁC HÀM CƠ BẢN HỆ THỐNG (Khóa học, VIP, UI, v.v.)
+        // CÁC HÀM CƠ BẢN QUẢN LÝ
         // ======================================================================
         let courses = getStorage('courses', [
             { id: 'course-en', icon: '🇬🇧', name: 'Từ Vựng Tiếng Anh', description: 'Học từ vựng tiếng Anh cơ bản', file: 'games/vocab-en.html', vip: false, status: 'hot', isGlobal: false },
@@ -831,7 +829,7 @@
             if (id === 'games') renderGames();
             if (id === 'support') loadStudentChat();
             if (id === 'admin-support') loadAdminChat();
-            if (id === 'students') renderStudentList();
+            if (id === 'students') renderStudents();
         }
 
         function switchAdminTab(tab) {

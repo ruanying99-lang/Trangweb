@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Học Tiếng Anh Pro</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%232E7D32'/%3E%3Ctext x='50%25' y='57%25' font-size='40' font-family='Arial, sans-serif' font-weight='bold' fill='white' dominant-baseline='middle' text-anchor='middle'%3EEN%3C/text%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%232E7D32'/%3E%3Ctext x='50%25' y='57%25' font-size='40' font-family='Arial, sans-serif' font-weight='bold' fill='white' dominant-baseline='middle' text-anchor='middle'%3EEN%3C/text%3E%3C/svg%3E">
     <!-- Thư viện đọc file Excel SheetJS -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
     <style>
-        /* --- GIAO DIỆN CHUNG --- */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body {
             background-color: #1a252f; 
@@ -23,7 +22,6 @@
         .screen { display: none; }
         .screen.active { display: block !important; }
 
-        /* --- NÚT BẤM --- */
         .btn {
             width: 100%; padding: 16px; font-size: 1.3rem; font-weight: bold; color: #000000; background-color: #FFFFFF;
             border: 3px solid #C5E1A5; border-radius: 12px; cursor: pointer; transition: all 0.2s; margin-bottom: 12px; text-align: center;
@@ -33,7 +31,6 @@
         .btn:active { transform: translateY(1px); }
         .back-btn { background-color: #EEEEEE; border-color: #BDBDBD; margin-top: 15px; }
 
-        /* --- GIAO DIỆN GAMEPLAY --- */
         .score-board { display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; border-bottom: 2px dashed #8BC34A; padding-bottom: 10px; }
         .question-hint { font-size: 1rem; color: #555; text-align: center; margin-bottom: 5px; font-weight: bold; }
         .question-box { font-size: 2.3rem; font-weight: bold; text-align: center; margin-bottom: 5px; line-height: 1.4; cursor: pointer; user-select: none; color: #2E7D32; }
@@ -41,14 +38,12 @@
         .options-container { display: grid; grid-template-columns: 1fr; gap: 12px; }
         @media (min-width: 480px) { .options-container { grid-template-columns: 1fr 1fr; } }
         
-        /* Câu ví dụ */
         .example-box {
             background-color: #F1F8E9; border: 2px dashed #8BC34A; padding: 12px; border-radius: 8px;
             margin-bottom: 15px; font-size: 1.2rem; text-align: center; display: none; line-height: 1.5;
         }
         .example-box span.highlight { color: #E53935; font-style: italic; font-weight: bold; }
 
-        /* --- BẢNG NHẬT KÝ --- */
         .log-section { margin-top: 25px; padding-top: 15px; border-top: 2px dashed #8BC34A; }
         .log-title { font-size: 1.3rem; font-weight: bold; text-align: center; margin-bottom: 10px; color: #2E7D32; }
         .log-table { width: 100%; border-collapse: collapse; background-color: #E8F5E9; border-radius: 10px; overflow: hidden; font-size: 1.1rem; }
@@ -57,7 +52,6 @@
         .log-table tr:nth-child(even) { background-color: #C8E6C9; opacity: 0.8; }
         .log-empty { text-align: center; padding: 15px; color: #81C784; font-style: italic; font-size: 1rem; }
 
-        /* --- SỔ TỪ VỰNG & QUẢN LÝ XÓA --- */
         .vocab-actions { display: flex; gap: 10px; margin-bottom: 15px; }
         .btn-sm { padding: 8px 12px; font-size: 1rem; margin-bottom: 0; width: auto; flex: 1; }
         .vocab-list-container { max-height: 320px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px; }
@@ -77,11 +71,9 @@
             font-size: 1rem; margin-top: 5px; line-height: 1.4; display: none;
         }
 
-        /* --- MÀN HÌNH TỔNG KẾT --- */
         .summary-list { max-height: 300px; overflow-y: auto; margin: 15px 0; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #ddd; }
         .summary-item { display: flex; align-items: center; gap: 12px; padding: 8px; border-bottom: 1px solid #eee; font-size: 1.1rem; border-radius: 6px; margin-bottom: 4px; }
 
-        /* --- HIỆU ỨNG NHẤP NHÁY --- */
         @keyframes blink-green { 0%, 100% { background-color: #FFFFFF; } 50% { background-color: #4CAF50; color: white; } }
         @keyframes blink-red { 0%, 100% { background-color: #FFFFFF; } 50% { background-color: #F44336; color: white; } }
         .correct-blink { animation: blink-green 0.3s ease-in-out 3; }
@@ -92,7 +84,6 @@
 
     <div class="game-container">
         
-        <!-- MÀN HÌNH MENU CHÍNH (Hiển thị đầu tiên) -->
         <div id="screen-menu" class="screen active">
             <div class="menu-title">ENGLISH LEARNING GAME PRO</div>
             <button class="btn" onclick="autoStartSmartGame()">🎮 BẮT ĐẦU CHƠI (50 CÂU)</button>
@@ -116,7 +107,6 @@
             </div>
         </div>
 
-        <!-- MÀN HÌNH TÙY CHỌN SỔ TỪ VỰNG -->
         <div id="screen-vocab-options" class="screen">
             <div class="menu-title">XEM SỔ TỪ VỰNG</div>
             <button class="btn" onclick="viewVocab('all')">🌐 Tất Cả Từ Vựng</button>
@@ -125,7 +115,6 @@
             <button class="btn back-btn" onclick="showScreen('screen-menu')">⬅️ Quay Lại Menu</button>
         </div>
 
-        <!-- MÀN HÌNH CHI TIẾT SỔ TỪ VỰNG -->
         <div id="screen-vocab-list" class="screen">
             <div class="menu-title" id="vocab-list-title">DANH SÁCH TỪ VỰNG</div>
             <div class="vocab-actions">
@@ -137,12 +126,10 @@
             <button class="btn back-btn" onclick="showScreen('screen-vocab-options')">⬅️ Quay Lại</button>
         </div>
 
-        <!-- MÀN HÌNH CHỜ -->
         <div id="screen-loading" class="screen">
             <div class="loading-text" style="text-align:center; font-weight:bold;">⏳ Hệ thống đang xử lý...</div>
         </div>
 
-        <!-- MÀN HÌNH GAMEPLAY CHÍNH -->
         <div id="screen-gameplay" class="screen">
             <div class="score-board">
                 <div>Câu: <span id="current-q-index" style="color: #0288D1;">0</span>/50</div>
@@ -153,14 +140,12 @@
             <div class="question-box" id="question-main" onclick="toggleExampleDisplay()">--</div>
             <div class="pinyin-box" id="question-sub">(--)</div>
 
-            <!-- Khung hiển thị câu ví dụ -->
             <div class="example-box" id="example-display-box"></div>
 
             <div class="options-container" id="options-box"></div>
             <button class="btn back-btn" onclick="showScreen('screen-menu')" style="margin-top: 20px;">📴 Thoát Game</button>
         </div>
 
-        <!-- MÀN HÌNH TỔNG KẾT -->
         <div id="screen-summary" class="screen">
             <div class="menu-title">KẾT QUẢ VÒNG CHƠI</div>
             <div style="text-align: center; font-weight: bold; margin-bottom: 10px;" id="summary-score-text">Bạn đạt: 0/50 câu đúng</div>
@@ -178,8 +163,7 @@
     </div>
 
     <script>
-        // Kho dữ liệu mặc định ban đầu cấu trúc tiếng Anh
-        let vocabulary = [
+        let defaultVocabulary = [
             { word: "Hello", pronunciation: "/həˈloʊ/", type: "interjection", definition: "Xin chào", example: "Hello! How are you?", learned: false },
             { word: "Book", pronunciation: "/bʊk/", type: "noun", definition: "Quyển sách", example: "I am reading a good book.", learned: false },
             { word: "Beautiful", pronunciation: "/ˈbjuːtɪfl/", type: "adjective", definition: "Xinh đẹp", example: "She is a beautiful girl.", learned: false },
@@ -187,6 +171,7 @@
             { word: "Quickly", pronunciation: "/ˈkwɪkli/", type: "adverb", definition: "Một cách nhanh chóng", example: "Please finish your homework quickly.", learned: false }
         ];
 
+        let vocabulary = [];
         let studyLogs = [];
         let gameQuestions = [];  
         let currentQuestionIndex = 0;
@@ -197,23 +182,42 @@
         let currentVocabViewMode = 'all';
         let wordPerformanceTracker = {};
 
-        // --- ĐỒNG BỘ LOCALSTORAGE ---
-        function saveDataToStorage() {
-            localStorage.setItem('en_game_vocabulary', JSON.stringify(vocabulary));
-            localStorage.setItem('en_game_study_logs', JSON.stringify(studyLogs));
+        // Đồng bộ dữ liệu qua AppDataBridge kết nối Cloud Firestore của trang chính
+        async function saveDataToCloud() {
+            if (window.parent && window.parent.AppDataBridge) {
+                await window.parent.AppDataBridge.saveData('vocab_game_data', false, {
+                    vocabulary: vocabulary,
+                    studyLogs: studyLogs
+                });
+            } else {
+                localStorage.setItem('en_game_vocabulary', JSON.stringify(vocabulary));
+                localStorage.setItem('en_game_study_logs', JSON.stringify(studyLogs));
+            }
         }
 
-        function loadDataFromStorage() {
-            const savedVocab = localStorage.getItem('en_game_vocabulary');
-            const savedLogs = localStorage.getItem('en_game_study_logs');
-            if (savedVocab) { try { vocabulary = JSON.parse(savedVocab); } catch(e) {} }
-            if (savedLogs) { try { studyLogs = JSON.parse(savedLogs); } catch(e) {} }
-        }
-        loadDataFromStorage();
-        
-        // Khởi tạo giao diện nhật ký ngay khi tải trang
-        window.onload = function() {
+        async function loadDataFromCloud() {
+            showScreen('screen-loading');
+            if (window.parent && window.parent.AppDataBridge) {
+                const data = await window.parent.AppDataBridge.loadData('vocab_game_data', false, null);
+                if (data) {
+                    vocabulary = data.vocabulary || defaultVocabulary;
+                    studyLogs = data.studyLogs || [];
+                } else {
+                    vocabulary = defaultVocabulary;
+                    studyLogs = [];
+                }
+            } else {
+                const savedVocab = localStorage.getItem('en_game_vocabulary');
+                const savedLogs = localStorage.getItem('en_game_study_logs');
+                vocabulary = savedVocab ? JSON.parse(savedVocab) : defaultVocabulary;
+                studyLogs = savedLogs ? JSON.parse(savedLogs) : [];
+            }
             renderLogTable();
+            showScreen('screen-menu');
+        }
+
+        window.onload = async function() {
+            await loadDataFromCloud();
         };
 
         function showScreen(screenId) {
@@ -222,13 +226,12 @@
             if (target) target.classList.add('active');
         }
 
-        // --- NẠP FILE EXCEL ---
         function handleExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             showScreen('screen-loading');
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
@@ -253,7 +256,7 @@
                         }
                     });
                     
-                    saveDataToStorage();
+                    await saveDataToCloud();
                     alert(`🎉 Thành công! Đã nạp thêm ${addedCount} từ vựng mới.\n🚫 Bỏ qua ${duplicateCount} từ trùng tên.`);
                 } catch (error) { alert("Lỗi định dạng file Excel!"); }
                 event.target.value = '';
@@ -262,7 +265,6 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // --- CƠ CHẾ KHỞI TẠO VÒNG CHƠI THÔNG MINH ---
         function autoStartSmartGame() {
             if (vocabulary.length < 4) { alert("Vui lòng nạp tối thiểu từ 4 từ vựng tiếng Anh trở lên để hệ thống trộn đề!"); return; }
 
@@ -300,7 +302,6 @@
             loadNextQuestion();
         }
 
-        // --- TẢI CÂU HỎI IN GAME ---
         function loadNextQuestion() {
             document.getElementById('example-display-box').style.display = 'none';
             if (currentQuestionIndex >= gameQuestions.length) { endGameTurn(); return; }
@@ -418,7 +419,6 @@
             }
         }
 
-        // --- MÀN HÌNH TỔNG KẾT ---
         function endGameTurn() {
             showScreen('screen-summary');
             document.getElementById('summary-score-text').innerText = `Bạn đạt: ${currentScore}/${gameQuestions.length} câu đúng`;
@@ -470,7 +470,7 @@
 
         function selectSummaryAll(status) { document.querySelectorAll('#summary-list-content input[type="checkbox"]').forEach(c => c.checked = status); }
 
-        function submitSummaryChanges() {
+        async function submitSummaryChanges() {
             document.querySelectorAll('#summary-list-content input[type="checkbox"]').forEach(c => {
                 const idx = parseInt(c.getAttribute('data-origin-idx'));
                 if (idx >= 0 && idx < vocabulary.length) { vocabulary[idx].learned = c.checked; }
@@ -481,7 +481,7 @@
             let dateStr = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
             studyLogs.unshift({ date: dateStr, count: uniqueCount });
-            saveDataToStorage();
+            await saveDataToCloud();
 
             alert("💾 Đã lưu tiến trình học tập thành công!");
             showScreen('screen-menu');
@@ -502,7 +502,6 @@
             });
         }
 
-        // --- XEM VÀ QUẢN LÝ SỔ TỪ VỰNG ANH VĂN ---
         function viewVocab(mode) {
             currentVocabViewMode = mode; showScreen('screen-loading'); renderVocabList();
             setTimeout(() => { showScreen('screen-vocab-list'); }, 600);
@@ -517,7 +516,7 @@
             const container = document.getElementById('vocab-list-content'); container.innerHTML = '';
             if (filtered.length === 0) { container.innerHTML = '<div style="text-align:center; padding:20px; color:#757575; font-style:italic;">Sổ từ vựng trống.</div>'; return; }
 
-            filtered.forEach((w, localIdx) => {
+            filtered.forEach((w) => {
                 const globalIdx = vocabulary.findIndex(v => v.word === w.word);
                 const item = document.createElement('div');
                 item.className = `vocab-item ${w.learned ? 'status-learned' : ''}`;
@@ -574,21 +573,27 @@
             chks.forEach(c => c.checked = !allChecked);
         }
 
-        function deleteSelectedVocab() {
+        async function deleteSelectedVocab() {
             const chks = document.querySelectorAll('.vocab-select-chk:checked');
             if (chks.length === 0) { alert("Vui lòng chọn từ để xóa!"); return; }
             if (confirm(`Bạn có chắc chắn muốn xóa ${chks.length} mục đã chọn?`)) {
                 let indices = Array.from(chks).map(c => parseInt(c.getAttribute('data-global-idx'))).sort((a, b) => b - a);
                 indices.forEach(idx => { if (idx >= 0 && idx < vocabulary.length) vocabulary.splice(idx, 1); });
-                saveDataToStorage();
+                await saveDataToCloud();
                 renderVocabList(); 
             }
         }
 
-        function deleteAllVocabMode() {
-            if (currentVocabViewMode === 'all') { if (confirm("Xóa SẠCH kho dữ liệu?")) { vocabulary = []; saveDataToStorage(); renderVocabList(); } }
-            else if (currentVocabViewMode === 'new') { if (confirm("Xóa hết từ mới?")) { vocabulary = vocabulary.filter(w => w.learned); saveDataToStorage(); renderVocabList(); } }
-            else if (currentVocabViewMode === 'learned') { if (confirm("Xóa hết từ đã thuộc?")) { vocabulary = vocabulary.filter(w => !w.learned); saveDataToStorage(); renderVocabList(); } }
+        async function deleteAllVocabMode() {
+            if (currentVocabViewMode === 'all') { 
+                if (confirm("Xóa SẠCH kho dữ liệu?")) { vocabulary = []; await saveDataToCloud(); renderVocabList(); } 
+            }
+            else if (currentVocabViewMode === 'new') { 
+                if (confirm("Xóa hết từ mới?")) { vocabulary = vocabulary.filter(w => w.learned); await saveDataToCloud(); renderVocabList(); } 
+            }
+            else if (currentVocabViewMode === 'learned') { 
+                if (confirm("Xóa hết từ đã thuộc?")) { vocabulary = vocabulary.filter(w => !w.learned); await saveDataToCloud(); renderVocabList(); } 
+            }
         }
     </script>
 </body>

@@ -23,8 +23,7 @@
         .screen { display: none; }
         .screen.active { display: block !important; }
 
-        /* --- NÚT BẤM & Ô NHẬP --- */
-        .input-group { width: 100%; display: flex; flex-direction: column; gap: 15px; align-items: center; }
+        /* --- NÚT BẤM --- */
         .btn {
             width: 100%; padding: 16px; font-size: 1.3rem; font-weight: bold; color: #000000; background-color: #FFFFFF;
             border: 3px solid #C5E1A5; border-radius: 12px; cursor: pointer; transition: all 0.2s; margin-bottom: 12px; text-align: center;
@@ -93,9 +92,9 @@
 
     <div class="game-container">
         
-        <!-- MÀN HÌNH 2: MENU CHÍNH (Được đặt làm mặc định hiển thị khi vào trang) -->
+        <!-- MÀN HÌNH MENU CHÍNH (Hiển thị đầu tiên) -->
         <div id="screen-menu" class="screen active">
-            <div class="menu-title" id="welcome-text">ENGLISH LEARNING GAME PRO</div>
+            <div class="menu-title">ENGLISH LEARNING GAME PRO</div>
             <button class="btn" onclick="autoStartSmartGame()">🎮 BẮT ĐẦU CHƠI (50 CÂU)</button>
             <button class="btn" onclick="showScreen('screen-vocab-options')">📖 SỔ TỪ VỰNG ANH VĂN</button>
             
@@ -107,8 +106,7 @@
                 <table class="log-table">
                     <thead>
                         <tr>
-                            <th>Tên</th>
-                            <th>Ngày học</th>
+                            <th>Thời gian</th>
                             <th>Số từ học</th>
                         </tr>
                     </thead>
@@ -118,7 +116,7 @@
             </div>
         </div>
 
-        <!-- MÀN HÌNH 3: TÙY CHỌN SỔ TỪ VỰNG -->
+        <!-- MÀN HÌNH TÙY CHỌN SỔ TỪ VỰNG -->
         <div id="screen-vocab-options" class="screen">
             <div class="menu-title">XEM SỔ TỪ VỰNG</div>
             <button class="btn" onclick="viewVocab('all')">🌐 Tất Cả Từ Vựng</button>
@@ -127,7 +125,7 @@
             <button class="btn back-btn" onclick="showScreen('screen-menu')">⬅️ Quay Lại Menu</button>
         </div>
 
-        <!-- MÀN HÌNH 4: CHI TIẾT SỔ TỪ VỰNG -->
+        <!-- MÀN HÌNH CHI TIẾT SỔ TỪ VỰNG -->
         <div id="screen-vocab-list" class="screen">
             <div class="menu-title" id="vocab-list-title">DANH SÁCH TỪ VỰNG</div>
             <div class="vocab-actions">
@@ -144,10 +142,9 @@
             <div class="loading-text" style="text-align:center; font-weight:bold;">⏳ Hệ thống đang xử lý...</div>
         </div>
 
-        <!-- MÀN HÌNH 5: GAMEPLAY CHÍNH -->
+        <!-- MÀN HÌNH GAMEPLAY CHÍNH -->
         <div id="screen-gameplay" class="screen">
             <div class="score-board">
-                <div>👤: <span id="display-name" style="color: #558B2F;">Học viên</span></div>
                 <div>Câu: <span id="current-q-index" style="color: #0288D1;">0</span>/50</div>
                 <div>🏆: <span id="score" style="color: #E65100;">0</span></div>
             </div>
@@ -163,7 +160,7 @@
             <button class="btn back-btn" onclick="showScreen('screen-menu')" style="margin-top: 20px;">📴 Thoát Game</button>
         </div>
 
-        <!-- MÀN HÌNH 6: TỔNG KẾT -->
+        <!-- MÀN HÌNH TỔNG KẾT -->
         <div id="screen-summary" class="screen">
             <div class="menu-title">KẾT QUẢ VÒNG CHƠI</div>
             <div style="text-align: center; font-weight: bold; margin-bottom: 10px;" id="summary-score-text">Bạn đạt: 0/50 câu đúng</div>
@@ -181,7 +178,7 @@
     </div>
 
     <script>
-        // Kho dữ liệu mặc định ban đầu cấu trúc 5 cột tiếng Anh
+        // Kho dữ liệu mặc định ban đầu cấu trúc tiếng Anh
         let vocabulary = [
             { word: "Hello", pronunciation: "/həˈloʊ/", type: "interjection", definition: "Xin chào", example: "Hello! How are you?", learned: false },
             { word: "Book", pronunciation: "/bʊk/", type: "noun", definition: "Quyển sách", example: "I am reading a good book.", learned: false },
@@ -191,7 +188,6 @@
         ];
 
         let studyLogs = [];
-        let currentPlayerName = "Học viên";
         let gameQuestions = [];  
         let currentQuestionIndex = 0;
         let currentScore = 0;
@@ -226,7 +222,7 @@
             if (target) target.classList.add('active');
         }
 
-        // --- NẠP FILE EXCEL (5 CỘT TIẾNG ANH) ---
+        // --- NẠP FILE EXCEL ---
         function handleExcelUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -484,7 +480,7 @@
             let now = new Date();
             let dateStr = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
-            studyLogs.unshift({ name: currentPlayerName, date: dateStr, count: uniqueCount });
+            studyLogs.unshift({ date: dateStr, count: uniqueCount });
             saveDataToStorage();
 
             alert("💾 Đã lưu tiến trình học tập thành công!");
@@ -501,7 +497,7 @@
 
             studyLogs.forEach(log => {
                 const row = document.createElement('tr');
-                row.innerHTML = `<td>${log.name}</td><td>${log.date}</td><td><strong>${log.count} từ</strong></td>`;
+                row.innerHTML = `<td>${log.date}</td><td><strong>${log.count} từ</strong></td>`;
                 tbody.appendChild(row);
             });
         }

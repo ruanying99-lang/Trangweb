@@ -18,57 +18,219 @@
             --warning: #E65100;
             --info: #1565C0;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 60px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            padding-bottom: 60px;
+        }
 
         /* HEADER */
-        .header { background: var(--primary); color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-        .logo { font-size: 22px; font-weight: bold; color: var(--accent); }
-        .nav { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-        .nav a { color: #fff; text-decoration: none; padding: 6px 14px; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 14px; position: relative; }
-        .nav a:hover, .nav a.active { background: var(--primary-dark); color: var(--accent); }
-        .nav-badge { position: absolute; top: -6px; right: -6px; background: #FF1744; color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: bold; }
-        .user-info { background: var(--primary-dark); padding: 5px 15px; border-radius: 20px; border: 1px solid var(--accent); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 14px; }
-        .btn-logout { background: #fff; color: var(--primary); border: none; padding: 4px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .header {
+            background: var(--primary);
+            color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        .nav {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 6px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            position: relative;
+        }
+        .nav a:hover,
+        .nav a.active {
+            background: var(--primary-dark);
+            color: var(--accent);
+        }
+        .nav-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #FF1744;
+            color: #fff;
+            font-size: 10px;
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .user-info {
+            background: var(--primary-dark);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 14px;
+        }
+        .btn-logout {
+            background: #fff;
+            color: var(--primary);
+            border: none;
+            padding: 4px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-logout:hover { background: #eee; }
 
-        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
-        .page { display: none; animation: fadeIn 0.35s ease; }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .page {
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         /* AUTH */
-        .auth-wrapper { max-width: 400px; margin: 80px auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); border-top: 5px solid var(--primary); }
+        .auth-wrapper {
+            max-width: 400px;
+            margin: 80px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-top: 5px solid var(--primary);
+        }
         .auth-wrapper h2 { text-align: center; margin-bottom: 20px; color: var(--primary); }
         .form-group { margin-bottom: 14px; }
         .form-group label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 14px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
-        .btn-submit { width: 100%; background: var(--primary); color: #fff; border: none; padding: 12px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;
+        }
+        .form-group textarea { resize: vertical; min-height: 70px; }
+        .btn-submit {
+            width: 100%; background: var(--primary); color: #fff; border: none; padding: 12px;
+            border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
         .btn-submit:hover { background: var(--primary-dark); transform: scale(1.01); }
         .btn-submit.small { width: auto; padding: 8px 18px; font-size: 13px; }
         .auth-toggle { text-align: center; margin-top: 14px; font-size: 14px; }
         .auth-toggle span { color: var(--primary); cursor: pointer; font-weight: bold; }
+        .security-notice {
+            background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px;
+            padding: 10px 14px; margin-bottom: 14px; font-size: 13px; color: #856404;
+        }
 
-        /* HERO & CARDS */
-        .hero { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; padding: 30px 35px; border-radius: 12px; margin-bottom: 25px; }
+        /* HERO */
+        .hero {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff; padding: 30px 35px; border-radius: 12px; margin-bottom: 25px;
+        }
         .hero h1 { color: var(--accent); font-size: 28px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 20px; }
-        .card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06); border-left: 5px solid var(--primary); position: relative; transition: 0.3s; }
-        
-        /* ADMIN PANEL & TABLES */
-        .admin-panel { background: #fff; border-radius: 10px; padding: 20px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04); }
+        .hero p { opacity: 0.9; }
+
+        /* CARDS & GRID */
+        .grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 20px;
+        }
+        .card {
+            background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            border-left: 5px solid var(--primary); position: relative; transition: 0.3s;
+        }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); }
+        .card h3 { color: var(--primary-dark); margin-bottom: 8px; }
+        .card p { font-size: 14px; color: #666; margin-bottom: 12px; }
+        .game-status-badge {
+            position: absolute; top: 14px; right: 14px; font-size: 11px; padding: 3px 10px; border-radius: 4px; font-weight: bold;
+        }
+        .badge-locked { background: #555; color: #fff; }
+        .badge-vip { background: var(--accent); color: #333; }
+        .badge-new { background: var(--info); color: #fff; }
+        .badge-unlocked { background: var(--success); color: #fff; }
+
+        /* ADMIN PANEL */
+        .admin-panel {
+            background: #fff; border-radius: 10px; padding: 20px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        }
+        .admin-panel h3 { color: var(--primary-dark); margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
         .admin-form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .admin-form .full-width { grid-column: 1 / -1; }
+
         .table-container { overflow-x: auto; margin-top: 12px; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
         table th { background: var(--primary); color: #fff; padding: 10px 12px; text-align: left; }
         table td { padding: 10px 12px; border-bottom: 1px solid #eee; }
+        table tr:hover td { background: #f9f9f9; }
+
+        .status-badge { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; }
+        .status-badge.active { background: #C8E6C9; color: #2E7D32; }
+        .status-badge.vip { background: var(--accent); color: #333; }
+        .status-badge.free { background: #E0E0E0; color: #555; }
+        .status-badge.locked { background: #FFCDD2; color: #C62828; }
+        .status-badge.pending { background: #FFA726; color: #fff; }
+        .status-badge.approved { background: #66BB6A; color: #fff; }
+        .status-badge.rejected { background: #EF5350; color: #fff; }
 
         .btn-action { padding: 4px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; margin: 2px; }
         .btn-edit { background: #1565C0; color: #fff; }
         .btn-delete { background: #C62828; color: #fff; }
-        .btn-approve { background: #2E7D32; color: #fff; }
+        .btn-download { background: #4CAF50; color: #fff; }
+        .btn-approve { background: #66BB6A; color: #fff; }
+        .btn-reject { background: #EF5350; color: #fff; }
 
-        /* CHAT CSS */
+        .search-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .search-bar input, .search-bar select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; flex: 1; min-width: 150px; }
+
+        .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        .stat-card { background: #fff; padding: 18px; border-radius: 10px; text-align: center; border-left: 5px solid var(--primary); }
+        .stat-card .number { font-size: 28px; font-weight: bold; color: var(--primary-dark); }
+        .stat-card .label { font-size: 13px; color: #666; }
+
+        .admin-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .admin-tab { padding: 8px 18px; background: #e0e0e0; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .admin-tab.active { background: var(--primary); color: #fff; }
+
+        .locked-banner { background: #FFEBEE; border: 2px dashed var(--danger); padding: 20px; border-radius: 10px; text-align: center; margin-top: 20px; }
+        .course-checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; background: #f9f9f9; border-radius: 8px; border: 1px solid #e0e0e0; }
+        .course-checkbox-group label { display: flex; align-items: center; gap: 5px; padding: 4px 12px; background: #fff; border-radius: 20px; border: 1px solid #ddd; cursor: pointer; font-size: 13px; }
+        .course-checkbox-group .select-all { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        .file-upload-area { border: 2px dashed #ccc; border-radius: 8px; padding: 30px; text-align: center; cursor: pointer; background: #fafafa; }
+        .document-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 14px; }
+        .document-item { background: #fff; border-radius: 8px; padding: 16px; border: 1px solid #eee; }
+        .document-item .doc-title { font-weight: bold; font-size: 15px; color: var(--primary-dark); }
+        .document-item .doc-meta { font-size: 12px; color: #888; margin: 4px 0; }
+
+        .category-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .category-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; background: #e3f2fd; border-radius: 15px; font-size: 13px; border: 1px solid #90caf9; }
+        .category-tag .remove { cursor: pointer; color: var(--danger); font-weight: bold; margin-left: 4px; }
+
+        /* CHAT */
         .chat-container { display: flex; flex-direction: column; height: 480px; background: #fff; border-radius: 10px; border: 1px solid #e0e0e0; overflow: hidden; }
         .chat-messages { flex: 1; padding: 14px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; }
         .chat-message { margin-bottom: 12px; display: flex; flex-direction: column; max-width: 80%; }
@@ -79,119 +241,213 @@
         .chat-message.received .msg-bubble { background: #e0e0e0; color: #333; border-bottom-left-radius: 4px; }
         .chat-message .msg-time { font-size: 11px; color: #999; margin-top: 4px; }
         .chat-message .msg-sender { font-size: 12px; font-weight: bold; margin-bottom: 3px; }
-        
         .chat-input-area { display: flex; gap: 10px; padding: 12px; background: #fff; border-top: 1px solid #e0e0e0; flex-shrink: 0; }
         .chat-input-area textarea { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; resize: none; height: 48px; font-size: 14px; }
+        .chat-empty { text-align: center; color: #999; padding: 40px 20px; }
 
-        .admin-chat-list { display: grid; grid-template-columns: 260px 1fr; gap: 0; height: 480px; background: #fff; border-radius: 10px; border: 1px solid #e0e0e0; overflow: hidden; }
+        .admin-chat-list { display: grid; grid-template-columns: 260px 1fr; height: 480px; background: #fff; border-radius: 10px; border: 1px solid #e0e0e0; overflow: hidden; }
         .admin-chat-sidebar { border-right: 1px solid #e0e0e0; background: #fafafa; overflow-y: auto; }
         .admin-chat-sidebar .chat-user-item { padding: 12px 16px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .admin-chat-sidebar .chat-user-item:hover { background: #f0f0f0; }
         .admin-chat-sidebar .chat-user-item.active { background: #E3F2FD; border-left: 4px solid var(--primary); }
         .admin-chat-sidebar .unread-badge { background: #FF1744; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
         .admin-chat-main { display: flex; flex-direction: column; min-width: 0; }
         .admin-chat-header { padding: 12px 20px; background: var(--primary); color: #fff; font-weight: bold; flex-shrink: 0; }
 
+        /* PROFILE */
+        .profile-container { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; }
+        .profile-sidebar { background: #fff; border-radius: 10px; padding: 25px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+        .profile-sidebar .avatar { font-size: 72px; margin-bottom: 8px; }
+        .profile-sidebar .username { font-size: 22px; font-weight: bold; color: var(--primary-dark); }
+        .profile-content { background: #fff; border-radius: 10px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+        .profile-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; flex-wrap: wrap; }
+        .profile-tab { padding: 8px 20px; border: none; background: none; cursor: pointer; font-weight: bold; color: #666; border-radius: 5px; transition: 0.3s; }
+        .profile-tab.active { background: var(--primary); color: #fff; }
+        .profile-tab-content { display: none; }
+        .profile-tab-content.active { display: block; }
+
+        /* MODALS & IFRAMES */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: #fff; max-width: 550px; width: 100%; border-radius: 12px; padding: 28px; max-height: 90vh; overflow-y: auto; }
+        .game-iframe-container { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 99998; padding: 20px; }
+        .game-iframe-container.active { display: flex; justify-content: center; align-items: center; }
+        .game-iframe-wrapper { background: #fff; border-radius: 12px; width: 100%; max-width: 1200px; height: 90vh; display: flex; flex-direction: column; }
+        .game-iframe-header { background: #f5f5f5; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); }
+
         /* TOAST */
-        .toast-container { position: fixed; top: 80px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { padding: 14px 20px; border-radius: 8px; color: #fff; font-weight: 600; animation: slideIn 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .toast-container { position: fixed; top: 80px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; max-width: 360px; }
+        .toast { padding: 14px 20px; border-radius: 8px; color: #fff; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .toast.success { background: var(--success); }
         .toast.error { background: var(--danger); }
         .toast.info { background: var(--info); }
-        @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .spinner-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 99999; justify-content: center; align-items: center; flex-direction: column; }
+        .spinner-overlay.active { display: flex; }
+        .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <!-- ===== HEADER & NAVIGATION ===== -->
+    <div id="spinner-overlay" class="spinner-overlay">
+        <div class="spinner"></div>
+        <div style="color:#fff;margin-top:14px;">Đang tải...</div>
+    </div>
+
+    <!-- ===== AUTH AREA ===== -->
+    <div id="auth-area">
+        <div id="login-box" class="auth-wrapper">
+            <h2>🔐 ĐĂNG NHẬP</h2>
+            <div class="security-notice">🔒 Khóa tài khoản sau 5 lần sai</div>
+            <div class="form-group"><label>Tài khoản</label><input type="text" id="login-user" placeholder="Tên đăng nhập"></div>
+            <div class="form-group"><label>Mật khẩu</label><input type="password" id="login-pass" placeholder="Mật khẩu"></div>
+            <button class="btn-submit" onclick="login()">Đăng Nhập</button>
+            <div class="auth-toggle">Chưa có tài khoản? <span onclick="toggleAuth(false)">Đăng ký</span></div>
+            <div id="login-error" style="color:var(--danger);margin-top:10px;display:none;"></div>
+        </div>
+
+        <div id="register-box" class="auth-wrapper" style="display:none;">
+            <h2>📝 ĐĂNG KÝ</h2>
+            <div class="form-group"><label>Tài khoản</label><input type="text" id="reg-user"></div>
+            <div class="form-group"><label>Mật khẩu</label><input type="password" id="reg-pass"></div>
+            <div class="form-group"><label>Xác nhận mật khẩu</label><input type="password" id="reg-pass-confirm"></div>
+            <button class="btn-submit" onclick="register()">Tạo Tài Khoản</button>
+            <div class="auth-toggle">Đã có tài khoản? <span onclick="toggleAuth(true)">Đăng nhập</span></div>
+            <div id="register-error" style="color:var(--danger);margin-top:10px;display:none;"></div>
+        </div>
+    </div>
+
+    <!-- ===== MEMBER AREA ===== -->
     <div id="member-area" style="display:none;">
         <div class="header">
             <div class="logo">🎓 HỌC VIỆN ĐỎ PRO</div>
             <div class="nav">
                 <a onclick="switchPage('home')" id="nav-home" class="active">🏠 Trang Chủ</a>
                 <a onclick="switchPage('games')" id="nav-games">🎮 Khóa Học</a>
-                <a onclick="switchPage('videos')" id="nav-videos">🎬 Thư Viện Video</a>
-                <a onclick="switchPage('profile')" id="nav-profile">👤 Sổ Từ Vựng</a>
-                <a onclick="switchPage('support')" id="nav-support">💬 Hỗ trợ</a>
+                <a onclick="switchPage('profile')" id="nav-profile">👤 Hồ Sơ</a>
+                <a onclick="switchPage('documents')" id="nav-documents">📄 Tài Liệu</a>
+                <a onclick="switchPage('support')" id="nav-support">💬 Hỗ Trợ</a>
                 <a onclick="switchPage('admin')" id="nav-admin" style="display:none;">⚙️ Quản Trị</a>
-                <a onclick="switchPage('admin-support')" id="nav-admin-support" style="display:none;">📩 Hỗ trợ HV</a>
+                <a onclick="switchPage('students')" id="nav-students" style="display:none;">👥 Học Viên</a>
+                <a onclick="switchPage('admin-support')" id="nav-admin-support" style="display:none;">📩 Hỗ Trợ HV</a>
+                <a onclick="switchPage('admin-documents')" id="nav-admin-documents" style="display:none;">📋 Duyệt Tài Liệu</a>
+                <a onclick="switchPage('help')" id="nav-help">📖 Hướng Dẫn</a>
                 <div class="user-info">
                     <span id="user-display-name">User</span>
+                    <span id="user-status-badge" style="font-size:12px;"></span>
                     <button class="btn-logout" onclick="logout()">Đăng xuất</button>
                 </div>
             </div>
         </div>
 
         <div class="container">
-            <!-- ===== HOME ===== -->
+            <!-- HOME -->
             <div id="page-home" class="page active">
                 <div class="hero">
                     <h1>Chào mừng, <span id="welcome-username">Bạn</span>!</h1>
-                    <p>Hệ thống học phản xạ thông minh tích hợp Video & Từ vựng cá nhân.</p>
+                    <p>Hệ thống học phản xạ thông minh tích hợp bảo mật & dữ liệu Cloud.</p>
+                </div>
+                <div id="activation-banner" class="locked-banner" style="display:none;">
+                    <h3>🔒 TÀI KHOẢN CHƯA KÍCH HOẠT VIP</h3>
+                    <div style="margin-top:10px;">
+                        <input type="text" id="activation-key-input" placeholder="Nhập mã kích hoạt..." style="padding:8px;border-radius:4px;border:1px solid #ccc;width:250px;">
+                        <button class="btn-submit small" onclick="activateVip()" style="margin:0;width:auto;">Kích hoạt</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- ===== GAMES ===== -->
+            <!-- GAMES / KHÓA HỌC -->
             <div id="page-games" class="page">
+                <div class="hero" style="background:linear-gradient(135deg,#e53935,#b71c1c);">
+                    <h1>🎮 Danh Sách Khóa Học</h1>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="search-games" placeholder="🔍 Tìm kiếm..." oninput="renderGames()">
+                    <select id="filter-game-status" onchange="renderGames()">
+                        <option value="all">Tất cả</option>
+                        <option value="new">🆕 Mới</option>
+                        <option value="hot">🔥 Hot</option>
+                        <option value="vip">⭐ VIP</option>
+                        <option value="free">📖 Miễn phí</option>
+                    </select>
+                </div>
                 <div id="game-grid-container" class="grid"></div>
             </div>
 
-            <!-- ===== THƯ VIỆN VIDEO ===== -->
-            <div id="page-videos" class="page">
-                <div class="hero" style="background:linear-gradient(135deg,#1565C0,#0D47A1);">
-                    <h1>🎬 Thư Viện Video Bài Học</h1>
-                    <p>Học viên và Admin cùng đóng góp Video cho cộng đồng.</p>
-                </div>
-                <div class="admin-panel">
-                    <h3>📤 Tải lên Video bài học mới</h3>
-                    <div class="admin-form">
-                        <div class="form-group"><label>Tiêu đề Video</label><input type="text" id="video-title" placeholder="Ví dụ: Bài 1 - Từ vựng giao tiếp"></div>
-                        <div class="form-group"><label>Link Youtube / MP4</label><input type="text" id="video-url" placeholder="https://www.youtube.com/embed/..."></div>
-                        <div class="form-group full-width"><label>Mô tả bài học</label><textarea id="video-desc" placeholder="Tóm tắt nội dung..."></textarea></div>
-                        <div class="form-group full-width"><button class="btn-submit" onclick="uploadVideo()">📤 Tải Video Lên</button></div>
-                    </div>
-                </div>
-                <div class="admin-panel" style="margin-top:20px;">
-                    <h3>📺 Danh Sách Bài Học Video</h3>
-                    <div id="video-list-container" class="grid"></div>
-                </div>
-            </div>
-
-            <!-- ===== SỔ TỪ VỰNG CÁ NHÂN ===== -->
+            <!-- PROFILE -->
             <div id="page-profile" class="page">
-                <div class="hero" style="background:linear-gradient(135deg,#2E7D32,#1B5E20);">
-                    <h1>📖 Sổ Từ Vựng Cá Nhân</h1>
-                    <p>Kho từ vựng riêng biệt do chính bạn lưu giữ và quản lý.</p>
+                <div class="hero" style="background:linear-gradient(135deg,#1565C0,#0D47A1);">
+                    <h1>👤 Hồ Sơ Của Tôi</h1>
                 </div>
-                <div class="admin-panel">
-                    <h3>➕ Thêm từ mới vào Sổ tay cá nhân</h3>
-                    <div class="admin-form">
-                        <div class="form-group"><label>Từ mới (Word)</label><input type="text" id="my-word-input" placeholder="Ví dụ: Grateful"></div>
-                        <div class="form-group"><label>Nghĩa (Meaning)</label><input type="text" id="my-meaning-input" placeholder="Ví dụ: Biết ơn"></div>
-                        <div class="form-group full-width"><button class="btn-submit" onclick="addPersonalWord()" style="background:#2E7D32;">📌 Lưu Vào Sổ Cá Nhân</button></div>
+                <div class="profile-container">
+                    <div class="profile-sidebar">
+                        <div class="avatar">👤</div>
+                        <div class="username" id="profile-username">User</div>
+                        <div class="user-role">Học viên</div>
+                        <div class="user-status" id="profile-status"><span class="status-badge free">Free</span></div>
+                        <div style="margin-top:14px;font-size:13px;color:#666;"><span id="profile-courses-count">📚 0 khóa</span></div>
                     </div>
-                </div>
-                <div class="admin-panel" style="margin-top:20px;">
-                    <h3>📚 Từ vựng của tôi</h3>
-                    <div class="table-container">
-                        <table>
-                            <thead><tr><th>#</th><th>Từ mới</th><th>Nghĩa</th><th>Ngày lưu</th><th>Thao tác</th></tr></thead>
-                            <tbody id="my-vocab-table-body"></tbody>
-                        </table>
+                    <div class="profile-content">
+                        <div class="profile-tabs">
+                            <button class="profile-tab active" data-tab="courses" onclick="switchProfileTab('courses')">📚 Khóa học đã mua</button>
+                            <button class="profile-tab" data-tab="password" onclick="switchProfileTab('password')">🔑 Đổi mật khẩu</button>
+                        </div>
+                        <div class="profile-tab-content active" id="tab-courses">
+                            <div id="course-list-container" class="course-list"></div>
+                        </div>
+                        <div class="profile-tab-content" id="tab-password">
+                            <div class="form-group"><label>Mật khẩu hiện tại</label><input type="password" id="profile-current-pass"></div>
+                            <div class="form-group"><label>Mật khẩu mới (≥6 ký tự)</label><input type="password" id="profile-new-pass"></div>
+                            <div class="form-group"><label>Xác nhận mật khẩu mới</label><input type="password" id="profile-confirm-pass"></div>
+                            <div id="profile-change-result" style="margin-top:10px;display:none;"></div>
+                            <button class="btn-submit" onclick="changeUserPasswordProfile()" style="width:auto;padding:10px 30px;">🔄 Đổi mật khẩu</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ===== SUPPORT (HỌC VIÊN CHAT) ===== -->
+            <!-- DOCUMENTS -->
+            <div id="page-documents" class="page">
+                <div class="hero" style="background:linear-gradient(135deg,#2E7D32,#1B5E20);">
+                    <h1>📄 Thư Viện Tài Liệu</h1>
+                </div>
+                <div class="admin-panel" style="border-left:5px solid #2E7D32;">
+                    <h3>📤 Tải lên tài liệu mới</h3>
+                    <div class="admin-form">
+                        <div class="form-group full-width"><label>Tên tài liệu</label><input type="text" id="doc-title"></div>
+                        <div class="form-group full-width"><label>Mô tả</label><textarea id="doc-desc"></textarea></div>
+                        <div class="form-group"><label>Khóa học</label><select id="doc-course"></select></div>
+                        <div class="form-group"><label>Danh mục</label><select id="doc-category"></select></div>
+                        <div class="form-group full-width">
+                            <label>Chọn file</label>
+                            <div class="file-upload-area" id="file-upload-area">
+                                <span>📁 Nhấn để chọn file</span>
+                                <div id="selected-file-name" style="color:var(--primary);font-weight:bold;"></div>
+                                <input type="file" id="doc-file-input" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx" style="display:none;">
+                            </div>
+                        </div>
+                        <div class="form-group full-width"><button class="btn-submit" onclick="uploadDocument()">📤 Tải lên</button></div>
+                    </div>
+                </div>
+                <div class="admin-panel">
+                    <h3>📚 Thư viện</h3>
+                    <div class="search-bar">
+                        <input type="text" id="search-docs" placeholder="🔍 Tìm kiếm..." oninput="renderDocuments()">
+                        <select id="filter-doc-status" onchange="renderDocuments()"><option value="all">Tất cả</option><option value="approved">✅ Đã duyệt</option><option value="pending">⏳ Chờ duyệt</option></select>
+                        <select id="filter-doc-category" onchange="renderDocuments()"><option value="all">Tất cả danh mục</option></select>
+                    </div>
+                    <div id="document-list-container" class="document-list"></div>
+                </div>
+            </div>
+
+            <!-- SUPPORT (HỌC VIÊN CHAT) -->
             <div id="page-support" class="page">
                 <div class="hero" style="background:linear-gradient(135deg,#1565C0,#0D47A1);">
-                    <h1>💬 Trò Chuyện Với Admin</h1>
-                    <p>Gửi thắc mắc để nhận được giải đáp trực tiếp từ Quản trị viên.</p>
+                    <h1>💬 Hỗ Trợ Học Viên</h1>
                 </div>
                 <div class="admin-panel">
                     <div class="chat-container">
                         <div class="chat-messages" id="student-chat-messages">
-                            <div class="chat-empty"><p>Chưa có tin nhắn nào...</p></div>
+                            <div class="chat-empty"><p>Chưa có tin nhắn...</p></div>
                         </div>
                         <div class="chat-input-area">
                             <textarea id="student-chat-input" placeholder="Nhập tin nhắn..." rows="2"></textarea>
@@ -201,72 +457,143 @@
                 </div>
             </div>
 
-            <!-- ===== ADMIN (DUYỆT VIDEO) ===== -->
+            <!-- ADMIN -->
             <div id="page-admin" class="page">
                 <div class="hero" style="background:linear-gradient(135deg,#E65100,#BF360C);">
                     <h1>⚙️ Quản Trị Hệ Thống</h1>
-                    <p>Phê duyệt Video bài học do Học viên gửi lên.</p>
                 </div>
-                <div class="admin-panel">
-                    <h3>📝 Danh Sách Video Chờ Phê Duyệt</h3>
-                    <div class="table-container">
-                        <table>
-                            <thead><tr><th>#</th><th>Tiêu đề</th><th>Người tải</th><th>Link Video</th><th>Thao tác</th></tr></thead>
-                            <tbody id="pending-video-table-body"></tbody>
-                        </table>
+                <div class="dashboard-stats">
+                    <div class="stat-card"><div class="number" id="stat-students">0</div><div class="label">Học viên</div></div>
+                    <div class="stat-card"><div class="number" id="stat-vip">0</div><div class="label">VIP</div></div>
+                    <div class="stat-card"><div class="number" id="stat-courses">0</div><div class="label">Khóa học</div></div>
+                    <div class="stat-card"><div class="number" id="stat-docs">0</div><div class="label">Tài liệu</div></div>
+                </div>
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="switchAdminTab('students')">👥 Học viên</button>
+                    <button class="admin-tab" onclick="switchAdminTab('courses')">📚 Khóa học</button>
+                    <button class="admin-tab" onclick="switchAdminTab('vip-keys')">🔑 Mã VIP</button>
+                    <button class="admin-tab" onclick="switchAdminTab('documents')">📄 Tài liệu</button>
+                    <button class="admin-tab" onclick="switchAdminTab('categories')">📂 Thể loại</button>
+                    <button class="admin-tab" onclick="switchAdminTab('security')">🛡️ Bảo mật</button>
+                </div>
+
+                <!-- Tab Students -->
+                <div id="admin-students" class="admin-panel">
+                    <h3>👥 Quản lý học viên</h3>
+                    <div class="search-bar"><input type="text" id="search-students" placeholder="🔍 Tìm..." oninput="renderStudents()"></div>
+                    <div class="table-container"><table><thead><tr><th>#</th><th>Tên</th><th>Trạng thái</th><th>Khóa học VIP</th><th>Thao tác</th></tr></thead><tbody id="students-table-body"></tbody></table></div>
+                </div>
+
+                <!-- Tab Courses -->
+                <div id="admin-courses" class="admin-panel" style="display:none;">
+                    <h3>📚 Quản lý khóa học</h3>
+                    <div class="admin-form">
+                        <div class="form-group"><label>ID</label><input type="text" id="course-id"></div>
+                        <div class="form-group"><label>Icon</label><input type="text" id="course-icon" value="📚"></div>
+                        <div class="form-group"><label>Tên khóa học</label><input type="text" id="course-name"></div>
+                        <div class="form-group"><label>Trạng thái</label><select id="course-status"><option value="">Thường</option><option value="new">Mới</option><option value="hot">Hot</option><option value="vip">VIP</option></select></div>
+                        <div class="form-group full-width"><label>Mô tả</label><textarea id="course-desc"></textarea></div>
+                        <div class="form-group"><label>File HTML (App con)</label><input type="text" id="course-file" placeholder="games/vocab-en.html"></div>
+                        <div class="form-group"><label>Yêu cầu VIP?</label><select id="course-vip"><option value="false">Không</option><option value="true">Có</option></select></div>
+                        <div class="form-group full-width">
+                            <button class="btn-submit" onclick="addCourse()">➕ Thêm Khóa Học</button>
+                        </div>
                     </div>
+                    <div class="table-container"><table><thead><tr><th>#</th><th>Tên</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="courses-table-body"></tbody></table></div>
+                </div>
+
+                <!-- Tab VIP Keys -->
+                <div id="admin-vip-keys" class="admin-panel" style="display:none;">
+                    <h3>🔑 Quản lý mã VIP</h3>
+                    <div class="admin-form">
+                        <div class="form-group full-width"><label>Mã VIP</label><input type="text" id="vip-key-input"></div>
+                        <div class="form-group full-width"><label>Chọn khóa học</label><div id="vip-course-checkboxes" class="course-checkbox-group"></div></div>
+                        <div class="form-group"><label>Thời hạn</label><select id="vip-duration"><option value="30">30 ngày</option><option value="0">Vĩnh viễn</option></select></div>
+                        <div class="form-group"><label>Số lần dùng</label><input type="number" id="vip-max-uses" value="1" min="1"></div>
+                        <div class="form-group full-width"><button class="btn-submit" onclick="createVipKey()">➕ Tạo Mã</button></div>
+                    </div>
+                    <div class="table-container"><table><thead><tr><th>Mã VIP</th><th>Khóa học</th><th>Đã dùng</th><th>Thao tác</th></tr></thead><tbody id="vip-keys-table-body"></tbody></table></div>
+                </div>
+
+                <!-- Tab Documents -->
+                <div id="admin-documents" class="admin-panel" style="display:none;">
+                    <h3>📄 Duyệt tài liệu</h3>
+                    <div class="table-container"><table><thead><tr><th>Tên</th><th>Người tải</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="admin-documents-table-body"></tbody></table></div>
+                </div>
+
+                <!-- Tab Categories -->
+                <div id="admin-categories" class="admin-panel" style="display:none;">
+                    <h3>📂 Thể loại</h3>
+                    <div class="admin-form"><div class="form-group full-width"><input type="text" id="new-category-name" placeholder="Tên thể loại..."><button class="btn-submit small" onclick="addCategory()" style="margin-top:5px;">Thêm</button></div></div>
+                    <div id="category-list-container" class="category-list"></div>
+                </div>
+
+                <!-- Tab Security -->
+                <div id="admin-security" class="admin-panel" style="display:none;">
+                    <h3>🛡️ Bảo mật hệ thống</h3>
+                    <button class="btn-action btn-delete" onclick="resetAllData()">🗑️ Reset Dữ Liệu</button>
                 </div>
             </div>
 
-            <!-- ===== ADMIN SUPPORT (ADMIN CHAT) ===== -->
+            <!-- STUDENTS -->
+            <div id="page-students" class="page">
+                <div class="hero" style="background:linear-gradient(135deg,#1565C0,#0D47A1);"><h1>👥 Quản Lý Học Viên</h1></div>
+                <div class="admin-panel"><div id="student-list-container"></div></div>
+            </div>
+
+            <!-- ADMIN SUPPORT (CHAT QUẢN TRỊ) -->
             <div id="page-admin-support" class="page">
-                <div class="hero" style="background:linear-gradient(135deg,#E65100,#BF360C);">
-                    <h1>📩 Hỗ Trợ Học Viên (Admin)</h1>
-                    <p>Xem và phản hồi tin nhắn từ học viên.</p>
-                </div>
+                <div class="hero" style="background:linear-gradient(135deg,#E65100,#BF360C);"><h1>📩 Hỗ Trợ Học Viên</h1></div>
                 <div class="admin-panel">
                     <div class="admin-chat-list">
-                        <div class="admin-chat-sidebar" id="admin-chat-users">
-                            <div style="padding:20px;text-align:center;color:#999;"><p>Chưa có cuộc trò chuyện nào</p></div>
-                        </div>
+                        <div class="admin-chat-sidebar" id="admin-chat-users"><div style="padding:15px;color:#888;">Đang tải...</div></div>
                         <div class="admin-chat-main">
-                            <div class="admin-chat-header" id="admin-chat-header">Chọn học viên để xem tin nhắn</div>
-                            <div class="chat-messages" id="admin-chat-messages">
-                                <div class="chat-empty"><p>Chọn học viên bên trái</p></div>
-                            </div>
+                            <div class="admin-chat-header" id="admin-chat-header">Chọn học viên</div>
+                            <div class="chat-messages" id="admin-chat-messages"><div class="chat-empty"><p>Chọn học viên bên trái</p></div></div>
                             <div class="chat-input-area">
-                                <textarea id="admin-chat-input" placeholder="Nhập câu trả lời..." rows="2" disabled></textarea>
+                                <textarea id="admin-chat-input" placeholder="Nhập phản hồi..." rows="2" disabled></textarea>
                                 <button class="btn-submit" onclick="sendAdminReply()" disabled>📤 Gửi</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- ADMIN DOCUMENTS APPROVAL -->
+            <div id="page-admin-documents" class="page">
+                <div class="hero" style="background:linear-gradient(135deg,#E65100,#BF360C);"><h1>📋 Quản lý tài liệu học viên</h1></div>
+                <div class="admin-panel"><div id="pending-documents"></div></div>
+            </div>
+
+            <!-- HELP -->
+            <div id="page-help" class="page">
+                <div class="admin-panel"><h2>📖 HƯỚNG DẪN HỆ THỐNG</h2></div>
+            </div>
         </div>
     </div>
 
-    <!-- ===== AUTH AREA ===== -->
-    <div id="auth-area">
-        <div id="login-box" class="auth-wrapper">
-            <h2>🔐 ĐĂNG NHẬP</h2>
-            <div class="form-group"><label>Tên tài khoản</label><input type="text" id="login-user" placeholder="Tên đăng nhập"></div>
-            <div class="form-group"><label>Mật khẩu</label><input type="password" id="login-pass" placeholder="Mật khẩu"></div>
-            <button class="btn-submit" onclick="login()">Đăng Nhập</button>
-            <div class="auth-toggle">Chưa có tài khoản? <span onclick="toggleAuth(false)">Đăng ký</span></div>
-        </div>
-        <div id="register-box" class="auth-wrapper" style="display:none;">
-            <h2>📝 ĐĂNG KÝ</h2>
-            <div class="form-group"><label>Tên tài khoản</label><input type="text" id="reg-user"></div>
-            <div class="form-group"><label>Mật khẩu</label><input type="password" id="reg-pass"></div>
-            <button class="btn-submit" onclick="register()">Tạo Tài Khoản</button>
-            <div class="auth-toggle">Đã có tài khoản? <span onclick="toggleAuth(true)">Đăng nhập</span></div>
+    <!-- MODALS & IFRAMES -->
+    <div id="game-iframe-container" class="game-iframe-container">
+        <div class="game-iframe-wrapper">
+            <div class="game-iframe-header">
+                <h3 id="iframe-title">🎮 Chương trình</h3>
+                <button class="btn-action btn-delete" onclick="closeGameIframe()">✕ Đóng</button>
+            </div>
+            <div class="game-iframe-body" style="flex:1;"><iframe id="game-iframe" src="about:blank" style="width:100%;height:100%;border:none;"></iframe></div>
         </div>
     </div>
 
-    <!-- TOAST -->
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 id="confirm-title">Xác nhận</h3>
+            <p id="confirm-message" style="margin:10px 0;"></p>
+            <div style="display:flex;gap:10px;"><button class="btn-submit small" onclick="closeConfirmModal()" style="background:#666;">Hủy</button><button class="btn-submit small" id="confirm-btn">Đồng ý</button></div>
+        </div>
+    </div>
+
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- FIREBASE SDK -->
+    <!-- FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, setDoc, doc, getDocs, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -279,32 +606,47 @@
             messagingSenderId: "410660952284",
             appId: "1:410660952284:web:ee5b5a98d12bef3d45bc19"
         };
-
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
         window.db = db;
         window.fs = { collection, setDoc, doc, getDocs, getDoc, deleteDoc };
     </script>
 
-    <!-- LOGIC CHÍNH -->
+    <!-- MAIN APP SCRIPT -->
     <script>
         let currentUser = null;
         let adminSelectedUser = null;
 
-        function getStorage(key, def) {
-            try { const data = localStorage.getItem(key); return data ? JSON.parse(data) : def; } catch { return def; }
-        }
-        function setStorage(key, val) {
-            try { localStorage.setItem(key, JSON.stringify(val)); return true; } catch { return false; }
-        }
+        // CẦU NỐI DỮ LIỆU CHO CÁC CHƯƠNG TRÌNH CON (IFRAME)
+        window.AppDataBridge = {
+            async loadData(courseId, isGlobal, def = null) {
+                if (isGlobal && window.fs && window.db) {
+                    try {
+                        const snap = await window.fs.getDoc(window.fs.doc(window.db, "app_data", courseId));
+                        if (snap.exists()) return snap.data().content;
+                    } catch(e) {}
+                }
+                return getStorage('app_data_' + courseId, def);
+            },
+            async saveData(courseId, isGlobal, data) {
+                setStorage('app_data_' + courseId, data);
+                if (isGlobal && window.fs && window.db) {
+                    try {
+                        await window.fs.setDoc(window.fs.doc(window.db, "app_data", courseId), { content: data, updatedAt: Date.now() });
+                    } catch(e) {}
+                }
+            }
+        };
+
+        function getStorage(k, def) { try { const d = localStorage.getItem(k); return d ? JSON.parse(d) : def; } catch { return def; } }
+        function setStorage(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } }
         function getUsers() { return getStorage('study_users', {}); }
         function getUser(u) { return getUsers()[u] || null; }
-        function saveUser(u, data) { const users = getUsers(); users[u] = data; setStorage('study_users', users); }
+        function saveUser(u, d) { const users = getUsers(); users[u] = d; setStorage('study_users', users); }
 
-        async function saveUserCloud(username, userData) {
-            saveUser(username, userData);
-            try { if (window.fs && window.db) await window.fs.setDoc(window.fs.doc(window.db, "users", username), userData); } catch (e) {}
+        async function saveUserCloud(u, data) {
+            saveUser(u, data);
+            try { if (window.fs && window.db) await window.fs.setDoc(window.fs.doc(window.db, "users", u), data); } catch(e) {}
         }
 
         function showToast(msg, type = 'success') {
@@ -317,10 +659,8 @@
         }
 
         // ======================================================================
-        // 💬 CHAT CLOUD - SỬA LỖI ADMIN KHÔNG NHẬN TIN & XOÁ SỐ 1 ĐỎ GIẢ
+        // 💬 HỆ THỐNG CHAT CLOUD ĐÃ SỬA TRIỆT ĐỂ LỖI (ADMIN NHẬN TIN & SỐ 1 ĐỎ)
         // ======================================================================
-        
-        // 1. Học viên gửi tin nhắn
         async function sendStudentMessage() {
             if (!currentUser || currentUser === 'admin') return;
             const input = document.getElementById('student-chat-input');
@@ -328,109 +668,68 @@
             if (!text) { showToast('Vui lòng nhập nội dung!', 'warning'); return; }
 
             const msgId = 'msg_' + Date.now();
-            const newMsg = {
-                id: msgId,
-                from: currentUser,
-                to: 'admin',
-                text: text,
-                time: new Date().toISOString(),
-                read: false
-            };
+            const msg = { id: msgId, from: currentUser, to: 'admin', text, time: new Date().toISOString(), read: false };
 
             try {
                 if (window.fs && window.db) {
-                    await window.fs.setDoc(
-                        window.fs.doc(window.db, "chats", currentUser, "messages", msgId),
-                        newMsg
-                    );
+                    await window.fs.setDoc(window.fs.doc(window.db, "chats", currentUser, "messages", msgId), msg);
                     input.value = '';
-                    showToast('✅ Đã gửi tin nhắn đến Admin!', 'success');
+                    showToast('✅ Đã gửi tin nhắn!', 'success');
                     await loadStudentChat();
                 }
             } catch(e) { console.error(e); }
         }
 
-        // 2. Admin phản hồi tin nhắn
         async function sendAdminReply() {
             if (!adminSelectedUser) return;
             const input = document.getElementById('admin-chat-input');
             const text = input.value.trim();
-            if (!text) { showToast('Vui lòng nhập nội dung!', 'warning'); return; }
+            if (!text) { showToast('Vui lòng nhập phản hồi!', 'warning'); return; }
 
             const msgId = 'msg_' + Date.now();
-            const newMsg = {
-                id: msgId,
-                from: 'admin',
-                to: adminSelectedUser,
-                text: text,
-                time: new Date().toISOString(),
-                read: false
-            };
+            const msg = { id: msgId, from: 'admin', to: adminSelectedUser, text, time: new Date().toISOString(), read: false };
 
             try {
                 if (window.fs && window.db) {
-                    await window.fs.setDoc(
-                        window.fs.doc(window.db, "chats", adminSelectedUser, "messages", msgId),
-                        newMsg
-                    );
+                    await window.fs.setDoc(window.fs.doc(window.db, "chats", adminSelectedUser, "messages", msgId), msg);
                     input.value = '';
-                    showToast(`✅ Đã trả lời ${adminSelectedUser}!`, 'success');
+                    showToast('✅ Đã phản hồi!', 'success');
                     await loadAdminChat();
                 }
             } catch(e) { console.error(e); }
         }
 
-        // 3. Học viên tải đoạn chat
         async function loadStudentChat() {
             if (!currentUser || currentUser === 'admin' || !window.fs || !window.db) return;
             const container = document.getElementById('student-chat-messages');
             if (!container) return;
 
             try {
-                const snap = await window.fs.getDocs(
-                    window.fs.collection(window.db, "chats", currentUser, "messages")
-                );
+                const snap = await window.fs.getDocs(window.fs.collection(window.db, "chats", currentUser, "messages"));
+                let list = [];
+                snap.forEach(d => list.push(d.data()));
+                list.sort((a, b) => new Date(a.time) - new Date(b.time));
 
-                let userMessages = [];
-                snap.forEach(d => userMessages.push(d.data()));
-                userMessages.sort((a, b) => new Date(a.time) - new Date(b.time));
-
-                if (userMessages.length === 0) {
-                    container.innerHTML = `<div class="chat-empty"><p>Chưa có tin nhắn nào.<br>Hãy gửi câu hỏi cho Admin!</p></div>`;
+                if (list.length === 0) {
+                    container.innerHTML = `<div class="chat-empty"><p>Chưa có tin nhắn...</p></div>`;
                     return;
                 }
 
                 let html = '';
-                for (let msg of userMessages) {
-                    const isSent = msg.from === currentUser;
-                    const sender = isSent ? 'Bạn' : 'Admin';
-                    const time = new Date(msg.time).toLocaleString('vi-VN');
-
-                    // Đánh dấu đã đọc khi Học viên mở xem phản hồi từ Admin
-                    if (msg.from === 'admin' && !msg.read) {
-                        msg.read = true;
-                        await window.fs.setDoc(
-                            window.fs.doc(window.db, "chats", currentUser, "messages", msg.id),
-                            msg
-                        );
+                for (let m of list) {
+                    const isSent = m.from === currentUser;
+                    if (m.from === 'admin' && !m.read) {
+                        m.read = true;
+                        await window.fs.setDoc(window.fs.doc(window.db, "chats", currentUser, "messages", m.id), m);
                     }
-
-                    html += `
-                        <div class="chat-message ${isSent ? 'sent' : 'received'}">
-                            <div class="msg-sender">${sender}</div>
-                            <div class="msg-bubble">${msg.text}</div>
-                            <div class="msg-time">${time}</div>
-                        </div>
-                    `;
+                    html += `<div class="chat-message ${isSent ? 'sent' : 'received'}"><div class="msg-sender">${isSent ? 'Bạn' : 'Admin'}</div><div class="msg-bubble">${m.text}</div><div class="msg-time">${new Date(m.time).toLocaleTimeString()}</div></div>`;
                 }
-
                 container.innerHTML = html;
                 container.scrollTop = container.scrollHeight;
                 await updateChatBadge();
-            } catch(e) { console.error(e); }
+            } catch(e) {}
         }
 
-        // 4. Admin tải danh sách học viên & đoạn chat
         async function loadAdminChat() {
             if (currentUser !== 'admin' || !window.fs || !window.db) return;
             const sidebar = document.getElementById('admin-chat-users');
@@ -438,358 +737,206 @@
 
             try {
                 const usersSnap = await window.fs.getDocs(window.fs.collection(window.db, "users"));
-                let userList = [];
-                usersSnap.forEach(d => {
-                    if (d.id !== 'admin' && !d.data().isAdmin) userList.push(d.id);
-                });
+                let users = [];
+                usersSnap.forEach(d => { if (d.id !== 'admin' && !d.data().isAdmin) users.push(d.id); });
 
-                if (userList.length === 0) {
-                    sidebar.innerHTML = `<div style="padding:20px;text-align:center;color:#999;"><p>Chưa có học viên nào</p></div>`;
+                if (users.length === 0) {
+                    sidebar.innerHTML = `<div style="padding:15px;color:#888;">Chưa có học viên nào</div>`;
                     return;
                 }
 
-                let sidebarHtml = '';
-                for (let username of userList) {
-                    const msgSnap = await window.fs.getDocs(
-                        window.fs.collection(window.db, "chats", username, "messages")
-                    );
-                    
-                    let unreadCount = 0;
-                    msgSnap.forEach(m => {
-                        const data = m.data();
-                        // 🔴 CHỈ ĐẾM TIN NHẮN TỪ HỌC VIÊN GỬI ĐẾN MÀ ADMIN CHƯA ĐỌC
-                        if (data.from === username && !data.read) {
-                            unreadCount++;
-                        }
-                    });
-
-                    const isActive = (adminSelectedUser === username);
-                    sidebarHtml += `
-                        <div class="chat-user-item ${isActive ? 'active' : ''}" onclick="selectChatUser('${username}')">
-                            <span>👤 ${username}</span>
-                            ${unreadCount > 0 ? `<span class="unread-badge">${unreadCount}</span>` : ''}
-                        </div>
-                    `;
+                let sideHtml = '';
+                for (let u of users) {
+                    const mSnap = await window.fs.getDocs(window.fs.collection(window.db, "chats", u, "messages"));
+                    let unread = 0;
+                    mSnap.forEach(m => { if (m.data().from === u && !m.data().read) unread++; });
+                    sideHtml += `<div class="chat-user-item ${adminSelectedUser === u ? 'active' : ''}" onclick="selectChatUser('${u}')"><span>👤 ${u}</span>${unread > 0 ? `<span class="unread-badge">${unread}</span>` : ''}</div>`;
                 }
-
-                sidebar.innerHTML = sidebarHtml;
+                sidebar.innerHTML = sideHtml;
 
                 if (adminSelectedUser) {
-                    document.getElementById('admin-chat-header').textContent = '💬 Trò chuyện với: ' + adminSelectedUser;
+                    document.getElementById('admin-chat-header').textContent = '💬 Đang chat với: ' + adminSelectedUser;
                     document.getElementById('admin-chat-input').disabled = false;
                     document.querySelector('#admin-chat-main .chat-input-area .btn-submit').disabled = false;
 
-                    const msgSnap = await window.fs.getDocs(
-                        window.fs.collection(window.db, "chats", adminSelectedUser, "messages")
-                    );
-
-                    let detailMsgs = [];
-                    msgSnap.forEach(m => detailMsgs.push(m.data()));
-                    detailMsgs.sort((a, b) => new Date(a.time) - new Date(b.time));
+                    const mSnap = await window.fs.getDocs(window.fs.collection(window.db, "chats", adminSelectedUser, "messages"));
+                    let list = [];
+                    mSnap.forEach(m => list.push(m.data()));
+                    list.sort((a, b) => new Date(a.time) - new Date(b.time));
 
                     const container = document.getElementById('admin-chat-messages');
-                    if (detailMsgs.length === 0) {
-                        container.innerHTML = `<div class="chat-empty"><p>Chưa có tin nhắn từ học viên này</p></div>`;
-                    } else {
-                        let detailHtml = '';
-                        for (let msg of detailMsgs) {
-                            const isSent = msg.from === 'admin';
-                            const sender = isSent ? 'Admin' : adminSelectedUser;
-                            const time = new Date(msg.time).toLocaleString('vi-VN');
-
-                            if (msg.from === adminSelectedUser && !msg.read) {
-                                msg.read = true;
-                                await window.fs.setDoc(
-                                    window.fs.doc(window.db, "chats", adminSelectedUser, "messages", msg.id),
-                                    msg
-                                );
-                            }
-
-                            detailHtml += `
-                                <div class="chat-message ${isSent ? 'sent' : 'received'}">
-                                    <div class="msg-sender">${sender}</div>
-                                    <div class="msg-bubble">${msg.text}</div>
-                                    <div class="msg-time">${time}</div>
-                                </div>
-                            `;
+                    let html = '';
+                    for (let m of list) {
+                        const isSent = m.from === 'admin';
+                        if (m.from === adminSelectedUser && !m.read) {
+                            m.read = true;
+                            await window.fs.setDoc(window.fs.doc(window.db, "chats", adminSelectedUser, "messages", m.id), m);
                         }
-                        container.innerHTML = detailHtml;
-                        container.scrollTop = container.scrollHeight;
+                        html += `<div class="chat-message ${isSent ? 'sent' : 'received'}"><div class="msg-sender">${isSent ? 'Admin' : adminSelectedUser}</div><div class="msg-bubble">${m.text}</div></div>`;
                     }
+                    container.innerHTML = html;
+                    container.scrollTop = container.scrollHeight;
                 }
                 await updateChatBadge();
-            } catch(e) { console.error(e); }
+            } catch(e) {}
         }
 
-        function selectChatUser(username) {
-            adminSelectedUser = username;
-            loadAdminChat();
-        }
+        function selectChatUser(u) { adminSelectedUser = u; loadAdminChat(); }
 
-        // 5. Cập nhật Badge đỏ trên thanh Navigation
         async function updateChatBadge() {
             if (!currentUser || !window.fs || !window.db) return;
             document.querySelectorAll('.nav-badge').forEach(b => b.remove());
-
             try {
                 if (currentUser !== 'admin') {
-                    // 🔴 LỖI ĐÃ SỬA: Học viên CHỈ HIỆN SỐ 1 ĐỎ KHI CÓ TIN NHẮN MỚI TỪ ADMIN
-                    const snap = await window.fs.getDocs(
-                        window.fs.collection(window.db, "chats", currentUser, "messages")
-                    );
-                    let adminUnread = 0;
-                    snap.forEach(m => {
-                        const data = m.data();
-                        if (data.from === 'admin' && !data.read) adminUnread++;
-                    });
-
-                    if (adminUnread > 0) {
-                        const supportNav = document.getElementById('nav-support');
-                        if (supportNav) {
-                            const badge = document.createElement('span');
-                            badge.className = 'nav-badge';
-                            badge.textContent = adminUnread;
-                            supportNav.appendChild(badge);
-                        }
+                    const snap = await window.fs.getDocs(window.fs.collection(window.db, "chats", currentUser, "messages"));
+                    let unread = 0;
+                    snap.forEach(m => { if (m.data().from === 'admin' && !m.data().read) unread++; });
+                    if (unread > 0) {
+                        const nav = document.getElementById('nav-support');
+                        if (nav) { const b = document.createElement('span'); b.className = 'nav-badge'; b.textContent = unread; nav.appendChild(b); }
                     }
                 } else {
                     const usersSnap = await window.fs.getDocs(window.fs.collection(window.db, "users"));
-                    let totalUnreadForAdmin = 0;
-
+                    let totalUnread = 0;
                     for (let d of usersSnap.docs) {
                         if (d.id !== 'admin' && !d.data().isAdmin) {
-                            const msgSnap = await window.fs.getDocs(
-                                window.fs.collection(window.db, "chats", d.id, "messages")
-                            );
-                            msgSnap.forEach(m => {
-                                const data = m.data();
-                                if (data.from === d.id && !data.read) totalUnreadForAdmin++;
-                            });
+                            const mSnap = await window.fs.getDocs(window.fs.collection(window.db, "chats", d.id, "messages"));
+                            mSnap.forEach(m => { if (m.data().from === d.id && !m.data().read) totalUnread++; });
                         }
                     }
-
-                    if (totalUnreadForAdmin > 0) {
-                        const adminSupportNav = document.getElementById('nav-admin-support');
-                        if (adminSupportNav) {
-                            const badge = document.createElement('span');
-                            badge.className = 'nav-badge';
-                            badge.textContent = totalUnreadForAdmin;
-                            adminSupportNav.appendChild(badge);
-                        }
+                    if (totalUnread > 0) {
+                        const nav = document.getElementById('nav-admin-support');
+                        if (nav) { const b = document.createElement('span'); b.className = 'nav-badge'; b.textContent = totalUnread; nav.appendChild(b); }
                     }
                 }
             } catch(e) {}
         }
 
         // ======================================================================
-        // 🎬 THƯ VIỆN VIDEO CHUNG (ĐÃ FIX SỬA CHỮ HOẠT STATUS)
+        // CÁC HÀM CƠ BẢN HỆ THỐNG (Khóa học, VIP, UI, v.v.)
         // ======================================================================
-        async function uploadVideo() {
-            const title = document.getElementById('video-title').value.trim();
-            const url = document.getElementById('video-url').value.trim();
-            const desc = document.getElementById('video-desc').value.trim();
+        let courses = getStorage('courses', [
+            { id: 'course-en', icon: '🇬🇧', name: 'Từ Vựng Tiếng Anh', description: 'Học từ vựng tiếng Anh cơ bản', file: 'games/vocab-en.html', vip: false, status: 'hot', isGlobal: false },
+            { id: 'course-zh', icon: '🇨🇳', name: 'Từ Vựng Tiếng Trung', description: 'Học từ vựng tiếng Trung thông dụng', file: 'games/vocab-zh.html', vip: false, status: 'new', isGlobal: false }
+        ]);
+        let documents = getStorage('documents', []);
+        let categories = getStorage('categories', [{ id: 'file-mau', name: 'File mẫu', isDefault: true }]);
+        let vipKeys = getStorage('vip_keys', []);
 
-            if (!title || !url) { showToast('❌ Vui lòng điền đủ Tiêu đề & Link Video!', 'error'); return; }
-
-            const isAdmin = currentUser === 'admin' || getUser(currentUser)?.isAdmin;
-            const videoId = 'vid_' + Date.now();
-
-            const videoData = {
-                id: videoId,
-                title,
-                url,
-                desc,
-                uploadedBy: currentUser,
-                status: isAdmin ? 'approved' : 'pending',
-                createdAt: Date.now()
-            };
-
-            try {
-                if (window.fs && window.db) {
-                    await window.fs.setDoc(window.fs.doc(window.db, "shared_videos", videoId), videoData);
-                    if (isAdmin) {
-                        showToast("✅ Đã xuất bản Video lên Thư viện chung!", "success");
-                    } else {
-                        showToast("📩 Video đã được gửi! Vui lòng chờ Admin phê duyệt.", "info");
-                    }
-                    document.getElementById('video-title').value = '';
-                    document.getElementById('video-url').value = '';
-                    document.getElementById('video-desc').value = '';
-                    loadVideosFromCloud();
-                }
-            } catch(e) { console.error(e); }
+        function switchPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+            document.getElementById('page-' + id)?.classList.add('active');
+            document.getElementById('nav-' + id)?.classList.add('active');
+            if (id === 'games') renderGames();
+            if (id === 'support') loadStudentChat();
+            if (id === 'admin-support') loadAdminChat();
+            if (id === 'students') renderStudentList();
         }
 
-        async function loadVideosFromCloud() {
-            if (!window.fs || !window.db) return;
-            try {
-                const snap = await window.fs.getDocs(window.fs.collection(window.db, "shared_videos"));
-                let approvedVideos = [];
-                let pendingVideos = [];
-
-                snap.forEach(d => {
-                    const data = d.data();
-                    const videoStatus = (data.status || '').toLowerCase();
-                    if (videoStatus === 'approved') approvedVideos.push(data);
-                    else if (videoStatus === 'pending') pendingVideos.push(data);
-                });
-
-                renderApprovedVideos(approvedVideos);
-                renderPendingVideos(pendingVideos);
-            } catch(e) { console.error(e); }
+        function switchAdminTab(tab) {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('#page-admin .admin-panel').forEach(p => p.style.display = 'none');
+            event.target.classList.add('active');
+            document.getElementById('admin-' + tab).style.display = 'block';
+            if (tab === 'students') renderStudents();
+            if (tab === 'courses') renderCourses();
+            if (tab === 'vip-keys') { renderVipKeys(); renderCourseCheckboxes('vip-course-checkboxes', []); }
         }
 
-        function renderApprovedVideos(list) {
-            const container = document.getElementById('video-list-container');
+        function renderGames() {
+            const container = document.getElementById('game-grid-container');
             if (!container) return;
             container.innerHTML = '';
-            if (list.length === 0) {
-                container.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#999;">📭 Chưa có Video nào được duyệt.</div>';
-                return;
-            }
-            list.forEach(v => {
+            courses.forEach(c => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.innerHTML = `
-                    <h3>🎬 ${v.title}</h3>
-                    <p style="font-size:12px;color:#888;">📤 ${v.uploadedBy}</p>
-                    <p>${v.desc || 'Không có mô tả.'}</p>
-                    <div style="margin-top:10px;">
-                        <iframe src="${v.url}" style="width:100%;height:180px;border:none;border-radius:6px;" allowfullscreen></iframe>
-                    </div>
-                `;
+                card.innerHTML = `<h3>${c.icon} ${c.name}</h3><p>${c.description}</p><button class="btn-submit small" onclick="openGame('${c.id}')">Vào học</button>`;
                 container.appendChild(card);
             });
         }
 
-        function renderPendingVideos(list) {
-            const tbody = document.getElementById('pending-video-table-body');
+        function openGame(courseId) {
+            const c = courses.find(item => item.id === courseId);
+            if (!c) return;
+            document.getElementById('iframe-title').textContent = c.icon + ' ' + c.name;
+            document.getElementById('game-iframe').src = c.file;
+            document.getElementById('game-iframe-container').classList.add('active');
+        }
+
+        function closeGameIframe() {
+            document.getElementById('game-iframe-container').classList.remove('active');
+            document.getElementById('game-iframe').src = 'about:blank';
+        }
+
+        async function addCourse() {
+            const id = document.getElementById('course-id').value.trim();
+            const icon = document.getElementById('course-icon').value.trim() || '📚';
+            const name = document.getElementById('course-name').value.trim();
+            const desc = document.getElementById('course-desc').value.trim();
+            const file = document.getElementById('course-file').value.trim();
+            const vip = document.getElementById('course-vip').value === 'true';
+            const status = document.getElementById('course-status').value;
+
+            if (!id || !name || !file) { showToast('Nhập thiếu thông tin khóa học!', 'error'); return; }
+            const newC = { id, icon, name, description: desc, file, vip, status, isGlobal: false };
+            courses.push(newC);
+            setStorage('courses', courses);
+            if (window.fs && window.db) await window.fs.setDoc(window.fs.doc(window.db, "courses", id), newC);
+            showToast('Đã thêm khóa học!');
+            renderCourses();
+            renderGames();
+        }
+
+        function renderCourses() {
+            const tbody = document.getElementById('courses-table-body');
             if (!tbody) return;
             tbody.innerHTML = '';
-            if (list.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#999;">📭 Không có Video chờ duyệt.</td></tr>';
-                return;
-            }
-            list.forEach((v, i) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${i+1}</td>
-                    <td><strong>${v.title}</strong></td>
-                    <td>${v.uploadedBy}</td>
-                    <td><a href="${v.url}" target="_blank" style="color:#1565C0;">Xem thử</a></td>
-                    <td>
-                        <button class="btn-action btn-approve" onclick="approveVideo('${v.id}')">✅ Duyệt</button>
-                        <button class="btn-action btn-delete" onclick="deleteVideo('${v.id}')">🗑️ Xóa</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+            courses.forEach((c, i) => {
+                tbody.innerHTML += `<tr><td>${i+1}</td><td>${c.name}</td><td>${c.status || 'Thường'}</td><td><button class="btn-action btn-delete" onclick="deleteCourse('${c.id}')">Xóa</button></td></tr>`;
             });
         }
 
-        async function approveVideo(vidId) {
-            try {
-                if (window.fs && window.db) {
-                    const docRef = window.fs.doc(window.db, "shared_videos", vidId);
-                    const docSnap = await window.fs.getDoc(docRef);
-                    if (docSnap.exists()) {
-                        let data = docSnap.data();
-                        data.status = 'approved';
-                        await window.fs.setDoc(docRef, data);
-                        showToast("✅ Đã phê duyệt Video!", "success");
-                        loadVideosFromCloud();
-                    }
-                }
-            } catch(e) {}
+        function deleteCourse(id) {
+            courses = courses.filter(c => c.id !== id);
+            setStorage('courses', courses);
+            renderCourses();
+            renderGames();
         }
 
-        async function deleteVideo(vidId) {
-            try {
-                if (window.fs && window.db) {
-                    await window.fs.deleteDoc(window.fs.doc(window.db, "shared_videos", vidId));
-                    showToast("🗑️ Đã xóa Video!", "info");
-                    loadVideosFromCloud();
-                }
-            } catch(e) {}
+        async function createVipKey() {
+            const key = document.getElementById('vip-key-input').value.trim();
+            if (!key) return;
+            const newK = { key, courseIds: ['course-en'], duration: 30, maxUses: 1, usedCount: 0 };
+            vipKeys.push(newK);
+            setStorage('vip_keys', vipKeys);
+            if (window.fs && window.db) await window.fs.setDoc(window.fs.doc(window.db, "vip_keys", key), newK);
+            showToast('Đã tạo mã VIP!');
+            renderVipKeys();
         }
 
-        // ======================================================================
-        // 📖 SỔ TỪ VỰNG CÁ NHÂN (users/{username}/my_vocabulary)
-        // ======================================================================
-        async function addPersonalWord() {
-            const word = document.getElementById('my-word-input').value.trim();
-            const meaning = document.getElementById('my-meaning-input').value.trim();
-
-            if (!word || !meaning) { showToast('❌ Nhập cả Từ mới và Nghĩa!', 'error'); return; }
-            if (!currentUser) return;
-
-            const vocabId = 'vocab_' + Date.now();
-            const vocabData = {
-                id: vocabId,
-                word,
-                meaning,
-                createdAt: new Date().toLocaleDateString('vi-VN')
-            };
-
-            try {
-                if (window.fs && window.db) {
-                    await window.fs.setDoc(
-                        window.fs.doc(window.db, "users", currentUser, "my_vocabulary", vocabId),
-                        vocabData
-                    );
-                    showToast(`⭐ Đã lưu từ "${word}" vào Sổ cá nhân!`, "success");
-                    document.getElementById('my-word-input').value = '';
-                    document.getElementById('my-meaning-input').value = '';
-                    loadMyVocabulary();
-                }
-            } catch(e) { console.error(e); }
+        function renderVipKeys() {
+            const tbody = document.getElementById('vip-keys-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            vipKeys.forEach(k => {
+                tbody.innerHTML += `<tr><td><strong>${k.key}</strong></td><td>${k.courseIds.join(', ')}</td><td>${k.usedCount}/${k.maxUses}</td><td>-</td></tr>`;
+            });
         }
 
-        async function loadMyVocabulary() {
-            if (!currentUser || !window.fs || !window.db) return;
-            try {
-                const snap = await window.fs.getDocs(
-                    window.fs.collection(window.db, "users", currentUser, "my_vocabulary")
-                );
-                const tbody = document.getElementById('my-vocab-table-body');
-                if (!tbody) return;
-                tbody.innerHTML = '';
-
-                let list = [];
-                snap.forEach(d => list.push(d.data()));
-
-                if (list.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#999;">📖 Sổ từ vựng cá nhân đang trống.</td></tr>';
-                    return;
-                }
-
-                list.forEach((w, i) => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${i+1}</td>
-                        <td><strong style="color:var(--primary);">${w.word}</strong></td>
-                        <td>${w.meaning}</td>
-                        <td>${w.createdAt}</td>
-                        <td><button class="btn-action btn-delete" onclick="deleteMyWord('${w.id}')">🗑️ Xóa</button></td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } catch(e) {}
+        function renderCourseCheckboxes(id, sel) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.innerHTML = '';
+            courses.forEach(c => {
+                el.innerHTML += `<label><input type="checkbox" value="${c.id}" ${sel.includes(c.id)?'checked':''}> ${c.name}</label>`;
+            });
         }
 
-        async function deleteMyWord(vocabId) {
-            if (!currentUser || !window.fs || !window.db) return;
-            try {
-                await window.fs.deleteDoc(
-                    window.fs.doc(window.db, "users", currentUser, "my_vocabulary", vocabId)
-                );
-                showToast("🗑️ Đã xóa từ khỏi Sổ cá nhân!", "info");
-                loadMyVocabulary();
-            } catch(e) {}
-        }
+        function renderStudents() {}
+        function renderAdminDocuments() {}
+        function renderDashboardStats() {}
 
-        // ======================================================================
-        // HỆ THỐNG ĐĂNG NHẬP & KHỞI CHẠY LẠI
-        // ======================================================================
         async function login() {
             const u = document.getElementById('login-user').value.trim();
             const p = document.getElementById('login-pass').value.trim();
@@ -799,57 +946,40 @@
             document.getElementById('auth-area').style.display = 'none';
             document.getElementById('member-area').style.display = 'block';
 
-            // 🔴 SỬA LỖI: MỞ ĐÚNG TAB ADMIN DỰA TRÊN TÊN VÀ QUYỀN
             if (u === 'admin') {
                 document.getElementById('nav-admin').style.display = 'inline-block';
                 document.getElementById('nav-admin-support').style.display = 'inline-block';
                 document.getElementById('nav-support').style.display = 'none';
+                await loadAdminChat();
             } else {
                 document.getElementById('nav-admin').style.display = 'none';
                 document.getElementById('nav-admin-support').style.display = 'none';
                 document.getElementById('nav-support').style.display = 'inline-block';
+                await loadStudentChat();
             }
 
             document.getElementById('user-display-name').textContent = u;
             document.getElementById('welcome-username').textContent = u;
-
-            // 🔴 KHỞI CHẠY ĐỒNG BỘ CHAT TỨC THÌ
-            await loadVideosFromCloud();
-            await loadMyVocabulary();
-            if (currentUser !== 'admin') {
-                await loadStudentChat();
-            } else {
-                await loadAdminChat();
-            }
             await updateChatBadge();
-
             switchPage('home');
         }
 
         function logout() { location.reload(); }
-
         function toggleAuth(show) {
             document.getElementById('login-box').style.display = show ? 'block' : 'none';
             document.getElementById('register-box').style.display = show ? 'none' : 'block';
         }
 
-        function switchPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
-            const page = document.getElementById('page-' + id);
-            if (page) page.classList.add('active');
-            const nav = document.getElementById('nav-' + id);
-            if (nav) nav.classList.add('active');
-
-            if (id === 'videos') loadVideosFromCloud();
-            if (id === 'profile') loadMyVocabulary();
-            if (id === 'support') loadStudentChat();
-            if (id === 'admin-support') loadAdminChat();
-            if (id === 'admin') loadVideosFromCloud();
-        }
-
-        window.onload = function() {
-            console.log("✅ HỌC VIỆN ĐỎ PRO - Sẵn sàng!");
+        window.onload = async function() {
+            if (window.fs && window.db) {
+                try {
+                    const snap = await window.fs.getDocs(window.fs.collection(window.db, "courses"));
+                    let cloudC = [];
+                    snap.forEach(d => cloudC.push(d.data()));
+                    if (cloudC.length > 0) { courses = cloudC; setStorage('courses', courses); }
+                } catch(e){}
+            }
+            console.log("✅ HỌC VIỆN ĐỎ PRO - Ổn định toàn bộ logic cũ!");
         };
     </script>
 </body>

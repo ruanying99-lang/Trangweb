@@ -110,7 +110,7 @@
         .category-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; background: #e3f2fd; border-radius: 15px; font-size: 13px; border: 1px solid #90caf9; }
         .category-tag .remove { cursor: pointer; color: var(--danger); font-weight: bold; margin-left: 4px; }
 
-        /* CHAT STYLES (ĐÃ TỐI ƯU THANH CUỘN DỌC & CỐ ĐỊNH KHUNG NHẬP) */
+        /* CHAT STYLES */
         .chat-container { display: flex; flex-direction: column; height: 480px; background: #fff; border-radius: 10px; border: 1px solid #e0e0e0; overflow: hidden; }
         .chat-messages { flex: 1; padding: 14px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
         .chat-message { margin-bottom: 12px; display: flex; flex-direction: column; max-width: 80%; }
@@ -313,7 +313,6 @@
                     <div class="table-container"><table><thead><tr><th>#</th><th>Tên</th><th>Trạng thái</th><th>Khóa học VIP</th><th>Thao tác</th></tr></thead><tbody id="students-table-body"></tbody></table></div>
                 </div>
 
-                <!-- QUẢN LÝ KHÓA HỌC (CÓ FORM THÊM & SỬA) -->
                 <div id="admin-courses" class="admin-panel" style="display:none;">
                     <h3>📚 Quản lý khóa học</h3>
                     <div class="admin-form">
@@ -496,6 +495,123 @@
         }
 
         // ======================================================================
+        // 🔐 HÀM ĐĂNG NHẬP VÀ ĐĂNG KÝ TÀI KHOẢN MỚI
+        // ======================================================================
+        async function login() {
+            const u = document.getElementById('login-user').value.trim();
+            const p = document.getElementById('login-pass').value.trim();
+            const errBox = document.getElementById('login-error');
+            if (errBox) { errBox.style.display = 'none'; errBox.textContent = ''; }
+
+            if (!u || !p) {
+                showToast('Vui lòng nhập tài khoản và mật khẩu!', 'warning');
+                return;
+            }
+
+            // Kiểm tra tài khoản admin mặc định
+            if (u === 'admin' && p === 'admin123') {
+                currentUser = 'admin';
+            } else {
+                let users = getUsers();
+                // Đồng bộ từ Cloud nếu có
+                if (window.fs && window.db) {
+                    try {
+                        const snap = await window.fs.getDoc(window.fs.doc(window.db, "users", u));
+                        if (snap.exists()) {
+                            users[u] = snap.data();
+                            setStorage('study_users', users);
+                        }
+                    } catch(e) {}
+                }
+
+                const userObj = users[u];
+                if (!userObj || userObj.password !== p) {
+                    if (errBox) { errBox.textContent = '❌ Sai tài khoản hoặc mật khẩu!'; errBox.style.display = 'block'; }
+                    showToast('Sai tài khoản hoặc mật khẩu!', 'error');
+                    return;
+                }
+                currentUser = u;
+            }
+
+            document.getElementById('auth-area').style.display = 'none';
+            document.getElementById('member-area').style.display = 'block';
+
+            if (currentUser === 'admin') {
+                document.getElementById('nav-admin').style.display = 'inline-block';
+                document.getElementById('nav-admin-support').style.display = 'inline-block';
+                document.getElementById('nav-support').style.display = 'none';
+                await loadAdminChat();
+            } else {
+                document.getElementById('nav-admin').style.display = 'none';
+                document.getElementById('nav-admin-support').style.display = 'none';
+                document.getElementById('nav-support').style.display = 'inline-block';
+                await loadStudentChat();
+            }
+
+            document.getElementById('user-display-name').textContent = currentUser;
+            document.getElementById('welcome-username').textContent = currentUser;
+            await updateChatBadge();
+            switchPage('home');
+        }
+
+        async function register() {
+            const u = document.getElementById('reg-user').value.trim();
+            const p = document.getElementById('reg-pass').value.trim();
+            const pConfirm = document.getElementById('reg-pass-confirm').value.trim();
+            const errBox = document.getElementById('register-error');
+
+            if (errBox) { errBox.style.display = 'none'; errBox.textContent = ''; }
+
+            if (!u || !p || !pConfirm) {
+                if (errBox) { errBox.textContent = '❌ Vui lòng điền đầy đủ thông tin!'; errBox.style.display = 'block'; }
+                showToast('Vui lòng điền đầy đủ thông tin!', 'warning');
+                return;
+            }
+
+            if (p !== pConfirm) {
+                if (errBox) { errBox.textContent = '❌ Mật khẩu xác nhận không khớp!'; errBox.style.display = 'block'; }
+                showToast('Mật khẩu xác nhận không khớp!', 'error');
+                return;
+            }
+
+            let users = getUsers();
+            if (users[u] || u === 'admin') {
+                if (errBox) { errBox.textContent = '❌ Tên tài khoản này đã tồn tại!'; errBox.style.display = 'block'; }
+                showToast('Tên tài khoản đã tồn tại!', 'error');
+                return;
+            }
+
+            const newUserObj = {
+                username: u,
+                password: p,
+                isAdmin: false,
+                unlockedCourses: [],
+                createdAt: new Date().toISOString()
+            };
+
+            users[u] = newUserObj;
+            setStorage('study_users', users);
+
+            try {
+                if (window.fs && window.db) {
+                    await window.fs.setDoc(window.fs.doc(window.db, "users", u), newUserObj);
+                }
+            } catch(e) {}
+
+            showToast('🎉 Đăng ký thành công! Hãy đăng nhập.', 'success');
+            document.getElementById('reg-user').value = '';
+            document.getElementById('reg-pass').value = '';
+            document.getElementById('reg-pass-confirm').value = '';
+            toggleAuth(true);
+        }
+
+        function logout() { location.reload(); }
+        function toggleAuth(show) {
+            document.getElementById('login-box').style.display = show ? 'block' : 'none';
+            document.getElementById('register-box').style.display = show ? 'none' : 'block';
+        }
+
+        // ======================================================================
         // CHAT CLOUD
         // ======================================================================
         async function sendStudentMessage() {
@@ -663,7 +779,7 @@
         }
 
         // ======================================================================
-        // 📚 QUẢN LÝ KHÓA HỌC (TÍCH HỢP SỬA + LOGIC VIP)
+        // 📚 QUẢN LÝ KHÓA HỌC
         // ======================================================================
         let courses = getStorage('courses', [
             { id: 'course-en', icon: '🇬🇧', name: 'Từ Vựng Tiếng Anh', description: 'Học từ vựng tiếng Anh cơ bản', file: 'games/vocab-en.html', vip: false, status: 'hot' },
@@ -695,7 +811,6 @@
             if (tab === 'vip-keys') { renderVipKeys(); renderCourseCheckboxes('vip-course-checkboxes', []); }
         }
 
-        // RENDER KHÓA HỌC CHO HỌC VIÊN
         function renderGames() {
             const container = document.getElementById('game-grid-container');
             if (!container) return;
@@ -762,7 +877,6 @@
             document.getElementById('game-iframe').src = 'about:blank';
         }
 
-        // HÀM LƯU / CẬP NHẬT KHÓA HỌC CHO ADMIN
         async function saveCourse() {
             const hiddenId = document.getElementById('edit-course-id-hidden').value;
             const id = document.getElementById('course-id').value.trim();
@@ -892,39 +1006,6 @@
         function renderStudents() {}
         function renderAdminDocuments() {}
         function renderDashboardStats() {}
-
-        async function login() {
-            const u = document.getElementById('login-user').value.trim();
-            const p = document.getElementById('login-pass').value.trim();
-            if (!u || !p) return;
-
-            currentUser = u;
-            document.getElementById('auth-area').style.display = 'none';
-            document.getElementById('member-area').style.display = 'block';
-
-            if (u === 'admin') {
-                document.getElementById('nav-admin').style.display = 'inline-block';
-                document.getElementById('nav-admin-support').style.display = 'inline-block';
-                document.getElementById('nav-support').style.display = 'none';
-                await loadAdminChat();
-            } else {
-                document.getElementById('nav-admin').style.display = 'none';
-                document.getElementById('nav-admin-support').style.display = 'none';
-                document.getElementById('nav-support').style.display = 'inline-block';
-                await loadStudentChat();
-            }
-
-            document.getElementById('user-display-name').textContent = u;
-            document.getElementById('welcome-username').textContent = u;
-            await updateChatBadge();
-            switchPage('home');
-        }
-
-        function logout() { location.reload(); }
-        function toggleAuth(show) {
-            document.getElementById('login-box').style.display = show ? 'block' : 'none';
-            document.getElementById('register-box').style.display = show ? 'none' : 'block';
-        }
 
         window.onload = async function() {
             if (window.fs && window.db) {

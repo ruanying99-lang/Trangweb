@@ -6,12 +6,6 @@
     <title>Hệ Thống Quản Lý Học Viên VIP - Bảo Mật & Tích Hợp</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23C62828'/%3E%3Cpath d='M50 25 L80 40 L50 55 L20 40 Z' fill='%23FFD700'/%3E%3Cpath d='M35 48.5 L35 65 C35 70, 65 70, 65 65 L65 48.5' fill='none' stroke='%23FFD700' stroke-width='5'/%3E%3C/svg%3E">
     <style>
-        /* Bổ sung chuẩn khung chat admin */
-        .admin-chat-main { display: flex; flex-direction: column; height: 100%; justify-content: space-between; }
-        .admin-chat-main .chat-messages { flex: 1; overflow-y: auto; padding: 14px; background: #fafafa; }
-        .admin-chat-main .chat-input-area { display: flex; gap: 10px; padding: 12px; background: #fff; border-top: 1px solid #e0e0e0; align-items: center; }
-        .admin-chat-main .chat-input-area textarea { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; resize: none; height: 48px; font-size: 14px; }
-        .admin-chat-main .chat-input-area .btn-submit { width: auto; padding: 0 22px; height: 48px; margin: 0; }
         :root {
             --primary: #D32F2F;
             --primary-dark: #B71C1C;
@@ -233,7 +227,7 @@
         .category-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; background: #e3f2fd; border-radius: 15px; font-size: 13px; border: 1px solid #90caf9; }
         .category-tag .remove { cursor: pointer; color: var(--danger); font-weight: bold; margin-left: 4px; }
 
-        /* CHAT */
+        /* CHAT STYLES */
         .chat-container { display: flex; flex-direction: column; height: 480px; background: #fff; border-radius: 10px; border: 1px solid #e0e0e0; overflow: hidden; }
         .chat-messages { flex: 1; padding: 14px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; }
         .chat-message { margin-bottom: 12px; display: flex; flex-direction: column; max-width: 80%; }
@@ -244,8 +238,10 @@
         .chat-message.received .msg-bubble { background: #e0e0e0; color: #333; border-bottom-left-radius: 4px; }
         .chat-message .msg-time { font-size: 11px; color: #999; margin-top: 4px; }
         .chat-message .msg-sender { font-size: 12px; font-weight: bold; margin-bottom: 3px; }
-        .chat-input-area { display: flex; gap: 10px; padding: 12px; background: #fff; border-top: 1px solid #e0e0e0; flex-shrink: 0; }
+        
+        .chat-input-area { display: flex; gap: 10px; padding: 12px; background: #fff; border-top: 1px solid #e0e0e0; flex-shrink: 0; align-items: center; }
         .chat-input-area textarea { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; resize: none; height: 48px; font-size: 14px; }
+        .chat-input-area .btn-submit { width: auto; padding: 0 22px; height: 48px; margin: 0; }
         .chat-empty { text-align: center; color: #999; padding: 40px 20px; }
 
         .admin-chat-list { display: grid; grid-template-columns: 260px 1fr; height: 480px; background: #fff; border-radius: 10px; border: 1px solid #e0e0e0; overflow: hidden; }
@@ -254,20 +250,8 @@
         .admin-chat-sidebar .chat-user-item:hover { background: #f0f0f0; }
         .admin-chat-sidebar .chat-user-item.active { background: #E3F2FD; border-left: 4px solid var(--primary); }
         .admin-chat-sidebar .unread-badge { background: #FF1744; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
-        .admin-chat-main { display: flex; flex-direction: column; min-width: 0; }
+        .admin-chat-main { display: flex; flex-direction: column; height: 100%; justify-content: space-between; }
         .admin-chat-header { padding: 12px 20px; background: var(--primary); color: #fff; font-weight: bold; flex-shrink: 0; }
-
-        /* PROFILE */
-        .profile-container { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; }
-        .profile-sidebar { background: #fff; border-radius: 10px; padding: 25px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
-        .profile-sidebar .avatar { font-size: 72px; margin-bottom: 8px; }
-        .profile-sidebar .username { font-size: 22px; font-weight: bold; color: var(--primary-dark); }
-        .profile-content { background: #fff; border-radius: 10px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
-        .profile-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; flex-wrap: wrap; }
-        .profile-tab { padding: 8px 20px; border: none; background: none; cursor: pointer; font-weight: bold; color: #666; border-radius: 5px; transition: 0.3s; }
-        .profile-tab.active { background: var(--primary); color: #fff; }
-        .profile-tab-content { display: none; }
-        .profile-tab-content.active { display: block; }
 
         /* MODALS & IFRAMES */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center; padding: 20px; }
@@ -327,7 +311,6 @@
             <div class="nav">
                 <a onclick="switchPage('home')" id="nav-home" class="active">🏠 Trang Chủ</a>
                 <a onclick="switchPage('games')" id="nav-games">🎮 Khóa Học</a>
-                <a onclick="switchPage('profile')" id="nav-profile">👤 Sổ Từ Vựng</a>
                 <a onclick="switchPage('documents')" id="nav-documents">📄 Tài Liệu</a>
                 <a onclick="switchPage('support')" id="nav-support">💬 Hỗ Trợ</a>
                 <a onclick="switchPage('admin')" id="nav-admin" style="display:none;">⚙️ Quản Trị</a>
@@ -377,30 +360,6 @@
                 <div id="game-grid-container" class="grid"></div>
             </div>
 
-            <!-- PROFILE / SỔ TỪ VỰNG -->
-            <div id="page-profile" class="page">
-                <div class="hero" style="background:linear-gradient(135deg,#2E7D32,#1B5E20);">
-                    <h1>📖 Sổ Từ Vựng Cá Nhân</h1>
-                </div>
-                <div class="admin-panel">
-                    <h3>➕ Thêm từ mới vào Sổ tay cá nhân</h3>
-                    <div class="admin-form">
-                        <div class="form-group"><label>Từ mới (Word)</label><input type="text" id="my-word-input" placeholder="Ví dụ: Grateful"></div>
-                        <div class="form-group"><label>Nghĩa (Meaning)</label><input type="text" id="my-meaning-input" placeholder="Ví dụ: Biết ơn"></div>
-                        <div class="form-group full-width"><button class="btn-submit" onclick="addPersonalWord()" style="background:#2E7D32;">📌 Lưu Vào Sổ Cá Nhân</button></div>
-                    </div>
-                </div>
-                <div class="admin-panel" style="margin-top:20px;">
-                    <h3>📚 Từ vựng của tôi</h3>
-                    <div class="table-container">
-                        <table>
-                            <thead><tr><th>#</th><th>Từ mới</th><th>Nghĩa</th><th>Ngày lưu</th><th>Thao tác</th></tr></thead>
-                            <tbody id="my-vocab-table-body"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
             <!-- DOCUMENTS -->
             <div id="page-documents" class="page">
                 <div class="hero" style="background:linear-gradient(135deg,#2E7D32,#1B5E20);">
@@ -435,25 +394,23 @@
                 </div>
             </div>
 
-            <!-- SUPPORT (HỌC VIÊN CHAT) -->
-            <!-- ===== SUPPORT (HỌC VIÊN CHAT) ===== -->
-<div id="page-support" class="page">
-    <div class="hero" style="background:linear-gradient(135deg,#1565C0,#0D47A1);">
-        <h1>💬 Trò Chuyện Với Admin</h1>
-    </div>
-    <div class="admin-panel">
-        <div class="chat-container">
-            <div class="chat-messages" id="student-chat-messages">
-                <div class="chat-empty"><p>Chưa có tin nhắn...</p></div>
+            <!-- SUPPORT (HỌC VIÊN CHAT VỚI ADMIN) -->
+            <div id="page-support" class="page">
+                <div class="hero" style="background:linear-gradient(135deg,#1565C0,#0D47A1);">
+                    <h1>💬 Trò Chuyện Với Admin</h1>
+                </div>
+                <div class="admin-panel">
+                    <div class="chat-container">
+                        <div class="chat-messages" id="student-chat-messages">
+                            <div class="chat-empty"><p>Chưa có tin nhắn...</p></div>
+                        </div>
+                        <div class="chat-input-area">
+                            <textarea id="student-chat-input" placeholder="Nhập tin nhắn..." rows="2"></textarea>
+                            <button class="btn-submit" onclick="sendStudentMessage()">📤 Gửi</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- KHUNG NHẬP TIN NHẮN CHO HỌC VIÊN -->
-            <div class="chat-input-area">
-                <textarea id="student-chat-input" placeholder="Nhập tin nhắn..." rows="2"></textarea>
-                <button class="btn-submit" onclick="sendStudentMessage()">📤 Gửi</button>
-            </div>
-        </div>
-    </div>
-</div>
 
             <!-- ADMIN -->
             <div id="page-admin" class="page">
@@ -475,14 +432,12 @@
                     <button class="admin-tab" onclick="switchAdminTab('security')">🛡️ Bảo mật</button>
                 </div>
 
-                <!-- Tab Students -->
                 <div id="admin-students" class="admin-panel">
                     <h3>👥 Quản lý học viên</h3>
                     <div class="search-bar"><input type="text" id="search-students" placeholder="🔍 Tìm..." oninput="renderStudents()"></div>
                     <div class="table-container"><table><thead><tr><th>#</th><th>Tên</th><th>Trạng thái</th><th>Khóa học VIP</th><th>Thao tác</th></tr></thead><tbody id="students-table-body"></tbody></table></div>
                 </div>
 
-                <!-- Tab Courses -->
                 <div id="admin-courses" class="admin-panel" style="display:none;">
                     <h3>📚 Quản lý khóa học</h3>
                     <div class="admin-form">
@@ -493,14 +448,11 @@
                         <div class="form-group full-width"><label>Mô tả</label><textarea id="course-desc"></textarea></div>
                         <div class="form-group"><label>File HTML (App con)</label><input type="text" id="course-file" placeholder="games/vocab-en.html"></div>
                         <div class="form-group"><label>Yêu cầu VIP?</label><select id="course-vip"><option value="false">Không</option><option value="true">Có</option></select></div>
-                        <div class="form-group full-width">
-                            <button class="btn-submit" onclick="addCourse()">➕ Thêm Khóa Học</button>
-                        </div>
+                        <div class="form-group full-width"><button class="btn-submit" onclick="addCourse()">➕ Thêm Khóa Học</button></div>
                     </div>
                     <div class="table-container"><table><thead><tr><th>#</th><th>Tên</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="courses-table-body"></tbody></table></div>
                 </div>
 
-                <!-- Tab VIP Keys -->
                 <div id="admin-vip-keys" class="admin-panel" style="display:none;">
                     <h3>🔑 Quản lý mã VIP</h3>
                     <div class="admin-form">
@@ -513,20 +465,17 @@
                     <div class="table-container"><table><thead><tr><th>Mã VIP</th><th>Khóa học</th><th>Đã dùng</th><th>Thao tác</th></tr></thead><tbody id="vip-keys-table-body"></tbody></table></div>
                 </div>
 
-                <!-- Tab Documents -->
                 <div id="admin-documents" class="admin-panel" style="display:none;">
                     <h3>📄 Duyệt tài liệu</h3>
                     <div class="table-container"><table><thead><tr><th>Tên</th><th>Người tải</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="admin-documents-table-body"></tbody></table></div>
                 </div>
 
-                <!-- Tab Categories -->
                 <div id="admin-categories" class="admin-panel" style="display:none;">
                     <h3>📂 Thể loại</h3>
                     <div class="admin-form"><div class="form-group full-width"><input type="text" id="new-category-name" placeholder="Tên thể loại..."><button class="btn-submit small" onclick="addCategory()" style="margin-top:5px;">Thêm</button></div></div>
                     <div id="category-list-container" class="category-list"></div>
                 </div>
 
-                <!-- Tab Security -->
                 <div id="admin-security" class="admin-panel" style="display:none;">
                     <h3>🛡️ Bảo mật hệ thống</h3>
                     <button class="btn-action btn-delete" onclick="resetAllData()">🗑️ Reset Dữ Liệu</button>
@@ -539,31 +488,29 @@
                 <div class="admin-panel"><div id="student-list-container"></div></div>
             </div>
 
-            <!-- ADMIN SUPPORT (CHAT QUẢN TRỊ - HIỆN TẤT CẢ HỌC VIÊN ĐỂ PHÁT THÔNG BÁO) -->
-            <!-- ===== ADMIN SUPPORT (CHAT QUẢN TRỊ) ===== -->
-<div id="page-admin-support" class="page">
-    <div class="hero" style="background:linear-gradient(135deg,#E65100,#BF360C);">
-        <h1>📩 Hỗ Trợ & Phát Thông Báo Học Viên</h1>
-    </div>
-    <div class="admin-panel">
-        <div class="admin-chat-list">
-            <div class="admin-chat-sidebar" id="admin-chat-users">
-                <div style="padding:15px;color:#888;">Đang tải danh sách học viên...</div>
-            </div>
-            <div class="admin-chat-main">
-                <div class="admin-chat-header" id="admin-chat-header">Chọn một học viên bên trái để bắt đầu chat hoặc gửi thông báo</div>
-                <div class="chat-messages" id="admin-chat-messages">
-                    <div class="chat-empty"><p>Chọn học viên bên trái</p></div>
+            <!-- ADMIN SUPPORT (HIỆN TẤT CẢ HỌC VIÊN ĐỂ NHẮN TIN / PHÁT THÔNG BÁO) -->
+            <div id="page-admin-support" class="page">
+                <div class="hero" style="background:linear-gradient(135deg,#E65100,#BF360C);">
+                    <h1>📩 Hỗ Trợ & Phát Thông Báo Học Viên</h1>
                 </div>
-                <!-- KHUNG NHẬP TIN NHẮN CHO ADMIN -->
-                <div class="chat-input-area">
-                    <textarea id="admin-chat-input" placeholder="Nhập tin nhắn hoặc thông báo..." rows="2" disabled></textarea>
-                    <button class="btn-submit" onclick="sendAdminReply()" disabled>📤 Gửi</button>
+                <div class="admin-panel">
+                    <div class="admin-chat-list">
+                        <div class="admin-chat-sidebar" id="admin-chat-users">
+                            <div style="padding:15px;color:#888;">Đang tải danh sách học viên...</div>
+                        </div>
+                        <div class="admin-chat-main">
+                            <div class="admin-chat-header" id="admin-chat-header">Chọn một học viên bên trái để bắt đầu chat hoặc gửi thông báo</div>
+                            <div class="chat-messages" id="admin-chat-messages">
+                                <div class="chat-empty"><p>Chọn học viên bên trái</p></div>
+                            </div>
+                            <div class="chat-input-area">
+                                <textarea id="admin-chat-input" placeholder="Nhập tin nhắn hoặc thông báo..." rows="2" disabled></textarea>
+                                <button class="btn-submit" onclick="sendAdminReply()" disabled>📤 Gửi</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
             <!-- ADMIN DOCUMENTS APPROVAL -->
             <div id="page-admin-documents" class="page">
@@ -664,12 +611,12 @@
         }
 
         // ======================================================================
-        // 💬 HỆ THỐNG CHAT CLOUD & PHÁT THÔNG BÁO
+        // 💬 HỆ THỐNG CHAT CLOUD (ĐÃ KIỂM TRA KỸ KHUNG NHẬP & GỬI)
         // ======================================================================
         async function sendStudentMessage() {
             if (!currentUser || currentUser === 'admin') return;
             const input = document.getElementById('student-chat-input');
-            const text = input.value.trim();
+            const text = input ? input.value.trim() : '';
             if (!text) { showToast('Vui lòng nhập nội dung!', 'warning'); return; }
 
             const msgId = 'msg_' + Date.now();
@@ -688,7 +635,7 @@
         async function sendAdminReply() {
             if (!adminSelectedUser) { showToast('Vui lòng chọn học viên ở cột bên trái!', 'warning'); return; }
             const input = document.getElementById('admin-chat-input');
-            const text = input.value.trim();
+            const text = input ? input.value.trim() : '';
             if (!text) { showToast('Vui lòng nhập nội dung thông báo/tin nhắn!', 'warning'); return; }
 
             const msgId = 'msg_' + Date.now();
@@ -741,7 +688,6 @@
             if (!sidebar) return;
 
             try {
-                // 🟢 LẤY TẤT CẢ TÀI KHOẢN HỌC VIÊN TRÊN HỆ THỐNG (HIỂN THỊ ĐỦ HỌC VIÊN)
                 const usersSnap = await window.fs.getDocs(window.fs.collection(window.db, "users"));
                 let users = [];
                 usersSnap.forEach(d => {
@@ -755,7 +701,6 @@
 
                 let sideHtml = '';
                 for (let u of users) {
-                    // Kiểm tra xem học viên này có tin nhắn chưa đọc không
                     const mSnap = await window.fs.getDocs(window.fs.collection(window.db, "chats", u, "messages"));
                     let unread = 0;
                     mSnap.forEach(m => { if (m.data().from === u && !m.data().read) unread++; });
@@ -827,7 +772,7 @@
         }
 
         // ======================================================================
-        // CÁC HÀM CƠ BẢN QUẢN LÝ
+        // CÁC HÀM QUẢN LÝ KHÁC
         // ======================================================================
         let courses = getStorage('courses', [
             { id: 'course-en', icon: '🇬🇧', name: 'Từ Vựng Tiếng Anh', description: 'Học từ vựng tiếng Anh cơ bản', file: 'games/vocab-en.html', vip: false, status: 'hot', isGlobal: false },

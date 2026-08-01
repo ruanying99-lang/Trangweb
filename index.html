@@ -494,7 +494,7 @@
                             </div>
                             <div class="chat-input-area">
                                 <textarea id="admin-chat-input" placeholder="Nhập tin nhắn hoặc thông báo..." rows="2" disabled></textarea>
-                                <button class="btn-submit" onclick="sendAdminReply()" disabled>📤 Gửi</button>
+                                <button id="admin-send-btn" class="btn-submit" onclick="sendAdminReply()" disabled>📤 Gửi</button>
                             </div>
                         </div>
                     </div>
@@ -701,9 +701,9 @@
                 if (adminSelectedUser) {
                     document.getElementById('admin-chat-header').textContent = '💬 Đang chat & phát thông báo tới: ' + adminSelectedUser;
                     
-                    // Mở khóa khung nhập và nút gửi
+                    // Mở khóa khung nhập và nút gửi sử dụng ID chính xác
                     const inputArea = document.getElementById('admin-chat-input');
-                    const sendBtn = document.querySelector('#page-admin-support .btn-submit');
+                    const sendBtn = document.getElementById('admin-send-btn');
                     if (inputArea) inputArea.disabled = false;
                     if (sendBtn) sendBtn.disabled = false;
 

@@ -451,6 +451,174 @@
 
     <!-- MAIN APP SCRIPT -->
     <script>
+        // ======================================================================
+// 📄 QUẢN LÝ TÀI LIỆU
+// ======================================================================
+
+// Xử lý sự kiện hiển thị tên file khi chọn file
+document.addEventListener('DOMContentLoaded', () => {
+    const fileInput = document.getElementById('doc-file-input');
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : '';
+            const nameDisplay = document.getElementById('selected-file-name');
+            if (nameDisplay) {
+                nameDisplay.textContent = fileName ? `Đã chọn: ${fileName}` : '';
+            }
+        });
+    }
+    renderCategoriesSelect();
+    renderDocuments();
+});
+
+function renderCategoriesSelect() {
+    const select = document.getElementById('doc-category');
+    const filterSelect = document.getElementById('filter-doc-category');
+    if (!select) return;
+
+    let html = '';
+    let filterHtml = '<option value="all">Tất cả danh mục</option>';
+    
+    categories.forEach(cat => {
+        html += `<option value="${cat.id}">${cat.name}</option>`;
+        filterHtml += `<option value="${cat.id}">${cat.name}</option>`;
+    });
+
+    select.innerHTML = html;
+    if (filterSelect) filterSelect.innerHTML = filterHtml;
+}
+
+async function uploadDocument() {
+    const titleInput = document.getElementById('doc-title');
+    const descInput = document.getElementById('doc-desc');
+    const categorySelect = document.getElementById('doc-category');
+    const fileInput = document.getElementById('doc-file-input');
+
+    const title = titleInput ? titleInput.value.trim() : '';
+    const description = descInput ? descInput.value.trim() : '';
+    const category = categorySelect ? categorySelect.value : '';
+    const file = fileInput && fileInput.files[0] ? fileInput.files[0] : null;
+
+    if (!title) {
+        showToast('Vui lòng nhập tên tài liệu!', 'warning');
+        return;
+    }
+
+    if (!file) {
+        showToast('Vui lòng chọn file tài liệu cần tải lên!', 'warning');
+        return;
+    }
+
+    // Đọc file dưới dạng DataURL để lưu trữ tạm thời trong localStorage / Firestore
+    const reader = new FileReader();
+    reader.onload = async function(uploadEvent) {
+        const fileData = {
+            id: 'doc_' + Date.now(),
+            title: title,
+            description: description,
+            category: category,
+            fileName: file.name,
+            fileSize: file.size,
+            fileData: uploadEvent.target.result, // Chuỗi Base64 của file
+            uploader: currentUser || 'guest',
+            status: currentUser === 'admin' ? 'approved' : 'pending', // Admin tự duyệt, học viên chờ duyệt
+            createdAt: new Date().toISOString()
+        };
+
+        documents.unshift(fileData);
+        setStorage('documents', documents);
+
+        // Lưu lên Firestore nếu có
+        try {
+            if (window.fs && window.db) {
+                await window.fs.setDoc(window.fs.doc(window.db, "documents", fileData.id), fileData);
+            }
+        } catch (e) {
+            console.error("Lỗi lưu cloud:", e);
+        }
+
+        showToast('📤 Tải lên tài liệu thành công!', 'success');
+        
+        // Reset form
+        titleInput.value = '';
+        descInput.value = '';
+        fileInput.value = '';
+        const nameDisplay = document.getElementById('selected-file-name');
+        if (nameDisplay) nameDisplay.textContent = '';
+
+        renderDocuments();
+    };
+
+    reader.readAsDataURL(file);
+}
+
+function renderDocuments() {
+    const container = document.getElementById('document-list-container');
+    if (!container) return;
+
+    const searchInput = document.getElementById('search-docs');
+    const statusFilter = document.getElementById('filter-doc-status');
+    const categoryFilter = document.getElementById('filter-doc-category');
+
+    const keyword = searchInput ? searchInput.value.toLowerCase() : '';
+    const statusVal = statusFilter ? statusFilter.value : 'all';
+    const catVal = categoryFilter ? categoryFilter.value : 'all';
+
+    let filtered = documents.filter(doc => {
+        const matchKeyword = doc.title.toLowerCase().includes(keyword) || (doc.description && doc.description.toLowerCase().includes(keyword));
+        const matchStatus = (statusVal === 'all') || (doc.status === statusVal);
+        const matchCat = (catVal === 'all') || (doc.category === catVal);
+        
+        // Nếu không phải admin, chỉ hiển thị tài liệu đã được duyệt hoặc do chính mình tải lên
+        const isOwnerOrAdmin = (currentUser === 'admin' || doc.uploader === currentUser || doc.status === 'approved');
+
+        return matchKeyword && matchStatus && matchCat && isOwnerOrAdmin;
+    });
+
+    if (filtered.length === 0) {
+        container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #888; padding: 30px;">Không có tài liệu nào phù hợp.</div>`;
+        return;
+    }
+
+    let html = '';
+    filtered.forEach(doc => {
+        const catObj = categories.find(c => c.id === doc.category);
+        const catName = catObj ? catObj.name : 'Chung';
+        const isApproved = doc.status === 'approved';
+
+        html += `
+            <div class="document-item">
+                <div class="doc-title">${doc.title}</div>
+                <div class="doc-meta">📂 Danh mục: ${catName} | 👤 Đăng bởi: ${doc.uploader}</div>
+                <div class="doc-meta">📅 Ngày đăng: ${new Date(doc.createdAt).toLocaleDateString()}</div>
+                <p style="font-size: 13px; color: #666; margin: 8px 0;">${doc.description || 'Không có mô tả'}</p>
+                <div style="display: flex; gap: 8px; align-items: center; margin-top: 10px;">
+                    <span class="status-badge ${isApproved ? 'active' : 'free'}">${isApproved ? '✅ Đã duyệt' : '⏳ Chờ duyệt'}</span>
+                    <a href="${doc.fileData}" download="${doc.fileName}" class="btn-submit small" style="text-decoration: none; padding: 4px 12px; font-size: 12px;">📥 Tải xuống</a>
+                    ${currentUser === 'admin' && !isApproved ? `<button class="btn-action btn-edit" onclick="approveDocument('${doc.id}')">Duyệt</button>` : ''}
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+async function approveDocument(id) {
+    documents = documents.map(doc => doc.id === id ? { ...doc, status: 'approved' } : doc);
+    setStorage('documents', documents);
+    try {
+        if (window.fs && window.db) {
+            const docRef = window.fs.doc(window.db, "documents", id);
+            const docSnap = await window.fs.getDoc(docRef);
+            if (docSnap.exists()) {
+                await window.fs.setDoc(docRef, { ...docSnap.data(), status: 'approved' });
+            }
+        }
+    } catch(e) {}
+    showToast('✅ Đã duyệt tài liệu thành công!', 'success');
+    renderDocuments();
+}
         let currentUser = null;
         let adminSelectedUser = null;
 

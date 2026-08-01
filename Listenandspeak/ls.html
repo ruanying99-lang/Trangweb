@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Luyện Nói Tiếng Trung Qua Video Ngắn</title>
   
-  <!-- ===== CHÈN FIREBASE SDK (Nếu website chính chưa load) ===== -->
-  <!-- <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script> -->
-  <!-- <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script> -->
-  <!-- <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script> -->
+  <!-- ===== CHÈN FIREBASE SDK (Bắt buộc bỏ comment nếu file này chạy độc lập) ===== -->
+  <!-- <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script> -->
+  <!-- <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script> -->
+  <!-- <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script> -->
 
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/pinyin-pro.min.js">
@@ -438,28 +438,11 @@
   </div>
 
   <!-- ========================================================== -->
-  <!-- ===== JAVASCRIPT (Đã tích hợp nút Xóa/Sửa cho Admin) ===== -->
+  <!-- ===== JAVASCRIPT (Đã cập nhật xử lý Firebase) ===== -->
   <!-- ========================================================== -->
   <script>
     // =====================================================================
-    // 0.  FIREBASE CONFIG (Điền config của bạn vào đây)
-    // =====================================================================
-    /*
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    */
-
-    // =====================================================================
-    // 1.  LOG HELPER
+    // 0.  LOG HELPER
     // =====================================================================
     const logContainer = document.getElementById('floatingLog');
     const logBody = document.getElementById('logBody');
@@ -484,6 +467,47 @@
       logContainer.classList.toggle('collapsed', logCollapsed);
       this.textContent = logCollapsed ? '➕' : '➖';
     });
+
+    // =====================================================================
+    // 1.  FIREBASE BOOTSTRAP (Giải quyết lỗi không tìm thấy Firebase)
+    // =====================================================================
+    function getFirebaseInstance() {
+        // 1. Nếu window đã có firebase (trang web chính đã load), trả về luôn
+        if (typeof window.firebase !== 'undefined') {
+            addLog("✅ Đã phát hiện Firebase SDK từ trang web chính.", 'success');
+            return window.firebase;
+        }
+
+        // 2. Nếu chưa có, thử tự init (bạn cần bỏ comment các dòng import SDK ở trên đầu file)
+        addLog("⏳ Đang thử tự động khởi tạo Firebase (nếu SDK đã được tải)...", 'info');
+        try {
+            if (typeof window.firebase !== 'undefined') return window.firebase;
+        } catch(e) {}
+        
+        addLog("❌ Lỗi: Không tìm thấy thư viện Firebase.", 'error');
+        addLog("💡 Hướng dẫn: Nếu bạn chạy file này độc lập, hãy bỏ comment 3 dòng <script src='firebase...'> ở đầu file và điền Config bên dưới.", 'warning');
+        return null;
+    }
+
+    // Cấu hình Firebase của bạn (Điền vào đây nếu chạy độc lập)
+    const LOCAL_FIREBASE_CONFIG = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    
+    let firebaseInstance = getFirebaseInstance();
+    if (firebaseInstance && !firebaseInstance.apps.length && typeof LOCAL_FIREBASE_CONFIG.apiKey !== 'undefined' && LOCAL_FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY") {
+        try {
+            firebaseInstance.initializeApp(LOCAL_FIREBASE_CONFIG);
+            addLog("✅ Đã khởi tạo thành công Firebase Config cục bộ.", 'success');
+        } catch (initError) {
+            addLog("⚠️ Lỗi khởi tạo Firebase: " + initError.message, 'error');
+        }
+    }
 
     // =====================================================================
     // 2.  INDEXED DB HELPERS (v8)
@@ -543,7 +567,7 @@
     function updateVideo(videoData) { return executeTransaction(STORE_NAME, "readwrite", store => new Promise((resolve, reject) => { const req = store.put(videoData); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); })); }
     function deleteVideo(id) { return executeTransaction(STORE_NAME, "readwrite", store => new Promise((resolve, reject) => { const req = store.delete(id); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); })); }
 
-    // --- VOCAB STORE (User specific) ---
+    // --- VOCAB STORE ---
     function getAllVocab(userId) { return executeTransaction(VOCAB_STORE_NAME, "readonly", store => { const req = store.getAll(); return new Promise((resolve, reject) => { req.onsuccess = () => { const items = req.result || []; resolve(items.filter(item => item.userId === userId)); }; req.onerror = () => reject(req.error); }); }); }
     function addVocab(vocabItem) { return executeTransaction(VOCAB_STORE_NAME, "readwrite", store => new Promise((resolve, reject) => { const req = store.add(vocabItem); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); })); }
     function updateVocab(vocabItem) { return executeTransaction(VOCAB_STORE_NAME, "readwrite", store => new Promise((resolve, reject) => { const req = store.put(vocabItem); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); })); }
@@ -595,7 +619,7 @@
     const userStatusDisplay = document.getElementById('userStatusDisplay');
     const mainLayout = document.getElementById('mainLayout');
 
-    // ---------- FIRBASE AUTH & RENDER (QUAN TRỌNG: THÊM NÚT ADMIN) ----------
+    // ---------- FIRBASE AUTH & RENDER ----------
     async function renderLibraryList() {
         if (!videoLibraryList) return;
         videoLibraryList.innerHTML = '';
@@ -645,7 +669,6 @@
                 
                 if (currentLibraryTab === 'public') {
                   let adminHtml = '';
-                  // Chỉ Admin mới thấy nút Edit & Delete
                   if (isAdminMode) {
                       adminHtml = `
                           <button class="action-btn edit-btn" data-vid="${item.id}" title="Chỉnh sửa video">✏️</button>
@@ -669,25 +692,21 @@
                 
                 div.querySelector('.video-title-span').addEventListener('click', () => { selectVideo(item); });
 
-                // ========== EVENT LISTENERS CỦA NÚT ADMIN ==========
-                // SỬA VIDEO
                 const editBtn = div.querySelector('.edit-btn');
                 if (editBtn) {
                     editBtn.addEventListener('click', async function(e) {
                         e.stopPropagation();
                         const vid = parseInt(this.dataset.vid);
-                        // Gọi hàm mở modal chỉnh sửa có sẵn
                         openEditModal(e, vid);
                     });
                 }
 
-                // XÓA VIDEO (Chỉ Admin)
                 const delBtn = div.querySelector('.delete-btn');
                 if (delBtn) {
                     delBtn.addEventListener('click', async function(e) {
                         e.stopPropagation();
                         const vid = parseInt(this.dataset.vid);
-                        if (confirm("⚠️ Bạn chắc chắn muốn xóa video này khỏi toàn bộ hệ thống? (Hành động này không thể hoàn tác)")) {
+                        if (confirm("⚠️ Admin xác nhận xóa video này vĩnh viễn?")) {
                             await deleteVideo(vid);
                             if (currentVideoData && currentVideoData.id === vid) {
                                 currentVideoData = null;
@@ -700,7 +719,6 @@
                         }
                     });
                 }
-                // ================================================
 
                 if (currentLibraryTab === 'public') {
                   const favIcon = div.querySelector('.fav-icon');
@@ -752,11 +770,14 @@
 
     // ---------- FIRBASE AUTH CHECK ----------
     async function initializeAppWithFirebase() {
-        firebase.auth().onAuthStateChanged(async (user) => {
+        if (!firebaseInstance) {
+            return;
+        }
+        firebaseInstance.auth().onAuthStateChanged(async (user) => {
             if (user) {
                 CURRENT_USER_ID = user.uid;
                 try {
-                    const db = firebase.firestore();
+                    const db = firebaseInstance.firestore();
                     const userDoc = await db.collection('users').doc(CURRENT_USER_ID).get();
                     if (userDoc.exists) {
                         const userData = userDoc.data();
@@ -808,7 +829,6 @@
             document.getElementById("modalTitle").innerText = "Chỉnh Sửa Phụ Đề Video";
             document.getElementById("editVideoId").value = item.id;
             document.getElementById("inputVideoTitle").value = item.title;
-            // ... (Phần fill dữ liệu cho modal giữ nguyên)
             const modalVideo = document.getElementById("modalPreviewVideo");
             if (modalVideo && item.videoBlob) modalVideo.src = URL.createObjectURL(item.videoBlob);
             const container = document.getElementById("subtitleInputsContainer");
@@ -819,16 +839,16 @@
             document.getElementById('uploadModal').classList.add("show");
         });
     }
-    function addSubtitleRow(data = {}) { /* Hàm render dòng phụ đề để sửa, giữ nguyên */ }
-    function renderSentences() { /* Hàm render câu thoại, giữ nguyên */ }
+    function addSubtitleRow(data = {}) { /* Hàm render dòng phụ đề */ }
+    function renderSentences() { /* Hàm render câu thoại */ }
 
     // ---------- INIT ----------
     function init() {
-        if (typeof firebase !== 'undefined' && firebase.auth) {
+        if (firebaseInstance && firebaseInstance.auth) {
             initializeAppWithFirebase();
         } else {
-            addLog("❌ Lỗi: Không tìm thấy thư viện Firebase trên trang web!", 'error');
-            alert("Vui lòng đảm bảo trang web chính đã load Firebase SDK!");
+            userStatusDisplay.innerHTML = "❌ Lỗi Firebase";
+            addLog("❌ Không thể liên kết Firebase. Vui lòng kiểm tra lại việc tải SDK.", 'error');
         }
     }
 

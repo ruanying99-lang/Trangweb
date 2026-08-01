@@ -94,6 +94,30 @@
       border-color: var(--primary);
       transform: rotate(15deg);
     }
+    
+    /* Admin Mode Toggle */
+    .btn-admin-toggle {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-admin-toggle.admin {
+      color: var(--danger);
+      border-color: var(--danger);
+      background: rgba(244, 63, 94, 0.1);
+    }
+    .btn-admin-toggle:hover {
+      transform: scale(1.03);
+    }
 
     /* ===== HEADER ===== */
     header {
@@ -131,7 +155,7 @@
       }
     }
     .main-layout:not(.library-collapsed) {
-      grid-template-columns: 280px 2.2fr 0.8fr;
+      grid-template-columns: 300px 2.2fr 0.8fr;
     }
     .library-section {
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -176,6 +200,38 @@
       margin-bottom: 4px;
     }
 
+    /* ===== LIBRARY TABS ===== */
+    .library-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 2px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    .lib-tab {
+      flex: 1;
+      padding: 6px 0;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: 0.2s;
+      text-align: center;
+    }
+    .lib-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    .lib-tab:hover:not(.active) {
+      color: var(--text-secondary);
+    }
+    .lib-tab.pending-active {
+      color: var(--warning);
+    }
+
     /* ===== LIBRARY ===== */
     .library-list {
       display: flex;
@@ -195,7 +251,15 @@
       transition: 0.25s;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
+      position: relative;
+    }
+    .library-item.pending-item {
+      border-left: 4px solid var(--warning);
+      opacity: 0.7;
+    }
+    .library-item.favorite-item {
+      border-left: 4px solid var(--danger);
     }
     .library-item:hover {
       transform: translateY(-2px);
@@ -214,16 +278,36 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       max-width: 180px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .library-item .video-title-span .fav-icon {
+      color: var(--danger);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .library-item .video-title-span .fav-icon:hover {
+      transform: scale(1.2);
+    }
+    .library-item .video-title-span .status-badge {
+      font-size: 0.6rem;
+      padding: 2px 6px;
+      background: var(--warning);
+      color: #000;
+      border-radius: 4px;
+      font-weight: 700;
+      margin-left: auto;
     }
     .library-item-modes {
       display: flex;
-      gap: 8px;
-      margin-top: 6px;
+      gap: 6px;
+      flex-wrap: wrap;
     }
     .btn-mode {
-      flex: 1;
-      padding: 6px 8px;
-      font-size: 0.75rem;
+      padding: 4px 8px;
+      font-size: 0.7rem;
       font-weight: 700;
       border-radius: 6px;
       cursor: pointer;
@@ -231,6 +315,7 @@
       background: rgba(255, 255, 255, 0.03);
       color: var(--text-secondary);
       transition: 0.2s;
+      flex: 0 1 auto;
     }
     .btn-mode.active {
       background: var(--primary) !important;
@@ -238,6 +323,30 @@
       border-color: var(--primary);
       box-shadow: 0 0 8px var(--primary-glow);
     }
+    
+    .action-buttons {
+      display: flex;
+      gap: 4px;
+      margin-top: 2px;
+      justify-content: flex-end;
+    }
+    .action-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      transition: 0.2s;
+    }
+    .action-btn:hover {
+      background: var(--border);
+    }
+    .action-btn.approve-btn { color: var(--success); }
+    .action-btn.approve-btn:hover { background: rgba(16, 185, 129, 0.2); }
+    .action-btn.delete-btn { color: var(--danger); }
+    .action-btn.delete-btn:hover { background: rgba(244, 63, 94, 0.2); }
 
     /* ===== VIDEO SECTION ===== */
     .video-player-container {
@@ -1176,7 +1285,9 @@
     <div class="top-bar">
       <div class="top-bar-left">
         <span style="font-size:1.5rem;">🇨🇳</span>
-        <button id="btnToggleLibrary" class="btn btn-secondary" style="padding:6px 12px; font-size:0.85rem;">📚 Thư Viện Video</button>
+        <!-- Admin Mode Simulator -->
+        <button id="btnToggleAdmin" class="btn-admin-toggle" title="Bật để mô phỏng quyền Admin để duyệt video">👑 User Mode</button>
+        <button id="btnToggleLibrary" class="btn btn-secondary" style="padding:6px 12px; font-size:0.85rem;">📚 Hiện Thư Viện</button>
         <button id="btnOpenVocabHub" class="btn btn-secondary" style="padding:6px 12px; font-size:0.85rem;">📓 Sổ Từ Vựng</button>
       </div>
       <div class="top-bar-right">
@@ -1210,9 +1321,13 @@
 
     <!-- MAIN LAYOUT -->
     <main class="main-layout library-collapsed" id="mainLayout">
-      <!-- LIBRARY -->
+      <!-- LIBRARY SECTION -->
       <aside class="library-section dashboard-card">
-        <h2 id="libraryTitle">📚 Thư Viện Video</h2>
+        <div class="library-tabs">
+            <button class="lib-tab active" data-tab="public">📦 Kho Video</button>
+            <button class="lib-tab" data-tab="my">❤️ Thư viện của tôi</button>
+            <button class="lib-tab" data-tab="pending" id="pendingTab" style="display:none;">📝 Chờ duyệt</button>
+        </div>
         <div id="videoLibraryList" class="library-list"></div>
       </aside>
 
@@ -1304,7 +1419,6 @@
   </div>
 
   <!-- ===== MODALS ===== -->
-  <!-- Upload Modal -->
   <div id="uploadModal" class="modal">
     <div class="modal-content">
       <span class="close-modal">&times;</span>
@@ -1312,7 +1426,6 @@
       <form id="uploadForm" style="margin-top:0; display:flex; flex-direction:column; flex:1; overflow:hidden;">
         <input type="hidden" id="editVideoId" value="" />
         <div class="modal-body-scroll">
-          <!-- Video preview -->
           <div class="modal-video-preview">
             <video id="modalPreviewVideo" style="width:100%; height:100%; object-fit:contain;" controls></video>
             <div class="placeholder" id="modalVideoPlaceholder">
@@ -1321,7 +1434,6 @@
             </div>
           </div>
 
-          <!-- Time info & controls -->
           <div style="background:var(--bg-input); padding:12px; border-radius:var(--radius-md); border:1px solid var(--border); margin-bottom:16px;">
             <div style="display:flex; justify-content:space-between;">
               <span style="font-size:0.8rem; font-weight:700; color:var(--text-secondary);">Thời gian hiện tại:</span>
@@ -1333,7 +1445,6 @@
             </div>
           </div>
 
-          <!-- Form fields -->
           <div class="form-group"><label>Tên bài học / Video:</label><input type="text" id="inputVideoTitle" placeholder="Ví dụ: Luyện chào hỏi hàng ngày" /></div>
           <div class="form-group"><label>Chọn File Video (MP4):</label><input type="file" id="inputVideoFile" accept="video/mp4,video/*" /></div>
           <hr style="border:0; border-top:1px solid var(--border); margin:8px 0;" />
@@ -1354,7 +1465,6 @@
     </div>
   </div>
 
-  <!-- Vocab Popups -->
   <div id="vocabFloatingPopup" class="vocab-popup" style="display:none; position:absolute; z-index:10000; pointer-events:auto; flex-direction:column; align-items:stretch; padding:12px 16px; min-width:250px; gap:6px;">
     <div style="display:flex; align-items:center; gap:8px;"><span style="font-weight:700; font-size:0.95rem; min-width:60px;">Từ:</span><span id="vocabWordDisplay" style="font-weight:700; color:var(--primary); font-size:1.1rem; font-family:'Noto Sans SC',sans-serif;"></span></div>
     <div style="display:flex; align-items:center; gap:8px;"><label style="font-size:0.8rem; font-weight:600; min-width:60px;">Pinyin:</label><input type="text" id="vocabPinyinInput" placeholder="Tự động" style="flex:1; background:var(--bg-input); border:1px solid var(--border); border-radius:4px; padding:4px 8px; color:var(--text-primary); font-size:0.85rem;" /></div>
@@ -1369,7 +1479,6 @@
     <div style="margin-top:4px; display:flex; gap:8px; justify-content:flex-end;"><button id="btnInfoViewDetail" class="btn btn-secondary" style="padding:4px 12px; font-size:0.75rem;">📓 Xem chi tiết</button></div>
   </div>
 
-  <!-- Vocab Modal -->
   <div id="vocabModal" class="modal">
     <div class="modal-content" style="max-width:800px; width:90%;">
       <span class="close-modal" id="btnCloseVocabModal">&times;</span>
@@ -1433,12 +1542,13 @@
     });
 
     // =====================================================================
-    // 1.  DB HELPER
+    // 1.  DB HELPER (Upgraded to V7 to force upgrade)
     // =====================================================================
-    const DB_NAME = "ChineseShadowingDB_v3";
-    const DB_VERSION = 3;
+    const DB_NAME = "ChineseShadowingDB_v7";
+    const DB_VERSION = 7; 
     const STORE_NAME = "videos";
     const VOCAB_STORE_NAME = "vocabulary";
+    const LIBRARY_STORE_NAME = "user_libraries"; 
 
     let dbInstance = null;
 
@@ -1455,6 +1565,12 @@
             }
             if (!db.objectStoreNames.contains(VOCAB_STORE_NAME)) {
               db.createObjectStore(VOCAB_STORE_NAME, { keyPath: "id", autoIncrement: true });
+            }
+            if (!db.objectStoreNames.contains(LIBRARY_STORE_NAME)) {
+              const store = db.createObjectStore(LIBRARY_STORE_NAME, { keyPath: "id", autoIncrement: true });
+              store.createIndex('by_user', 'userId', { unique: false });
+              store.createIndex('by_video', 'videoId', { unique: false });
+              store.createIndex('by_user_video', ['userId', 'videoId'], { unique: true });
             }
           };
           request.onsuccess = (evt) => {
@@ -1485,6 +1601,7 @@
       });
     }
 
+    // ----- VIDEO STORE -----
     function getAllVideos() {
       return executeTransaction(STORE_NAME, "readonly", store => {
         return new Promise((resolve, reject) => {
@@ -1494,7 +1611,6 @@
         });
       });
     }
-
     function getVideo(id) {
       return executeTransaction(STORE_NAME, "readonly", store => {
         return new Promise((resolve, reject) => {
@@ -1504,7 +1620,6 @@
         });
       });
     }
-
     function addVideo(videoData) {
       return executeTransaction(STORE_NAME, "readwrite", store => {
         return new Promise((resolve, reject) => {
@@ -1514,7 +1629,6 @@
         });
       });
     }
-
     function updateVideo(videoData) {
       return executeTransaction(STORE_NAME, "readwrite", store => {
         return new Promise((resolve, reject) => {
@@ -1524,7 +1638,6 @@
         });
       });
     }
-
     function deleteVideo(id) {
       return executeTransaction(STORE_NAME, "readwrite", store => {
         return new Promise((resolve, reject) => {
@@ -1535,6 +1648,7 @@
       });
     }
 
+    // ----- VOCAB STORE -----
     function getAllVocab() {
       return executeTransaction(VOCAB_STORE_NAME, "readonly", store => {
         return new Promise((resolve, reject) => {
@@ -1544,7 +1658,6 @@
         });
       });
     }
-
     function addVocab(vocabItem) {
       return executeTransaction(VOCAB_STORE_NAME, "readwrite", store => {
         return new Promise((resolve, reject) => {
@@ -1554,7 +1667,6 @@
         });
       });
     }
-
     function updateVocab(vocabItem) {
       return executeTransaction(VOCAB_STORE_NAME, "readwrite", store => {
         return new Promise((resolve, reject) => {
@@ -1564,7 +1676,6 @@
         });
       });
     }
-
     function deleteVocab(id) {
       return executeTransaction(VOCAB_STORE_NAME, "readwrite", store => {
         return new Promise((resolve, reject) => {
@@ -1574,10 +1685,9 @@
         });
       });
     }
-
     function clearAllData() {
       return openDB().then(db => {
-        return Promise.all([STORE_NAME, VOCAB_STORE_NAME].map(storeName =>
+        return Promise.all([STORE_NAME, VOCAB_STORE_NAME, LIBRARY_STORE_NAME].map(storeName =>
           new Promise((resolve, reject) => {
             const tx = db.transaction([storeName], "readwrite");
             const store = tx.objectStore(storeName);
@@ -1589,21 +1699,89 @@
         ));
       });
     }
-
     function getAllDataForExport() {
       return openDB().then(db => {
         return new Promise((resolve, reject) => {
-          const tx = db.transaction([STORE_NAME, VOCAB_STORE_NAME], "readonly");
-          let videos, vocabulary;
+          const tx = db.transaction([STORE_NAME, VOCAB_STORE_NAME, LIBRARY_STORE_NAME], "readonly");
+          let videos, vocabulary, libraries;
           tx.objectStore(STORE_NAME).getAll().onsuccess = (e) => { videos = e.target.result;
             checkDone(); };
           tx.objectStore(VOCAB_STORE_NAME).getAll().onsuccess = (e) => { vocabulary = e.target.result;
             checkDone(); };
-          const checkDone = () => { if (videos !== undefined && vocabulary !== undefined) resolve({ videos,
-                vocabulary }); };
+          tx.objectStore(LIBRARY_STORE_NAME).getAll().onsuccess = (e) => { libraries = e.target.result;
+            checkDone(); };
+          const checkDone = () => { if (videos !== undefined && vocabulary !== undefined && libraries !== undefined) resolve({
+                videos, vocabulary, libraries }); };
           tx.onerror = () => reject(tx.error);
         });
       });
+    }
+
+    // ----- USER FAVORITES (New Library) -----
+    function getFavorites(userId) {
+      return executeTransaction(LIBRARY_STORE_NAME, "readonly", store => {
+        return new Promise((resolve, reject) => {
+          const idx = store.index('by_user');
+          const req = idx.getAll(userId);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      });
+    }
+    
+    // NOTE: UPDATED LOGIC: Adds a cloned video to the library.
+    async function toggleFavorite(userId, videoId) {
+      // Check existing favorites
+      const existingFavs = await getFavorites(userId);
+      const favEntry = existingFavs.find(f => f.videoId === videoId);
+
+      if (favEntry) {
+        // =================== REMOVE LOGIC ===================
+        // 1. Delete the favorite entry
+        await executeTransaction(LIBRARY_STORE_NAME, "readwrite", store => {
+          return new Promise((resolve, reject) => {
+            const req = store.delete(favEntry.id);
+            req.onsuccess = () => resolve();
+            req.onerror = () => reject(req.error);
+          });
+        });
+        // 2. Delete the cloned video itself to free up space
+        // Note: All My Library videos are clones.
+        const videoToDelete = await getVideo(videoId);
+        if (videoToDelete) {
+           await deleteVideo(videoId);
+        }
+        return false; // Removed
+      } else {
+        // =================== ADD LOGIC ===================
+        // 1. Get original video data
+        const original = await getVideo(videoId);
+        if (!original) return false;
+
+        // 2. Deep clone the data to create a fully independent record
+        const clonedData = {
+          title: original.title + ' (Bản sao)',
+          videoBlob: original.videoBlob, // Blob is immutable, safe to reference
+          sentences: JSON.parse(JSON.stringify(original.sentences)), // Deep clone sentences
+          status: 'approved',
+          uploadedBy: original.uploadedBy,
+          created_at: Date.now(),
+          parentId: original.id // Save origin for reference
+        };
+
+        // 3. Add clone to video store
+        const newCloneId = await addVideo(clonedData);
+
+        // 4. Add favorite entry pointing to the CLONE (not the original)
+        await executeTransaction(LIBRARY_STORE_NAME, "readwrite", store => {
+          return new Promise((resolve, reject) => {
+            const req = store.add({ userId, videoId: newCloneId, added_at: Date.now() });
+            req.onsuccess = () => resolve();
+            req.onerror = () => reject(req.error);
+          });
+        });
+        return true; // Added
+      }
     }
 
     // =====================================================================
@@ -1657,7 +1835,7 @@
     }
 
     // =====================================================================
-    // 3.  AUDIO ENGINE
+    // 3.  AUDIO ENGINE 
     // =====================================================================
     const WAVEFORM_SAMPLES = 1000;
     const WAVEFORM_HEIGHT = 40;
@@ -2124,6 +2302,11 @@
       let renderTimeout = null;
       let videoLoaded = false;
 
+      // NEW STATE
+      const CURRENT_USER_ID = 1; // Single user simulation
+      let isAdminMode = false; // Toggle to simulate Admin
+      let currentLibraryTab = 'public'; // 'public', 'my', 'pending'
+
       // ---------- DOM REFS ----------
       const video = document.getElementById('mainVideo');
       const sentenceListContainer = document.getElementById('sentenceList');
@@ -2161,6 +2344,9 @@
       const subtitleInputsContainer = document.getElementById('subtitleInputsContainer');
       const formError = document.getElementById('formError');
       const videoVolumeSlider = document.getElementById('videoVolumeSlider');
+      // Admin UI
+      const btnToggleAdmin = document.getElementById('btnToggleAdmin');
+      const pendingTab = document.getElementById('pendingTab');
 
       // Vocab DOM
       const vocabPopup = document.getElementById('vocabFloatingPopup');
@@ -2296,17 +2482,12 @@
       function stopAllPlayback() {
         isPlayingFullVideo = false;
         isDubbingPlaying = false;
-        // Không reset isSentenceMode và không reset highlight
-        // Chỉ dừng các timer và audio
         if (activeLoopInterval) { clearInterval(activeLoopInterval);
           activeLoopInterval = null; }
         clearInterval(sentenceTimingInterval);
         stopVideoSyncLoop();
         if (activeUserAudio) { try { activeUserAudio.pause(); } catch (e) {} activeUserAudio = null; }
-        // Không reset highlines, không xóa active class
         if (btnStopDubbing) btnStopDubbing.style.display = 'none';
-        // Không xóa active class
-        // lastActiveSentenceId giữ nguyên
         updateVisualizerStatus("Sóng âm: Sẵn sàng so sánh");
       }
 
@@ -2317,19 +2498,15 @@
           video.muted = false; }
         isDubbingPlaying = false;
         isPlayingFullVideo = false;
-        // Không reset isSentenceMode
         stopVideoSyncLoop();
         if (btnStopDubbing) btnStopDubbing.style.display = 'none';
         if (btnPlayFullDubbing) btnPlayFullDubbing.disabled = false;
-        // Không reset highlines
         updateVisualizerStatus("Đã dừng phát bản lồng tiếng");
       }
 
       // ---------- SENTENCE PLAYBACK ----------
       function playSentence(id) {
-        // Dừng tất cả, nhưng giữ nguyên highlight
         stopAllPlayback();
-
         const sentence = currentVideoData.sentences.find(s => s.id === id);
         if (!sentence || !video) return;
         if (!videoLoaded) {
@@ -2338,9 +2515,7 @@
           return;
         }
         isSentenceMode = true;
-        // Đánh dấu câu đang phát
         lastActiveSentenceId = id;
-        // Đảm bảo câu được highlight
         document.querySelectorAll('.sentence-card').forEach(c => c.classList.remove('active'));
         const card = document.getElementById(`card-${id}`);
         if (card) card.classList.add('active');
@@ -2352,7 +2527,6 @@
           setTimeout(() => playSentence(id), 500);
           return;
         }
-        // Vẽ waveform tĩnh
         drawStaticWaveform(waveformOriginalCanvas, originalWaveformData, WAVEFORM_COLOR_ORIG);
 
         video.currentTime = sentence.startTime;
@@ -2365,7 +2539,6 @@
         isPlayingFullVideo = true;
         startVideoSyncLoop();
 
-        // Khi kết thúc câu, chỉ dừng video, không reset highlight
         sentenceTimingInterval = setInterval(() => {
           if (video.currentTime >= sentence.endTime || video.paused) {
             if (video.paused) {
@@ -2379,7 +2552,6 @@
               stopVideoSyncLoop();
               isPlayingFullVideo = false;
               updateVisualizerStatus("Đã phát xong câu mẫu.");
-              // Không reset highlines, vẫn giữ active
             }
           }
         }, 50);
@@ -2387,9 +2559,7 @@
 
       // ---------- HIGHLIGHT ACTIVE SENTENCE ----------
       function highlightActiveSentence(currentTime) {
-        // Nếu đang ở chế độ phát câu, giữ nguyên câu đang active, không thay đổi
         if (isSentenceMode && lastActiveSentenceId !== null) {
-          // Đảm bảo câu đó vẫn được active, các câu khác không active
           document.querySelectorAll('.sentence-card').forEach(c => {
             const cardId = parseInt(c.id.replace('card-', ''));
             if (cardId === lastActiveSentenceId) {
@@ -2398,7 +2568,6 @@
               c.classList.remove('active');
             }
           });
-          // Cập nhật wrapper state
           const wrapper = document.getElementById('sentenceListWrapper');
           if (wrapper) wrapper.classList.add('has-active');
           return;
@@ -2648,12 +2817,6 @@
           drawWaveform(analyser, waveformUserCanvas, null, 'bar');
           btnRecord.innerHTML = "⏹️";
           btnRecord.classList.add("recording-active");
-
-          // KHÔNG PHÁT VIDEO KHI GHI ÂM
-          // Chỉ thu âm, không phát âm thanh gốc
-          // Nếu muốn nghe âm thanh trước, người dùng bấm phát mẫu
-
-          // Không phát video
           addLog("🎤 Đang ghi âm (không phát video)", 'info');
         } catch (err) {
           alert("Không thể truy cập Micro để ghi âm!");
@@ -2699,7 +2862,6 @@
         if (!sentence || !blob || !video) return;
         const userAudio = new Audio(URL.createObjectURL(blob));
         activeUserAudio = userAudio;
-        // Phát video từ đầu câu
         video.muted = false;
         video.volume = 0.3;
         video.currentTime = sentence.startTime;
@@ -2960,99 +3122,208 @@
       function hideVocabInfo() { infoPopup.style.display = 'none';
         currentInfoWord = null; }
 
-      // ---------- LIBRARY ----------
-      async function loadLibrary() {
+      // ---------- LIBRARY UI RENDER (Updated) ----------
+      async function renderLibraryList() {
+        if (!videoLibraryList) return;
+        videoLibraryList.innerHTML = '';
         try {
-          const videos = await getAllVideos();
-          if (!videoLibraryList) return;
-          videoLibraryList.innerHTML = '';
-          if (videos.length === 0) {
-            videoLibraryList.innerHTML =
-              '<p style="color:var(--text-muted); font-size:0.85rem; padding:10px;">Chưa có video nào. Hãy bấm nút Tải Video Mới!</p>';
+          const allVideos = await getAllVideos();
+          const pendingTabsVisibility = pendingTab;
+          
+          if (currentLibraryTab === 'pending' && !isAdminMode) {
+            currentLibraryTab = 'public'; // Fallback if user clicks accidentally
+            document.querySelectorAll('.lib-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.lib-tab[data-tab="public"]').classList.add('active');
+          }
+
+          let displayVideos = [];
+          let favorites = [];
+
+          if (currentLibraryTab === 'public') {
+            // Kho Video - Chỉ hiện video đã được admin duyệt (status === 'approved')
+            displayVideos = allVideos.filter(v => v.status === 'approved');
+          } else if (currentLibraryTab === 'my') {
+            // Thư viện của tôi - Lấy danh sách yêu thích
+            favorites = await getFavorites(CURRENT_USER_ID);
+            const favVideoIds = favorites.map(f => f.videoId);
+            displayVideos = allVideos.filter(v => favVideoIds.includes(v.id) && v.status === 'approved');
+          } else if (currentLibraryTab === 'pending') {
+            // Chờ Duyệt - Chỉ admin thấy
+            if (isAdminMode) {
+              displayVideos = allVideos.filter(v => v.status === 'pending');
+            }
+          }
+
+          if (displayVideos.length === 0) {
+            let msg = '<p style="color:var(--text-muted); font-size:0.85rem; padding:10px;">';
+            if (currentLibraryTab === 'public') msg += '📂 Kho video hiện đang trống. Hãy bấm nút Tải Video Mới và chờ admin duyệt!';
+            else if (currentLibraryTab === 'my') msg += '❤️ Bạn chưa lưu video nào vào thư viện cá nhân. Hãy vào Kho Video và bấm nút yêu thích!';
+            else if (currentLibraryTab === 'pending') msg += '📝 Không có video nào đang chờ duyệt.';
+            msg += '</p>';
+            videoLibraryList.innerHTML = msg;
             return;
           }
-          for (const item of videos) {
+
+          // Render list
+          for (const item of displayVideos) {
             const div = document.createElement('div');
-            div.className = `library-item ${currentVideoData && currentVideoData.id === item.id ? 'active' : ''}`;
+            const isActive = currentVideoData && currentVideoData.id === item.id;
+            const isFav = currentLibraryTab === 'my' || favorites.some(f => f.videoId === item.id);
+            
+            div.className = `library-item ${isActive ? 'active' : ''}`;
+            if (currentLibraryTab === 'pending') div.classList.add('pending-item');
+            if (currentLibraryTab === 'my') div.classList.add('favorite-item');
+
+            let actionsHtml = '';
+            let badgeHtml = '';
+            
+            if (currentLibraryTab === 'public') {
+              // Favorite toggle button
+              const favIcon = isFav ? '❤️' : '🤍';
+              const favAction = `<span class="fav-icon" data-vid="${item.id}" data-is-fav="${isFav}">${favIcon}</span>`;
+              actionsHtml = `<div class="action-buttons">${favAction}</div>`;
+            } else if (currentLibraryTab === 'my') {
+              actionsHtml = `
+                <div class="action-buttons">
+                  <button class="action-btn delete-btn" data-vid="${item.id}" data-remove-fav title="Xóa khỏi thư viện cá nhân">🗑️</button>
+                </div>
+              `;
+            } else if (currentLibraryTab === 'pending') {
+              badgeHtml = `<span class="status-badge">Chờ duyệt</span>`;
+              actionsHtml = `
+                <div class="action-buttons">
+                  <button class="action-btn approve-btn" data-vid="${item.id}" data-action="approve" title="Duyệt video">✅ Duyệt</button>
+                  <button class="action-btn delete-btn" data-vid="${item.id}" data-action="reject" title="Từ chối (Xóa)">❌ Từ chối</button>
+                </div>
+              `;
+            }
+
             div.innerHTML = `
               <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
-                <span class="video-title-span" title="${sanitizeHTML(item.title)}" style="font-weight:600;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px;">📹 ${sanitizeHTML(item.title)}</span>
-                <div class="library-item-menu-container">
-                  <button class="btn-menu-trigger" title="Tùy chọn">⋮</button>
-                  <div class="library-item-dropdown">
-                    <button class="dropdown-item btn-edit-lib" title="Chỉnh sửa phụ đề">✏️ Chỉnh sửa</button>
-                    <button class="dropdown-item btn-delete-lib" title="Xóa video">❌ Xóa video</button>
-                  </div>
-                </div>
+                <span class="video-title-span" title="${sanitizeHTML(item.title)}" data-vid="${item.id}">
+                  📹 ${sanitizeHTML(item.title)}
+                  ${badgeHtml}
+                </span>
               </div>
-              <div class="library-item-modes">
-                <button class="btn-mode btn-mode-speaking ${currentVideoData && currentVideoData.id === item.id && currentPracticeMode === 'speaking' ? 'active' : ''}" title="Luyện Nói & Lồng Tiếng">🎙️ Luyện Nói</button>
-                <button class="btn-mode btn-mode-listening ${currentVideoData && currentVideoData.id === item.id && currentPracticeMode === 'listening' ? 'active' : ''}" title="Luyện Nghe & Điền Từ">🎧 Luyện Nghe</button>
-              </div>
+              ${actionsHtml}
             `;
-            const trigger = div.querySelector('.btn-menu-trigger');
-            const dropdown = div.querySelector('.library-item-dropdown');
-            trigger.addEventListener('click', (e) => {
-              e.stopPropagation();
-              document.querySelectorAll('.library-item-dropdown').forEach(d => { if (d !== dropdown) d.style
-                  .display = 'none'; });
-              dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-            });
-            div.querySelector('.btn-edit-lib').addEventListener('click', (e) => {
-              e.stopPropagation();
-              dropdown.style.display = 'none';
-              openEditModal(e, item.id);
-            });
-            div.querySelector('.btn-delete-lib').addEventListener('click', (e) => {
-              e.stopPropagation();
-              dropdown.style.display = 'none';
-              handleDeleteVideo(e, item.id);
-            });
-            const titleSpan = div.querySelector('.video-title-span');
-            const speakingBtn = div.querySelector('.btn-mode-speaking');
-            const listeningBtn = div.querySelector('.btn-mode-listening');
-            titleSpan.addEventListener('click', () => { selectVideo(item);
-              switchPracticeMode('speaking'); });
-            speakingBtn.addEventListener('click', (e) => { e.stopPropagation();
-              selectVideo(item);
-              switchPracticeMode('speaking'); });
-            listeningBtn.addEventListener('click', (e) => { e.stopPropagation();
-              selectVideo(item);
-              switchPracticeMode('listening'); });
+
+            // Click to select video
+            div.querySelector('.video-title-span').addEventListener('click', () => { selectVideo(item); });
+            
+            // Favorite actions
+            if (currentLibraryTab === 'public') {
+              const favIcon = div.querySelector('.fav-icon');
+              favIcon.addEventListener('click', async function(e) {
+                e.stopPropagation();
+                const vid = parseInt(this.dataset.vid);
+                
+                const result = await toggleFavorite(CURRENT_USER_ID, vid);
+                // Update local state and UI
+                if (result) {
+                  this.dataset.isFav = 'true';
+                  this.innerText = '❤️';
+                  addLog(`✅ Đã thêm video (đã clone) vào thư viện cá nhân`, 'success');
+                } else {
+                  this.dataset.isFav = 'false';
+                  this.innerText = '🤍';
+                  addLog(`🗑️ Đã xóa video clone khỏi thư viện cá nhân`, 'info');
+                }
+                // If current tab is my library and user removed, remove it from view
+                if (currentLibraryTab === 'my' && !result) {
+                  div.remove();
+                  if (videoLibraryList.children.length === 0) renderLibraryList();
+                }
+              });
+            }
+
+            // Remove from My Library
+            if (currentLibraryTab === 'my') {
+              div.querySelector('.action-btn.delete-btn').addEventListener('click', async function(e) {
+                e.stopPropagation();
+                const vid = parseInt(this.dataset.vid);
+                await toggleFavorite(CURRENT_USER_ID, vid);
+                div.remove();
+                addLog(`🗑️ Đã xóa video clone khỏi thư viện cá nhân`, 'info');
+                if (videoLibraryList.children.length === 0) renderLibraryList();
+              });
+            }
+
+            // Admin Approve / Reject
+            if (currentLibraryTab === 'pending') {
+              div.querySelector('.action-btn.approve-btn').addEventListener('click', async function(e) {
+                e.stopPropagation();
+                const vid = parseInt(this.dataset.vid);
+                try {
+                  const v = await getVideo(vid);
+                  if (v) {
+                    v.status = 'approved';
+                    await updateVideo(v);
+                    addLog(`✅ Admin đã duyệt video "${v.title}"`, 'success');
+                    renderLibraryList();
+                  }
+                } catch (err) { addLog("❌ Lỗi duyệt video: " + err.message, 'error'); }
+              });
+              div.querySelector('.action-btn.delete-btn').addEventListener('click', async function(e) {
+                e.stopPropagation();
+                const vid = parseInt(this.dataset.vid);
+                if (confirm("Bạn chắc chắn muốn từ chối (xóa) video này?")) {
+                  await deleteVideo(vid);
+                  addLog(`🗑️ Admin đã từ chối video ID ${vid}`, 'info');
+                  renderLibraryList();
+                }
+              });
+            }
+
             videoLibraryList.appendChild(div);
           }
-          if (!currentVideoData && videos.length > 0) selectVideo(videos[0]);
         } catch (err) { addLog("❌ Lỗi tải thư viện: " + err.message, 'error'); }
       }
 
-      async function selectVideoById(id) {
-        try { const item = await getVideo(id); if (item) { selectVideo(item); return item; } return null; } catch (e) {
-          addLog("❌ Lỗi tải video: " + e.message, 'error');
-          return null; }
+      // ---------- LIBRARY TABS ----------
+      function initLibraryTabs() {
+        document.querySelectorAll('.lib-tab').forEach(tab => {
+          tab.addEventListener('click', function() {
+            const tabName = this.dataset.tab;
+            if (tabName === 'pending' && !isAdminMode) return;
+            
+            document.querySelectorAll('.lib-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            currentLibraryTab = tabName;
+            renderLibraryList();
+          });
+        });
       }
 
-      function jumpToSentence(sentenceId) {
-        document.querySelectorAll('.sentence-card.vocab-highlight').forEach(c => c.classList.remove('vocab-highlight'));
-        if (!sentenceId) return;
-        const card = document.getElementById(`card-${sentenceId}`);
-        if (!card) return;
-        card.classList.add('vocab-highlight');
-        if (sentenceListContainer) {
-          const cardTop = card.offsetTop;
-          const containerHeight = sentenceListContainer.clientHeight;
-          const cardHeight = card.clientHeight;
-          sentenceListContainer.scrollTop = cardTop - (containerHeight * 0.35) + (cardHeight / 2);
+      // ---------- ADMIN MODE TOGGLE ----------
+      function toggleAdminMode() {
+        isAdminMode = !isAdminMode;
+        const btn = btnToggleAdmin;
+        if (isAdminMode) {
+          btn.innerHTML = '👑 Admin Mode';
+          btn.classList.add('admin');
+          if (pendingTab) pendingTab.style.display = 'block';
+          addLog("👑 Đã bật chế độ Admin (mô phỏng)", 'info');
+        } else {
+          btn.innerHTML = '👤 User Mode';
+          btn.classList.remove('admin');
+          if (pendingTab) pendingTab.style.display = 'none';
+          if (currentLibraryTab === 'pending') {
+            currentLibraryTab = 'public';
+            document.querySelectorAll('.lib-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.lib-tab[data-tab="public"]').classList.add('active');
+          }
+          addLog("👤 Đã chuyển về chế độ Người dùng thường", 'info');
         }
+        renderLibraryList();
       }
 
       // ========== SELECT VIDEO ==========
       async function selectVideo(videoItem) {
         addLog(`📺 Đang chọn video: "${videoItem.title}"`, 'info');
-        // Reset trạng thái nhưng giữ lại các cài đặt cần thiết
         stopAllPlayback();
         if (isFullRecording) stopFullRecording();
 
-        // Reset chế độ câu
         isSentenceMode = false;
         lastActiveSentenceId = null;
 
@@ -3082,13 +3353,11 @@
           showLoading(false);
           return;
         }
-        addLog(`📹 videoBlob size: ${videoItem.videoBlob.size} bytes, type: ${videoItem.videoBlob.type}`, 'info');
 
         if (!video) return;
         let url = null;
         try {
           url = URL.createObjectURL(videoItem.videoBlob);
-          addLog(`✅ Đã tạo URL: ${url.substring(0, 30)}...`, 'success');
 
           video.pause();
           video.removeAttribute('src');
@@ -3189,32 +3458,28 @@
         switchPracticeMode(currentPracticeMode);
         await loadVocabWords();
         renderSentences();
-        loadLibrary();
+        renderLibraryList();
         document.querySelectorAll('.sentence-card.vocab-highlight').forEach(c => c.classList.remove('vocab-highlight'));
       }
 
-      async function handleDeleteVideo(e, id) {
-        e.stopPropagation();
-        if (!confirm("Bạn có chắc muốn xóa video này?")) return;
-        try {
-          await deleteVideo(id);
-          if (currentVideoData && currentVideoData.id === id) {
-            currentVideoData = null;
-            if (video) video.src = "";
-            if (currentVideoTitle) currentVideoTitle.innerText = "Chọn một video để học";
-            if (sentenceListContainer) sentenceListContainer.innerHTML = "";
-            if (btnEditCurrentSubtitles) btnEditCurrentSubtitles.style.display = 'none';
-            stopAllPlayback();
-            drawStaticWaveform(waveformOriginalCanvas, []);
-            drawStaticWaveform(waveformUserCanvas, []);
-            originalWaveformData = null;
-            userWaveformData = null;
-            videoLoaded = false;
-          }
-          loadLibrary();
-          addLog(`🗑️ Đã xóa video ID ${id}`, 'info');
-        } catch (err) { alert("Không thể xóa video: " + err.message);
-          addLog("❌ Lỗi xóa video: " + err.message, 'error'); }
+      async function selectVideoById(id) {
+        try { const item = await getVideo(id); if (item) { selectVideo(item); return item; } return null; } catch (e) {
+          addLog("❌ Lỗi tải video: " + e.message, 'error');
+          return null; }
+      }
+
+      function jumpToSentence(sentenceId) {
+        document.querySelectorAll('.sentence-card.vocab-highlight').forEach(c => c.classList.remove('vocab-highlight'));
+        if (!sentenceId) return;
+        const card = document.getElementById(`card-${sentenceId}`);
+        if (!card) return;
+        card.classList.add('vocab-highlight');
+        if (sentenceListContainer) {
+          const cardTop = card.offsetTop;
+          const containerHeight = sentenceListContainer.clientHeight;
+          const cardHeight = card.clientHeight;
+          sentenceListContainer.scrollTop = cardTop - (containerHeight * 0.35) + (cardHeight / 2);
+        }
       }
 
       // ---------- SWITCH PRACTICE MODE ----------
@@ -3886,18 +4151,23 @@
 
             try {
               let newId = null;
+              const status = isAdminMode ? 'approved' : 'pending'; // Admin uploading or User uploading
+              const uploadedBy = isAdminMode ? 'admin' : 'user';
+
               if (editId) {
                 const existing = await getVideo(parseInt(editId));
                 if (!existing) throw new Error("Không tìm thấy video cần sửa.");
                 existing.title = title;
                 existing.sentences = sentences;
                 if (videoFile) existing.videoBlob = videoFile;
+                // Admin edit doesn't change status
                 await updateVideo(existing);
                 newId = parseInt(editId);
                 addLog(`✅ Cập nhật video thành công ID: ${newId}`, 'success');
               } else {
-                newId = await addVideo({ title, videoBlob: videoFile, sentences });
-                addLog(`✅ Thêm video mới thành công ID: ${newId}`, 'success');
+                const newVideo = { title, videoBlob: videoFile, sentences, status, uploadedBy, created_at: Date.now() };
+                newId = await addVideo(newVideo);
+                addLog(`✅ ${isAdminMode ? 'Admin' : 'Người dùng'} tải video mới thành công ID: ${newId}, trạng thái: ${status}`, 'success');
               }
 
               if (uploadForm) uploadForm.reset();
@@ -3906,15 +4176,17 @@
                 formError.innerText = ''; }
               modal.classList.remove("show");
 
-              await loadLibrary();
+              renderLibraryList();
               if (newId) {
                 const newVideo = await getVideo(newId);
-                if (newVideo) {
+                if (newVideo && newVideo.status === 'approved') {
                   addLog(`🔄 Tự động chọn video vừa thêm: "${newVideo.title}"`, 'info');
                   await selectVideo(newVideo);
+                } else {
+                  addLog(`⏳ Video "${newVideo.title}" đang chờ Admin duyệt (Bật Admin Mode để duyệt)`, 'info');
+                  alert('Video đã được tải lên thành công và đang chờ Admin duyệt!\n(Nếu bạn là Admin, hãy bật "Admin Mode" trên thanh công cụ và vào tab "Chờ duyệt").');
                 }
               }
-              alert("✅ Video đã được lưu thành công!");
             } catch (err) {
               addLog("❌ Lỗi khi lưu video: " + err.message, 'error');
               if (formError) {
@@ -3944,7 +4216,8 @@
             version: 2,
             exportedAt: new Date().toISOString(),
             videos: videosWithBase64.map(({ videoBlob, ...rest }) => rest),
-            vocabulary: data.vocabulary
+            vocabulary: data.vocabulary,
+            libraries: data.libraries
           };
           const json = JSON.stringify(exportData, null, 2);
           const blob = new Blob([json], { type: 'application/json' });
@@ -3985,8 +4258,11 @@
             await addVideo({ ...rest, videoBlob: blob });
           }
           for (const vocabItem of data.vocabulary) await addVocab(vocabItem);
+          if (data.libraries) {
+             for (const libItem of data.libraries) await executeTransaction(LIBRARY_STORE_NAME, "readwrite", store => store.add(libItem));
+          }
           await loadVocabWords();
-          loadLibrary();
+          renderLibraryList();
           alert('✅ Đã nhập dữ liệu thành công!');
         } catch (err) { alert('❌ Lỗi khi nhập: ' + err.message);
           addLog("❌ Lỗi import: " + err.message, 'error'); }
@@ -4001,11 +4277,7 @@
                 addLog("⚠️ Video chưa sẵn sàng để phát", 'warning');
                 return;
               }
-              // Khi bấm play toàn cục, nếu đang ở chế độ câu, vẫn giữ isSentenceMode?
-              // Ta sẽ tạm thời không reset isSentenceMode, nhưng nếu play toàn bộ thì nên tắt chế độ câu?
-              // Theo logic, bấm play toàn cục sẽ phát toàn bộ video, ta nên tắt isSentenceMode
               isSentenceMode = false;
-              // Không reset lastActiveSentenceId, để vẫn highlight câu đang active
               isPlayingFullVideo = true;
               getAudioContext();
               video.play().catch(e => addLog("❌ Lỗi phát video: " + e.message, 'error'));
@@ -4035,9 +4307,6 @@
           video.addEventListener('ended', () => {
             stopVideoSyncLoop();
             if (!isSentenceMode) updateOriginalHighline(1);
-            else {
-              // Nếu ở chế độ câu, không reset highline
-            }
             isPlayingFullVideo = false;
             if (btnPlayPause) btnPlayPause.innerText = "▶";
           });
@@ -4159,12 +4428,16 @@
           });
         }
         window.addEventListener('click', (e) => { if (e.target === vocabModalEl) hideVocabModal(); });
+        
+        // Admin toggle button
+        if (btnToggleAdmin) btnToggleAdmin.addEventListener('click', toggleAdminMode);
       }
 
       // ---------- INIT ----------
       function init() {
         initTheme();
         initDisplayMode();
+        initLibraryTabs();
         setupCustomVideoPlayer();
         setupModalEventListeners();
         setupVocabEventListeners();
@@ -4173,11 +4446,13 @@
         window.addEventListener('resize', resizeAllWaveforms);
         setupVideoAudio(video);
         loadVocabWords();
-        openDB().then(() => loadLibrary()).catch(err => {
+        openDB().then(() => {
+          renderLibraryList(); // Load default Public Library
+        }).catch(err => {
           addLog("❌ Không thể khởi động cơ sở dữ liệu: " + err.message, 'error');
           alert("Lỗi IndexedDB: Ứng dụng không thể tải dữ liệu.");
         });
-        addLog("✅ Ứng dụng đã khởi động", 'success');
+        addLog("✅ Ứng dụng đã khởi động với Kho Video và Thư viện cá nhân (Chế độ Clone)", 'success');
         logContainer.style.display = 'block';
       }
 

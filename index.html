@@ -1791,25 +1791,25 @@
     <!-- FIREBASE FIRESTORE SDK -->
     <!-- ============================================================ -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, setDoc, doc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, setDoc, doc, getDocs, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // 🔴 ĐÃ DÁN CẤU HÌNH DỰ ÁN HOCVIENNGONNGU CỦA BẠN
-        const firebaseConfig = {
+    // ⚠️ CHÚ Ý: Điền đúng các thông số thật từ dự án Firebase Hocvienngonngu của bạn
+    const firebaseConfig = {
             apiKey: "AIzaSyDHnUhPNokBrXgYLNqlW0kB9tJm3U0Un0I",
-            uthDomain: "hocvienngon.firebaseapp.com",
-            projectId: "hocvienngon",
-            storageBucket: "hocvienngon.firebasestorage.app",
-            messagingSenderId: "410660952284",
-            appId: "1:410660952284:web:ee5b5a98d12bef3d45bc19"
-        };
+            uthDomain: "hocvienngon.firebaseapp.com",
+            projectId: "hocvienngon",
+            storageBucket: "hocvienngon.firebasestorage.app",
+            messagingSenderId: "410660952284",
+            appId: "1:410660952284:web:ee5b5a98d12bef3d45bc19"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        window.db = db;
-        window.fs = { collection, setDoc, doc, getDocs, deleteDoc };
-    </script>
+    // Xuất hàm ra toàn cục
+    window.db = db;
+    window.fs = { collection, setDoc, doc, getDocs, getDoc, deleteDoc };</script>
 
     <!-- ============================================================ -->
     <!-- JAVASCRIPT CHÍNH (ĐÃ TÍCH HỢP FIREBASE FIRESTORE) -->
@@ -1939,103 +1939,57 @@
         }
 
         async function login() {
-            const username = document.getElementById('login-user').value.trim();
-            const password = document.getElementById('login-pass').value.trim();
-            const errorEl = document.getElementById('login-error');
-            const attemptsEl = document.getElementById('login-attempts');
-            errorEl.style.display = 'none';
-            attemptsEl.style.display = 'none';
+    const username = document.getElementById('login-user').value.trim();
+    const password = document.getElementById('login-pass').value.trim();
+    const errorEl = document.getElementById('login-error');
+    const attemptsEl = document.getElementById('login-attempts');
+    errorEl.style.display = 'none';
+    attemptsEl.style.display = 'none';
 
-            if (!username || !password) {
-                errorEl.textContent = '❌ Vui lòng nhập đầy đủ!';
-                errorEl.style.display = 'block';
-                return;
+    if (!username || !password) {
+        errorEl.textContent = '❌ Vui lòng nhập đầy đủ!';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    // 🔥 Tải dữ liệu User từ Firebase về trước khi kiểm tra
+    try {
+        if (window.fs && window.db) {
+            const userDoc = await window.fs.getDoc(window.fs.doc(window.db, "users", username));
+            if (userDoc.exists()) {
+                saveUser(username, userDoc.data());
             }
-
-            if (isAccountLocked(username)) {
-                const user = getUser(username);
-                if (user?.lockedUntil) {
-                    const remaining = Math.ceil((user.lockedUntil - Date.now()) / 60000);
-                    errorEl.textContent = `🔒 Bị khóa! Thử lại sau ${remaining} phút.`;
-                } else {
-                    errorEl.textContent = '🔒 Tài khoản đã bị khóa!';
-                }
-                errorEl.style.display = 'block';
-                return;
-            }
-
-            const user = getUser(username);
-            if (!user) {
-                errorEl.textContent = '❌ Sai tài khoản hoặc mật khẩu!';
-                errorEl.style.display = 'block';
-                recordFailedLogin(username);
-                return;
-            }
-
-            const isValid = await verifyPassword(username, password);
-            if (!isValid) {
-                const remaining = 5 - (user.loginAttempts || 0) - 1;
-                errorEl.textContent = `❌ Sai mật khẩu! Còn ${remaining} lần thử.`;
-                errorEl.style.display = 'block';
-                recordFailedLogin(username);
-                if (remaining <= 0) {
-                    attemptsEl.textContent = '🔒 Tài khoản đã bị khóa!';
-                    attemptsEl.style.display = 'block';
-                }
-                return;
-            }
-
-            resetLoginAttempts(username);
-            currentUser = username;
-            user.lastLogin = Date.now();
-            saveUser(username, user);
-
-            document.getElementById('auth-area').style.display = 'none';
-            document.getElementById('member-area').style.display = 'block';
-
-            if (user.isAdmin) {
-                document.getElementById('nav-admin').style.display = 'inline-block';
-                document.getElementById('nav-students').style.display = 'inline-block';
-                document.getElementById('nav-admin-support').style.display = 'inline-block';
-                document.getElementById('nav-admin-documents').style.display = 'inline-block';
-                document.getElementById('nav-support').style.display = 'none';
-                document.getElementById('nav-profile').style.display = 'none';
-                document.getElementById('nav-documents').style.display = 'none';
-            } else {
-                document.getElementById('nav-admin').style.display = 'none';
-                document.getElementById('nav-students').style.display = 'none';
-                document.getElementById('nav-admin-support').style.display = 'none';
-                document.getElementById('nav-admin-documents').style.display = 'none';
-                document.getElementById('nav-support').style.display = 'inline-block';
-                document.getElementById('nav-profile').style.display = 'inline-block';
-                document.getElementById('nav-documents').style.display = 'inline-block';
-            }
-
-            startSessionTimer();
-            updateUI();
-            initAdminData();
-            switchPage('home');
-            renderGames();
-            renderDocuments();
-            if (currentUser !== 'admin') {
-                renderProfile();
-                loadStudentChat();
-            } else {
-                loadAdminChat();
-            }
-            updateChatBadge();
-            showToast(`👋 Chào mừng ${username}!`, 'success');
-
-            if (chatRefreshInterval) clearInterval(chatRefreshInterval);
-            chatRefreshInterval = setInterval(function() {
-                if (currentUser === 'admin') {
-                    loadAdminChat();
-                } else {
-                    loadStudentChat();
-                }
-                updateChatBadge();
-            }, 5000);
         }
+    } catch(e) {}
+
+    const user = getUser(username);
+    if (!user) {
+        errorEl.textContent = '❌ Sai tài khoản hoặc mật khẩu!';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    const isValid = await verifyPassword(username, password);
+    if (!isValid) {
+        errorEl.textContent = '❌ Sai mật khẩu!';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    resetLoginAttempts(username);
+    currentUser = username;
+    user.lastLogin = Date.now();
+    await saveUserCloud(username, user); // Cập nhật trạng thái mới nhất lên Cloud
+
+    document.getElementById('auth-area').style.display = 'none';
+    document.getElementById('member-area').style.display = 'block';
+
+    startSessionTimer();
+    updateUI();
+    initAdminData();
+    switchPage('home');
+    showToast(`👋 Chào mừng ${username}!`, 'success');
+}
 
         async function verifyPassword(username, password) {
             const user = getUser(username);
@@ -2113,36 +2067,50 @@
 
         // ======================================================================
         // 6. REGISTER
-        // ======================================================================
         async function register() {
-            const u = document.getElementById('reg-user').value.trim();
-            const p = document.getElementById('reg-pass').value.trim();
-            const c = document.getElementById('reg-pass-confirm').value.trim();
-            const errorEl = document.getElementById('register-error');
-            errorEl.style.display = 'none';
-            if (!u || u.length < 3) { errorEl.textContent = '❌ Tên phải có ít nhất 3 ký tự!'; errorEl.style.display = 'block'; return; }
-            if (p.length < 6) { errorEl.textContent = '❌ Mật khẩu phải có ít nhất 6 ký tự!'; errorEl.style.display = 'block'; return; }
-            if (p !== c) { errorEl.textContent = '❌ Mật khẩu xác nhận không khớp!'; errorEl.style.display = 'block'; return; }
-            const users = getUsers();
-            if (users[u]) { errorEl.textContent = '❌ Tài khoản đã tồn tại!'; errorEl.style.display = 'block'; return; }
-            users[u] = {
-                password: await sha256(p),
-                isAdmin: false,
-                gameKeys: {},
-                learned: [],
-                learnedHistory: [],
-                loginAttempts: 0,
-                locked: false,
-                lockedUntil: null,
-                lastLogin: null,
-                registeredAt: Date.now()
-            };
-            setStorage('study_users', users);
-            showToast('Đăng ký thành công! Vui lòng đăng nhập.', 'success');
-            toggleAuth(true);
-            document.getElementById('login-user').value = u;
-            document.getElementById('login-pass').value = '';
+    const u = document.getElementById('reg-user').value.trim();
+    const p = document.getElementById('reg-pass').value.trim();
+    const c = document.getElementById('reg-pass-confirm').value.trim();
+    const errorEl = document.getElementById('register-error');
+    errorEl.style.display = 'none';
+
+    if (!u || u.length < 3) { errorEl.textContent = '❌ Tên phải có ít nhất 3 ký tự!'; errorEl.style.display = 'block'; return; }
+    if (p.length < 6) { errorEl.textContent = '❌ Mật khẩu phải có ít nhất 6 ký tự!'; errorEl.style.display = 'block'; return; }
+    if (p !== c) { errorEl.textContent = '❌ Mật khẩu xác nhận không khớp!'; errorEl.style.display = 'block'; return; }
+
+    // Kiểm tra trùng tài khoản trên Cloud
+    try {
+        if (window.fs && window.db) {
+            const userDoc = await window.fs.getDoc(window.fs.doc(window.db, "users", u));
+            if (userDoc.exists()) {
+                errorEl.textContent = '❌ Tài khoản đã tồn tại!';
+                errorEl.style.display = 'block';
+                return;
+            }
         }
+    } catch(e) {}
+
+    const newUser = {
+        password: await sha256(p),
+        isAdmin: false,
+        gameKeys: {},
+        learned: [],
+        learnedHistory: [],
+        loginAttempts: 0,
+        locked: false,
+        lockedUntil: null,
+        lastLogin: null,
+        registeredAt: Date.now()
+    };
+
+    // 🔥 Lưu trực tiếp lên Firebase
+    await saveUserCloud(u, newUser);
+
+    showToast('Đăng ký thành công! Vui lòng đăng nhập.', 'success');
+    toggleAuth(true);
+    document.getElementById('login-user').value = u;
+    document.getElementById('login-pass').value = '';
+}
 
         // ======================================================================
         // 7. TOAST
@@ -2323,7 +2291,37 @@
                 console.log("Dùng dữ liệu local storage");
             }
         }
+        // 🔥 Hàm tự động nạp tất cả Khóa học và Học viên từ Firebase về trang web
+async function syncAllDataFromCloud() {
+    if (!window.fs || !window.db) return;
+    try {
+        // 1. Tải danh sách khóa học mới nhất từ Cloud
+        const coursesSnap = await window.fs.getDocs(window.fs.collection(window.db, "courses"));
+        let cloudCourses = [];
+        coursesSnap.forEach(d => cloudCourses.push(d.data()));
+        if (cloudCourses.length > 0) {
+            courses = cloudCourses;
+            setStorage('courses', courses);
+        }
 
+        // 2. Tải danh sách tài khoản học viên mới nhất từ Cloud
+        const usersSnap = await window.fs.getDocs(window.fs.collection(window.db, "users"));
+        let cloudUsers = {};
+        usersSnap.forEach(d => { cloudUsers[d.id] = d.data(); });
+        if (Object.keys(cloudUsers).length > 0) {
+            setStorage('study_users', cloudUsers);
+        }
+
+        // 3. Render lại toàn bộ giao diện
+        renderCourses();
+        renderGames();
+        renderStudents();
+        renderDashboardStats();
+        populateCourseSelects();
+    } catch(e) {
+        console.error("Lỗi tải từ Cloud:", e);
+    }
+}
         function initAdminData() {
             courses = getCourses();
             documents = getDocuments();
@@ -2341,8 +2339,8 @@
             renderCourseCheckboxes('edit-vip-course-checkboxes', []);
             setupFileUpload();
 
-            // Tự động tải từ Cloud sau 1s
-            setTimeout(loadCoursesFromCloud, 1000);
+            // 🔥 Tự động gọi đồng bộ từ Đám mây về
+            syncAllDataFromCloud();
         }
 
         // ======================================================================

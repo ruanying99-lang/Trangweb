@@ -436,22 +436,24 @@
             </div>
 
             <!-- SUPPORT (HỌC VIÊN CHAT) -->
-            <div id="page-support" class="page">
-                <div class="hero" style="background:linear-gradient(135deg,#1565C0,#0D47A1);">
-                    <h1>💬 Trò Chuyện Với Admin</h1>
-                </div>
-                <div class="admin-panel">
-                    <div class="chat-container">
-                        <div class="chat-messages" id="student-chat-messages">
-                            <div class="chat-empty"><p>Chưa có tin nhắn...</p></div>
-                        </div>
-                        <div class="chat-input-area">
-                            <textarea id="student-chat-input" placeholder="Nhập tin nhắn..." rows="2"></textarea>
-                            <button class="btn-submit" onclick="sendStudentMessage()">📤 Gửi</button>
-                        </div>
-                    </div>
-                </div>
+            <!-- ===== SUPPORT (HỌC VIÊN CHAT) ===== -->
+<div id="page-support" class="page">
+    <div class="hero" style="background:linear-gradient(135deg,#1565C0,#0D47A1);">
+        <h1>💬 Trò Chuyện Với Admin</h1>
+    </div>
+    <div class="admin-panel">
+        <div class="chat-container">
+            <div class="chat-messages" id="student-chat-messages">
+                <div class="chat-empty"><p>Chưa có tin nhắn...</p></div>
             </div>
+            <!-- KHUNG NHẬP TIN NHẮN CHO HỌC VIÊN -->
+            <div class="chat-input-area">
+                <textarea id="student-chat-input" placeholder="Nhập tin nhắn..." rows="2"></textarea>
+                <button class="btn-submit" onclick="sendStudentMessage()">📤 Gửi</button>
+            </div>
+        </div>
+    </div>
+</div>
 
             <!-- ADMIN -->
             <div id="page-admin" class="page">
@@ -538,8 +540,11 @@
             </div>
 
             <!-- ADMIN SUPPORT (CHAT QUẢN TRỊ - HIỆN TẤT CẢ HỌC VIÊN ĐỂ PHÁT THÔNG BÁO) -->
-            <div id="page-admin-support" class="page">
-    <div class="hero" style="background:linear-gradient(135deg,#E65100,#BF360C);"><h1>📩 Hỗ Trợ & Phát Thông Báo Học Viên</h1></div>
+            <!-- ===== ADMIN SUPPORT (CHAT QUẢN TRỊ) ===== -->
+<div id="page-admin-support" class="page">
+    <div class="hero" style="background:linear-gradient(135deg,#E65100,#BF360C);">
+        <h1>📩 Hỗ Trợ & Phát Thông Báo Học Viên</h1>
+    </div>
     <div class="admin-panel">
         <div class="admin-chat-list">
             <div class="admin-chat-sidebar" id="admin-chat-users">
@@ -550,7 +555,7 @@
                 <div class="chat-messages" id="admin-chat-messages">
                     <div class="chat-empty"><p>Chọn học viên bên trái</p></div>
                 </div>
-                <!-- Khung nhập tin nhắn -->
+                <!-- KHUNG NHẬP TIN NHẮN CHO ADMIN -->
                 <div class="chat-input-area">
                     <textarea id="admin-chat-input" placeholder="Nhập tin nhắn hoặc thông báo..." rows="2" disabled></textarea>
                     <button class="btn-submit" onclick="sendAdminReply()" disabled>📤 Gửi</button>

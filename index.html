@@ -110,9 +110,9 @@
         .category-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; background: #e3f2fd; border-radius: 15px; font-size: 13px; border: 1px solid #90caf9; }
         .category-tag .remove { cursor: pointer; color: var(--danger); font-weight: bold; margin-left: 4px; }
 
-        /* CHAT STYLES */
+        /* CHAT STYLES (ĐÃ TỐI ƯU THANH CUỘN DỌC & CỐ ĐỊNH KHUNG NHẬP) */
         .chat-container { display: flex; flex-direction: column; height: 480px; background: #fff; border-radius: 10px; border: 1px solid #e0e0e0; overflow: hidden; }
-        .chat-messages { flex: 1; padding: 14px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; }
+        .chat-messages { flex: 1; padding: 14px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
         .chat-message { margin-bottom: 12px; display: flex; flex-direction: column; max-width: 80%; }
         .chat-message.sent { align-self: flex-end; align-items: flex-end; }
         .chat-message.received { align-self: flex-start; align-items: flex-start; }
@@ -133,7 +133,7 @@
         .admin-chat-sidebar .chat-user-item:hover { background: #f0f0f0; }
         .admin-chat-sidebar .chat-user-item.active { background: #E3F2FD; border-left: 4px solid var(--primary); }
         .admin-chat-sidebar .unread-badge { background: #FF1744; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
-        .admin-chat-main { display: flex; flex-direction: column; height: 100%; justify-content: space-between; }
+        .admin-chat-main { display: flex; flex-direction: column; height: 100%; justify-content: space-between; min-height: 0; }
         .admin-chat-header { padding: 12px 20px; background: var(--primary); color: #fff; font-weight: bold; flex-shrink: 0; }
 
         /* MODALS & IFRAMES */

@@ -1794,7 +1794,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, setDoc, doc, getDocs, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // ✅ ĐÃ SỬA CÚ PHÁP: authDomain
         const firebaseConfig = {
             apiKey: "AIzaSyDHnUhPNokBrXgYLNqlW0kB9tJm3U0Un0I",
             authDomain: "hocvienngon.firebaseapp.com",
@@ -1813,7 +1812,7 @@
     </script>
 
     <!-- ============================================================ -->
-    <!-- JAVASCRIPT CHÍNH (ĐÃ TÍCH HỢP ĐẦY ĐỦ CLOUD) -->
+    <!-- JAVASCRIPT CHÍNH (ĐÃ ĐƯỢC TÍCH HỢP TƯƠNG TÁC CLOUD HOÀN CHỈNH) -->
     <!-- ============================================================ -->
     <script>
         // ======================================================================
@@ -1850,7 +1849,7 @@
             setStorage('study_users', users);
         }
 
-        // ✅ BỔ SUNG HÀM LƯU TÀI KHOẢN LÊN CLOUD
+        // ✅ HÀM LƯU TÀI KHOẢN LÊN CLOUD
         async function saveUserCloud(username, userData) {
             saveUser(username, userData);
             try {
@@ -2336,9 +2335,19 @@
                     setStorage('study_users', cloudUsers);
                 }
 
+                // 🔥 3. TẢI MÃ VIP TỪ CLOUD
+                const vipSnap = await window.fs.getDocs(window.fs.collection(window.db, "vip_keys"));
+                let cloudVipKeys = [];
+                vipSnap.forEach(d => cloudVipKeys.push(d.data()));
+                if (cloudVipKeys.length > 0) {
+                    vipKeys = cloudVipKeys;
+                    setStorage('vip_keys', vipKeys);
+                }
+
                 renderCourses();
                 renderGames();
                 renderStudents();
+                renderVipKeys();
                 renderDashboardStats();
                 populateCourseSelects();
             } catch(e) {
@@ -2688,21 +2697,35 @@
         }
 
         // ======================================================================
-        // 15. VIP KEYS
+        // 15. VIP KEYS (✅ ĐÃ ĐƯỢC TÍCH HỢP ĐẨY MÃ LÊN CLOUD)
         // ======================================================================
-        function createVipKey() {
+        async function createVipKey() {
             const key = document.getElementById('vip-key-input').value.trim();
             const selected = getSelectedCourses('vip-course-checkboxes');
             const duration = parseInt(document.getElementById('vip-duration').value);
             const maxUses = parseInt(document.getElementById('vip-max-uses').value);
+            
             if (!key || key.length < 3) { showToast('❌ Mã VIP phải có ít nhất 3 ký tự!', 'error'); return; }
             if (selected.length === 0) { showToast('❌ Chọn ít nhất 1 khóa học!', 'error'); return; }
             if (vipKeys.some(k => k.key === key)) { showToast('❌ Mã đã tồn tại!', 'error'); return; }
-            vipKeys.push({ key, courseIds: selected, duration, maxUses, usedCount: 0, createdAt: Date.now() });
+            
+            const newVipKey = { key, courseIds: selected, duration, maxUses, usedCount: 0, createdAt: Date.now() };
+            
+            vipKeys.push(newVipKey);
             setStorage('vip_keys', vipKeys);
+
+            // 🔥 ĐẨY MÃ VIP MỚI LÊN FIREBASE CLOUD
+            try {
+                if (window.fs && window.db) {
+                    await window.fs.setDoc(window.fs.doc(window.db, "vip_keys", key), newVipKey);
+                    showToast(`✅ Đã tạo & đồng bộ mã VIP: ${key} lên Cloud!`, 'success');
+                }
+            } catch(err) {
+                console.error("Lỗi Firestore:", err);
+            }
+
             document.getElementById('vip-key-input').value = '';
             document.getElementById('vip-max-uses').value = '1';
-            showToast(`✅ Đã tạo mã VIP: ${key}`, 'success');
             renderVipKeys();
             renderDashboardStats();
         }
@@ -2732,9 +2755,17 @@
         }
 
         function deleteVipKey(index) {
-            showConfirmModal('Xóa mã VIP?', 'Hành động này không thể hoàn tác!', function() {
+            const keyToDelete = vipKeys[index]?.key;
+            showConfirmModal('Xóa mã VIP?', 'Hành động này không thể hoàn tác!', async function() {
                 vipKeys.splice(index, 1);
                 setStorage('vip_keys', vipKeys);
+
+                try {
+                    if (window.fs && window.db && keyToDelete) {
+                        await window.fs.deleteDoc(window.fs.doc(window.db, "vip_keys", keyToDelete));
+                    }
+                } catch(e){}
+
                 showToast('Đã xóa mã VIP', 'info');
                 renderVipKeys();
                 renderDashboardStats();
@@ -3129,15 +3160,32 @@
         });
 
         // ======================================================================
-        // 19. ACTIVATE VIP
+        // 19. ACTIVATE VIP (✅ ĐÃ ĐƯỢC TÍCH HỢP TƯƠNG TÁC CLOUD)
         // ======================================================================
         async function activateVip() {
             const key = document.getElementById('activation-key-input').value.trim();
-            const keyData = vipKeys.find(k => k.key === key);
-            if (!keyData) { showToast('❌ Mã VIP không hợp lệ!', 'error'); return; }
-            if (keyData.usedCount >= keyData.maxUses) { showToast('❌ Mã đã hết lượt!', 'error'); return; }
+            if (!key) { showToast('❌ Vui lòng nhập mã VIP!', 'error'); return; }
+
+            let keyData = null;
+
+            // 🔥 1. KIỂM TRA MÃ VIP TRỰC TIẾP TRÊN CLOUD
+            try {
+                if (window.fs && window.db) {
+                    const keyDoc = await window.fs.getDoc(window.fs.doc(window.db, "vip_keys", key));
+                    if (keyDoc.exists()) {
+                        keyData = keyDoc.data();
+                    }
+                }
+            } catch(e) { console.error("Lỗi kiểm tra VIP:", e); }
+
+            if (!keyData) { keyData = vipKeys.find(k => k.key === key); }
+
+            if (!keyData) { showToast('❌ Mã VIP không tồn tại trên hệ thống!', 'error'); return; }
+            if (keyData.usedCount >= keyData.maxUses) { showToast('❌ Mã VIP này đã hết lượt sử dụng!', 'error'); return; }
+
             const user = getUser(currentUser);
             if (!user) return;
+
             const existing = user.vipCourses || [];
             const newCourses = keyData.courseIds || [];
             user.vipCourses = [...new Set([...existing, ...newCourses])];
@@ -3153,17 +3201,20 @@
                         start: new Date().toISOString().split('T')[0],
                         end: keyData.duration === 0 ? null : new Date(Date.now() + keyData.duration * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
                     };
-                } else {
-                    if (keyData.duration > 0) {
-                        user.gameKeys[cid].end = new Date(Date.now() + keyData.duration * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-                    } else {
-                        user.gameKeys[cid].end = null;
-                    }
                 }
             });
+
+            // 🔥 2. CẬP NHẬT SỐ LẦN SỬ DỤNG MÃ LÊN CLOUD
             keyData.usedCount++;
-            setStorage('vip_keys', vipKeys);
+            try {
+                if (window.fs && window.db) {
+                    await window.fs.setDoc(window.fs.doc(window.db, "vip_keys", key), keyData);
+                }
+            } catch(e){}
+
+            // 🔥 3. LƯU THÔNG TIN HỌC VIỆN MỚI NÂNG VIP LÊN CLOUD
             await saveUserCloud(currentUser, user);
+
             showToast(`🎉 Kích hoạt VIP thành công!`, 'success');
             updateUI();
             renderGames();

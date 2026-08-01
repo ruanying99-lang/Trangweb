@@ -68,6 +68,30 @@
         .btn-delete { background: #C62828; color: #fff; }
         .btn-approve { background: #2E7D32; color: #fff; }
 
+        /* CHAT CSS */
+        .chat-container { display: flex; flex-direction: column; height: 480px; background: #fff; border-radius: 10px; border: 1px solid #e0e0e0; overflow: hidden; }
+        .chat-messages { flex: 1; padding: 14px; overflow-y: auto; background: #fafafa; display: flex; flex-direction: column; }
+        .chat-message { margin-bottom: 12px; display: flex; flex-direction: column; max-width: 80%; }
+        .chat-message.sent { align-self: flex-end; align-items: flex-end; }
+        .chat-message.received { align-self: flex-start; align-items: flex-start; }
+        .chat-message .msg-bubble { padding: 10px 16px; border-radius: 12px; word-wrap: break-word; max-width: 100%; }
+        .chat-message.sent .msg-bubble { background: var(--primary); color: #fff; border-bottom-right-radius: 4px; }
+        .chat-message.received .msg-bubble { background: #e0e0e0; color: #333; border-bottom-left-radius: 4px; }
+        .chat-message .msg-time { font-size: 11px; color: #999; margin-top: 4px; }
+        .chat-message .msg-sender { font-size: 12px; font-weight: bold; margin-bottom: 3px; }
+        
+        .chat-input-area { display: flex; gap: 10px; padding: 12px; background: #fff; border-top: 1px solid #e0e0e0; flex-shrink: 0; }
+        .chat-input-area textarea { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; resize: none; height: 48px; font-size: 14px; }
+
+        .admin-chat-list { display: grid; grid-template-columns: 260px 1fr; gap: 0; height: 480px; background: #fff; border-radius: 10px; border: 1px solid #e0e0e0; overflow: hidden; }
+        .admin-chat-sidebar { border-right: 1px solid #e0e0e0; background: #fafafa; overflow-y: auto; }
+        .admin-chat-sidebar .chat-user-item { padding: 12px 16px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .admin-chat-sidebar .chat-user-item:hover { background: #f0f0f0; }
+        .admin-chat-sidebar .chat-user-item.active { background: #E3F2FD; border-left: 4px solid var(--primary); }
+        .admin-chat-sidebar .unread-badge { background: #FF1744; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+        .admin-chat-main { display: flex; flex-direction: column; min-width: 0; }
+        .admin-chat-header { padding: 12px 20px; background: var(--primary); color: #fff; font-weight: bold; flex-shrink: 0; }
+
         /* TOAST */
         .toast-container { position: fixed; top: 80px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; }
         .toast { padding: 14px 20px; border-radius: 8px; color: #fff; font-weight: 600; animation: slideIn 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
@@ -75,12 +99,6 @@
         .toast.error { background: var(--danger); }
         .toast.info { background: var(--info); }
         @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-        /* IFRAME MODAL */
-        .game-iframe-container { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 99998; padding: 20px; }
-        .game-iframe-container.active { display: flex; justify-content: center; align-items: center; }
-        .game-iframe-wrapper { background: #fff; border-radius: 12px; width: 100%; max-width: 1200px; height: 90vh; display: flex; flex-direction: column; }
-        .game-iframe-header { background: #f5f5f5; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); }
     </style>
 </head>
 <body>
@@ -113,18 +131,17 @@
                 </div>
             </div>
 
-            <!-- ===== GAMES / KHÓA HỌC ===== -->
+            <!-- ===== GAMES ===== -->
             <div id="page-games" class="page">
                 <div id="game-grid-container" class="grid"></div>
             </div>
 
-            <!-- ===== THƯ VIỆN VIDEO (DÙNG CHUNG) ===== -->
+            <!-- ===== THƯ VIỆN VIDEO ===== -->
             <div id="page-videos" class="page">
                 <div class="hero" style="background:linear-gradient(135deg,#1565C0,#0D47A1);">
                     <h1>🎬 Thư Viện Video Bài Học</h1>
                     <p>Học viên và Admin cùng đóng góp Video cho cộng đồng.</p>
                 </div>
-
                 <div class="admin-panel">
                     <h3>📤 Tải lên Video bài học mới</h3>
                     <div class="admin-form">
@@ -134,14 +151,13 @@
                         <div class="form-group full-width"><button class="btn-submit" onclick="uploadVideo()">📤 Tải Video Lên</button></div>
                     </div>
                 </div>
-
                 <div class="admin-panel" style="margin-top:20px;">
                     <h3>📺 Danh Sách Bài Học Video</h3>
                     <div id="video-list-container" class="grid"></div>
                 </div>
             </div>
 
-            <!-- ===== SỔ TỪ VỰNG CÁ NHÂN (DÙNG RIÊNG) ===== -->
+            <!-- ===== SỔ TỪ VỰNG CÁ NHÂN ===== -->
             <div id="page-profile" class="page">
                 <div class="hero" style="background:linear-gradient(135deg,#2E7D32,#1B5E20);">
                     <h1>📖 Sổ Từ Vựng Cá Nhân</h1>
@@ -175,7 +191,7 @@
                 <div class="admin-panel">
                     <div class="chat-container">
                         <div class="chat-messages" id="student-chat-messages">
-                            <div class="chat-empty"><p>Đang tải tin nhắn...</p></div>
+                            <div class="chat-empty"><p>Chưa có tin nhắn nào...</p></div>
                         </div>
                         <div class="chat-input-area">
                             <textarea id="student-chat-input" placeholder="Nhập tin nhắn..." rows="2"></textarea>
@@ -185,7 +201,7 @@
                 </div>
             </div>
 
-            <!-- ===== ADMIN (QUẢN TRỊ DUYỆT VIDEO) ===== -->
+            <!-- ===== ADMIN (DUYỆT VIDEO) ===== -->
             <div id="page-admin" class="page">
                 <div class="hero" style="background:linear-gradient(135deg,#E65100,#BF360C);">
                     <h1>⚙️ Quản Trị Hệ Thống</h1>
@@ -202,7 +218,7 @@
                 </div>
             </div>
 
-            <!-- ===== ADMIN SUPPORT (ADMIN TẢI CHAT MỌI HỌC VIÊN) ===== -->
+            <!-- ===== ADMIN SUPPORT (ADMIN CHAT) ===== -->
             <div id="page-admin-support" class="page">
                 <div class="hero" style="background:linear-gradient(135deg,#E65100,#BF360C);">
                     <h1>📩 Hỗ Trợ Học Viên (Admin)</h1>
@@ -250,9 +266,7 @@
     <!-- TOAST -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- ============================================================ -->
     <!-- FIREBASE SDK -->
-    <!-- ============================================================ -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, setDoc, doc, getDocs, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -273,9 +287,7 @@
         window.fs = { collection, setDoc, doc, getDocs, getDoc, deleteDoc };
     </script>
 
-    <!-- ============================================================ -->
-    <!-- JAVASCRIPT XỬ LÝ TOÀN BỘ LOGIC (CHAT CLOUD + VIDEO + TỪ VỰNG) -->
-    <!-- ============================================================ -->
+    <!-- LOGIC CHÍNH -->
     <script>
         let currentUser = null;
         let adminSelectedUser = null;
@@ -305,7 +317,7 @@
         }
 
         // ======================================================================
-        // 💬 CHAT CLOUD - SỬA LỖI ADMIN KHÔNG NHẬN TIN & FIX THÔNG BÁO ĐỎ CẢM ỨNG
+        // 💬 CHAT CLOUD - SỬA LỖI ADMIN KHÔNG NHẬN TIN & XOÁ SỐ 1 ĐỎ GIẢ
         // ======================================================================
         
         // 1. Học viên gửi tin nhắn
@@ -333,7 +345,7 @@
                     );
                     input.value = '';
                     showToast('✅ Đã gửi tin nhắn đến Admin!', 'success');
-                    loadStudentChat();
+                    await loadStudentChat();
                 }
             } catch(e) { console.error(e); }
         }
@@ -343,7 +355,7 @@
             if (!adminSelectedUser) return;
             const input = document.getElementById('admin-chat-input');
             const text = input.value.trim();
-            if (!text) { showToast('Vui lòng nhập nội dung câu trả lời!', 'warning'); return; }
+            if (!text) { showToast('Vui lòng nhập nội dung!', 'warning'); return; }
 
             const msgId = 'msg_' + Date.now();
             const newMsg = {
@@ -363,7 +375,7 @@
                     );
                     input.value = '';
                     showToast(`✅ Đã trả lời ${adminSelectedUser}!`, 'success');
-                    loadAdminChat();
+                    await loadAdminChat();
                 }
             } catch(e) { console.error(e); }
         }
@@ -389,15 +401,15 @@
                 }
 
                 let html = '';
-                userMessages.forEach(msg => {
+                for (let msg of userMessages) {
                     const isSent = msg.from === currentUser;
                     const sender = isSent ? 'Bạn' : 'Admin';
                     const time = new Date(msg.time).toLocaleString('vi-VN');
 
-                    // Đánh dấu đã đọc khi xem phản hồi Admin
+                    // Đánh dấu đã đọc khi Học viên mở xem phản hồi từ Admin
                     if (msg.from === 'admin' && !msg.read) {
                         msg.read = true;
-                        window.fs.setDoc(
+                        await window.fs.setDoc(
                             window.fs.doc(window.db, "chats", currentUser, "messages", msg.id),
                             msg
                         );
@@ -410,15 +422,15 @@
                             <div class="msg-time">${time}</div>
                         </div>
                     `;
-                });
+                }
 
                 container.innerHTML = html;
                 container.scrollTop = container.scrollHeight;
-                updateChatBadge();
+                await updateChatBadge();
             } catch(e) { console.error(e); }
         }
 
-        // 4. Admin tải danh sách học viên nhắn tin & xem chi tiết
+        // 4. Admin tải danh sách học viên & đoạn chat
         async function loadAdminChat() {
             if (currentUser !== 'admin' || !window.fs || !window.db) return;
             const sidebar = document.getElementById('admin-chat-users');
@@ -445,7 +457,7 @@
                     let unreadCount = 0;
                     msgSnap.forEach(m => {
                         const data = m.data();
-                        // 🟢 FIX LỖI: Chỉ đếm tin nhắn HỌC VIỆN gửi đến mà ADMIN chưa đọc
+                        // 🔴 CHỈ ĐẾM TIN NHẮN TỪ HỌC VIÊN GỬI ĐẾN MÀ ADMIN CHƯA ĐỌC
                         if (data.from === username && !data.read) {
                             unreadCount++;
                         }
@@ -480,14 +492,14 @@
                         container.innerHTML = `<div class="chat-empty"><p>Chưa có tin nhắn từ học viên này</p></div>`;
                     } else {
                         let detailHtml = '';
-                        detailMsgs.forEach(msg => {
+                        for (let msg of detailMsgs) {
                             const isSent = msg.from === 'admin';
                             const sender = isSent ? 'Admin' : adminSelectedUser;
                             const time = new Date(msg.time).toLocaleString('vi-VN');
 
                             if (msg.from === adminSelectedUser && !msg.read) {
                                 msg.read = true;
-                                window.fs.setDoc(
+                                await window.fs.setDoc(
                                     window.fs.doc(window.db, "chats", adminSelectedUser, "messages", msg.id),
                                     msg
                                 );
@@ -500,12 +512,12 @@
                                     <div class="msg-time">${time}</div>
                                 </div>
                             `;
-                        });
+                        }
                         container.innerHTML = detailHtml;
                         container.scrollTop = container.scrollHeight;
                     }
                 }
-                updateChatBadge();
+                await updateChatBadge();
             } catch(e) { console.error(e); }
         }
 
@@ -514,14 +526,14 @@
             loadAdminChat();
         }
 
-        // 5. Cập nhật Badge đỏ thông báo
+        // 5. Cập nhật Badge đỏ trên thanh Navigation
         async function updateChatBadge() {
             if (!currentUser || !window.fs || !window.db) return;
             document.querySelectorAll('.nav-badge').forEach(b => b.remove());
 
             try {
                 if (currentUser !== 'admin') {
-                    // 🟢 FIX LỖI: Học viên chỉ nhận Badge đỏ khi có phản hồi MỚI TỪ ADMIN
+                    // 🔴 LỖI ĐÃ SỬA: Học viên CHỈ HIỆN SỐ 1 ĐỎ KHI CÓ TIN NHẮN MỚI TỪ ADMIN
                     const snap = await window.fs.getDocs(
                         window.fs.collection(window.db, "chats", currentUser, "messages")
                     );
@@ -701,7 +713,7 @@
         }
 
         // ======================================================================
-        // 📖 SỔ TỪ VỰNG CÁ NHÂN (LƯU VÀO users/{username}/my_vocabulary)
+        // 📖 SỔ TỪ VỰNG CÁ NHÂN (users/{username}/my_vocabulary)
         // ======================================================================
         async function addPersonalWord() {
             const word = document.getElementById('my-word-input').value.trim();
@@ -776,7 +788,7 @@
         }
 
         // ======================================================================
-        // SYSTEM INIT & AUTH LOGIC
+        // HỆ THỐNG ĐĂNG NHẬP & KHỞI CHẠY LẠI
         // ======================================================================
         async function login() {
             const u = document.getElementById('login-user').value.trim();
@@ -787,6 +799,7 @@
             document.getElementById('auth-area').style.display = 'none';
             document.getElementById('member-area').style.display = 'block';
 
+            // 🔴 SỬA LỖI: MỞ ĐÚNG TAB ADMIN DỰA TRÊN TÊN VÀ QUYỀN
             if (u === 'admin') {
                 document.getElementById('nav-admin').style.display = 'inline-block';
                 document.getElementById('nav-admin-support').style.display = 'inline-block';
@@ -800,10 +813,15 @@
             document.getElementById('user-display-name').textContent = u;
             document.getElementById('welcome-username').textContent = u;
 
-            loadVideosFromCloud();
-            loadMyVocabulary();
-            if (currentUser !== 'admin') loadStudentChat();
-            else loadAdminChat();
+            // 🔴 KHỞI CHẠY ĐỒNG BỘ CHAT TỨC THÌ
+            await loadVideosFromCloud();
+            await loadMyVocabulary();
+            if (currentUser !== 'admin') {
+                await loadStudentChat();
+            } else {
+                await loadAdminChat();
+            }
+            await updateChatBadge();
 
             switchPage('home');
         }

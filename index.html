@@ -1278,10 +1278,10 @@
                 <a onclick="switchPage('games')" id="nav-games">🎮 Khóa Học</a>
                 <a onclick="switchPage('profile')" id="nav-profile">👤 Hồ Sơ</a>
                 <a onclick="switchPage('documents')" id="nav-documents">📄 Tài Liệu</a>
-                <a onclick="switchPage('support')" id="nav-support">💬 Hỗ hỗ trợ</a>
+                <a onclick="switchPage('support')" id="nav-support">💬 Hỗ trợ</a>
                 <a onclick="switchPage('admin')" id="nav-admin" style="display:none;">⚙️ Quản Trị</a>
                 <a onclick="switchPage('students')" id="nav-students" style="display:none;">👥 Học Viên</a>
-                <a onclick="switchPage('admin-support')" id="nav-admin-support" style="display:none;">📩 Hỗ trợ HV</a>
+                <a onclick="switchPage('admin-support')" id="nav-admin-support" style="display:none;">📩 Hỗ hỗ trợ HV</a>
                 <a onclick="switchPage('admin-documents')" id="nav-admin-documents" style="display:none;">📋 Duyệt tài liệu</a>
                 <a onclick="switchPage('help')" id="nav-help">📖 Hướng dẫn</a>
                 <div class="user-info">
@@ -1312,7 +1312,7 @@
                     <p style="font-size:14px;color:#555;line-height:1.8;">
                         1. Chọn khóa học trong <strong>Danh Mục Khóa Học</strong><br>
                         2. Tải lên / tải xuống tài liệu trong <strong>Tài Liệu</strong><br>
-                        3. Gửi tin nhắn hỗ trợ trong <strong>Hỗ hỗ trợ</strong>
+                        3. Gửi tin nhắn hỗ hỗ trợ trong <strong>Hỗ hỗ trợ</strong>
                     </p>
                 </div>
             </div>
@@ -1490,6 +1490,14 @@
                         <div class="form-group"><label>Yêu cầu VIP?</label>
                             <select id="course-vip"><option value="false">❌ Không</option><option value="true">✅ Có</option></select>
                         </div>
+                        <!-- 🌐 BỔ SUNG TÙY CHỌN DỮ LIỆU CHUNG HOẶC CÁ NHÂN -->
+                        <div class="form-group">
+                            <label>Chế độ lưu dữ liệu chương trình?</label>
+                            <select id="course-global-data">
+                                <option value="false">👤 Dữ liệu cá nhân (LocalStorage)</option>
+                                <option value="true">🌐 Dữ liệu chung (Firebase Cloud)</option>
+                            </select>
+                        </div>
                         <div class="form-group full-width" style="display:flex;gap:10px;">
                             <button class="btn-submit" onclick="addCourse()" style="margin:0;flex:1;">➕ Thêm</button>
                             <button class="btn-submit" onclick="updateCourse()" style="margin:0;flex:1;background:#1565C0;">✏️ Cập nhật</button>
@@ -1499,7 +1507,7 @@
                     </div>
                     <div class="table-container">
                         <table>
-                            <thead><tr><th>#</th><th>Icon</th><th>Tên</th><th>Trạng thái</th><th>VIP</th><th>Thao tác</th></tr></thead>
+                            <thead><tr><th>#</th><th>Icon</th><th>Tên</th><th>Loại dữ liệu</th><th>Trạng thái</th><th>VIP</th><th>Thao tác</th></tr></thead>
                             <tbody id="courses-table-body"></tbody>
                         </table>
                     </div>
@@ -1812,9 +1820,40 @@
     </script>
 
     <!-- ============================================================ -->
-    <!-- JAVASCRIPT CHÍNH (ĐÃ ĐƯỢC TÍCH HỢP TƯƠNG TÁC CLOUD HOÀN CHỈNH) -->
+    <!-- JAVASCRIPT CHÍNH (ĐÃ BỔ SUNG CẦU NỐI DỮ LIỆU CHUNG cho APPS) -->
     <!-- ============================================================ -->
     <script>
+        // 🌐 CẦU NỐI DÙNG CHUNG CHO CÁC CHƯƠNG TRÌNH NHỎ (IFRAME)
+        window.AppDataBridge = {
+            async loadData(courseId, isGlobal, keyDef = null) {
+                if (isGlobal && window.fs && window.db) {
+                    try {
+                        const docSnap = await window.fs.getDoc(window.fs.doc(window.db, "app_data", courseId));
+                        if (docSnap.exists()) {
+                            return docSnap.data().content;
+                        }
+                    } catch (e) {
+                        console.error("Lỗi tải dữ liệu Cloud của app:", e);
+                    }
+                }
+                return getStorage('app_data_' + courseId, keyDef);
+            },
+            async saveData(courseId, isGlobal, data) {
+                setStorage('app_data_' + courseId, data);
+                if (isGlobal && window.fs && window.db) {
+                    try {
+                        await window.fs.setDoc(window.fs.doc(window.db, "app_data", courseId), {
+                            content: data,
+                            updatedAt: Date.now()
+                        });
+                        showToast("✅ Đã đồng bộ dữ liệu chung lên Cloud!", "success");
+                    } catch (e) {
+                        console.error("Lỗi lưu dữ liệu Cloud của app:", e);
+                    }
+                }
+            }
+        };
+
         // ======================================================================
         // 1. SECURITY: SHA-256
         // ======================================================================
@@ -1849,7 +1888,7 @@
             setStorage('study_users', users);
         }
 
-        // ✅ HÀM LƯU TÀI KHOẢN LÊN CLOUD
+        // HÀM LƯU TÀI KHOẢN LÊN CLOUD
         async function saveUserCloud(username, userData) {
             saveUser(username, userData);
             try {
@@ -1961,7 +2000,6 @@
                 return;
             }
 
-            // Tải dữ liệu User từ Firebase về trước
             try {
                 if (window.fs && window.db) {
                     const userDoc = await window.fs.getDoc(window.fs.doc(window.db, "users", username));
@@ -2119,7 +2157,6 @@
             if (p.length < 6) { errorEl.textContent = '❌ Mật khẩu phải có ít nhất 6 ký tự!'; errorEl.style.display = 'block'; return; }
             if (p !== c) { errorEl.textContent = '❌ Mật khẩu xác nhận không khớp!'; errorEl.style.display = 'block'; return; }
 
-            // Kiểm tra trùng tài khoản trên Cloud
             try {
                 if (window.fs && window.db) {
                     const userDoc = await window.fs.getDoc(window.fs.doc(window.db, "users", u));
@@ -2274,9 +2311,9 @@
             const data = getStorage('courses', null);
             if (data) return data;
             const defaultCourses = [
-                { id: 'course-en', icon: '🇬🇧', name: 'Từ Vựng Tiếng Anh', description: 'Học từ vựng tiếng Anh cơ bản', file: 'games/vocab-en.html', vip: false, status: 'hot' },
-                { id: 'course-zh', icon: '🇨🇳', name: 'Từ Vựng Tiếng Trung', description: 'Học từ vựng tiếng Trung thông dụng', file: 'games/vocab-zh.html', vip: false, status: 'new' },
-                { id: 'course-ja', icon: '🇯🇵', name: 'Từ Vựng Tiếng Nhật', description: 'Học từ vựng tiếng Nhật N5-N4', file: 'games/vocab-ja.html', vip: true, status: 'vip' }
+                { id: 'course-en', icon: '🇬🇧', name: 'Từ Vựng Tiếng Anh', description: 'Học từ vựng tiếng Anh cơ bản', file: 'games/vocab-en.html', vip: false, status: 'hot', isGlobal: false },
+                { id: 'course-zh', icon: '🇨🇳', name: 'Từ Vựng Tiếng Trung', description: 'Học từ vựng tiếng Trung thông dụng', file: 'games/vocab-zh.html', vip: false, status: 'new', isGlobal: false },
+                { id: 'course-ja', icon: '🇯🇵', name: 'Từ Vựng Tiếng Nhật', description: 'Học từ vựng tiếng Nhật N5-N4', file: 'games/vocab-ja.html', vip: true, status: 'vip', isGlobal: false }
             ];
             setStorage('courses', defaultCourses);
             return defaultCourses;
@@ -2314,11 +2351,9 @@
             return defaultKeys;
         }
 
-        // 🔥 HÀM ĐỒNG BỘ TOÀN BỘ DỮ LIỆU TỪ CLOUD
         async function syncAllDataFromCloud() {
             if (!window.fs || !window.db) return;
             try {
-                // 1. Tải Khóa học
                 const coursesSnap = await window.fs.getDocs(window.fs.collection(window.db, "courses"));
                 let cloudCourses = [];
                 coursesSnap.forEach(d => cloudCourses.push(d.data()));
@@ -2327,7 +2362,6 @@
                     setStorage('courses', courses);
                 }
 
-                // 2. Tải Học viên
                 const usersSnap = await window.fs.getDocs(window.fs.collection(window.db, "users"));
                 let cloudUsers = {};
                 usersSnap.forEach(d => { cloudUsers[d.id] = d.data(); });
@@ -2335,7 +2369,6 @@
                     setStorage('study_users', cloudUsers);
                 }
 
-                // 🔥 3. TẢI MÃ VIP TỪ CLOUD
                 const vipSnap = await window.fs.getDocs(window.fs.collection(window.db, "vip_keys"));
                 let cloudVipKeys = [];
                 vipSnap.forEach(d => cloudVipKeys.push(d.data()));
@@ -2540,7 +2573,7 @@
         }
 
         // ======================================================================
-        // 14. COURSES
+        // 14. COURSES (ĐÃ TÍCH HỢP LƯU TÙY CHỌN DỮ LIỆU CÁ NHÂN / CHUNG)
         // ======================================================================
         let editingCourseId = null;
 
@@ -2552,16 +2585,18 @@
             const file = document.getElementById('course-file').value.trim();
             const vip = document.getElementById('course-vip').value === 'true';
             const status = document.getElementById('course-status').value;
+            const isGlobal = document.getElementById('course-global-data').value === 'true';
+
             if (!id || !name || !file) { showToast('❌ Vui lòng điền đầy đủ!', 'error'); return; }
             if (courses.some(c => c.id === id)) { showToast('❌ ID đã tồn tại!', 'error'); return; }
             
-            const newCourse = { id, icon, name, description: desc, file, vip, status };
+            const newCourse = { id, icon, name, description: desc, file, vip, status, isGlobal };
             
             courses.push(newCourse);
             setStorage('courses', courses);
 
             try {
-                if (window.fs) {
+                if (window.fs && window.db) {
                     await window.fs.setDoc(window.fs.doc(window.db, "courses", id), newCourse);
                     showToast(`✅ Đã lưu ${name} lên Đám mây!`, 'success');
                 }
@@ -2584,16 +2619,18 @@
             const file = document.getElementById('course-file').value.trim();
             const vip = document.getElementById('course-vip').value === 'true';
             const status = document.getElementById('course-status').value;
+            const isGlobal = document.getElementById('course-global-data').value === 'true';
+
             if (!name || !file) { showToast('❌ Vui lòng điền đầy đủ!', 'error'); return; }
             const idx = courses.findIndex(c => c.id === editId);
             if (idx === -1) { showToast('❌ Không tìm thấy!', 'error'); return; }
             
-            const updatedCourse = { id: editId, icon, name, description: desc, file, vip, status };
+            const updatedCourse = { id: editId, icon, name, description: desc, file, vip, status, isGlobal };
             courses[idx] = updatedCourse;
             setStorage('courses', courses);
 
             try {
-                if (window.fs) {
+                if (window.fs && window.db) {
                     await window.fs.setDoc(window.fs.doc(window.db, "courses", editId), updatedCourse);
                     showToast(`✅ Đã cập nhật ${name} trên Đám mây!`, 'success');
                 }
@@ -2622,6 +2659,7 @@
             document.getElementById('course-file').value = c.file;
             document.getElementById('course-vip').value = c.vip ? 'true' : 'false';
             document.getElementById('course-status').value = c.status || '';
+            document.getElementById('course-global-data').value = c.isGlobal ? 'true' : 'false';
             document.querySelector('#admin-courses .admin-form').scrollIntoView({ behavior: 'smooth' });
             showToast(`✏️ Đang sửa: ${c.name}`, 'info');
         }
@@ -2642,6 +2680,7 @@
             document.getElementById('course-file').value = '';
             document.getElementById('course-vip').value = 'false';
             document.getElementById('course-status').value = '';
+            document.getElementById('course-global-data').value = 'false';
         }
 
         function deleteCourse(id) {
@@ -2651,7 +2690,7 @@
                 setStorage('courses', courses);
 
                 try {
-                    if (window.fs) {
+                    if (window.fs && window.db) {
                         await window.fs.deleteDoc(window.fs.doc(window.db, "courses", id));
                         showToast(`Đã xóa ${c?.name} trên Đám mây`, 'info');
                     }
@@ -2670,7 +2709,7 @@
             const tbody = document.getElementById('courses-table-body');
             tbody.innerHTML = '';
             if (courses.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999;">📚 Chưa có khóa học</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#999;">📚 Chưa có khóa học</td></tr>';
                 return;
             }
             courses.forEach((c, i) => {
@@ -2680,11 +2719,13 @@
                     'vip': '<span style="background:#FFD700;color:#333;padding:2px 10px;border-radius:12px;font-size:11px;">⭐ VIP</span>',
                     'free': '<span style="background:#4CAF50;color:#fff;padding:2px 10px;border-radius:12px;font-size:11px;">📖 Free</span>'
                 };
+                const dataTypeText = c.isGlobal ? '<span style="color:#1565C0;font-weight:bold;">🌐 Dữ liệu chung</span>' : '<span style="color:#666;">👤 Cá nhân</span>';
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${i+1}</td>
                     <td style="font-size:24px;">${c.icon}</td>
                     <td><strong>${c.name}</strong></td>
+                    <td>${dataTypeText}</td>
                     <td>${statusMap[c.status] || '-'}</td>
                     <td>${c.vip ? '⭐ VIP' : '📖 Free'}</td>
                     <td>
@@ -2697,7 +2738,7 @@
         }
 
         // ======================================================================
-        // 15. VIP KEYS (✅ ĐÃ ĐƯỢC TÍCH HỢP ĐẨY MÃ LÊN CLOUD)
+        // 15. VIP KEYS
         // ======================================================================
         async function createVipKey() {
             const key = document.getElementById('vip-key-input').value.trim();
@@ -2714,7 +2755,6 @@
             vipKeys.push(newVipKey);
             setStorage('vip_keys', vipKeys);
 
-            // 🔥 ĐẨY MÃ VIP MỚI LÊN FIREBASE CLOUD
             try {
                 if (window.fs && window.db) {
                     await window.fs.setDoc(window.fs.doc(window.db, "vip_keys", key), newVipKey);
@@ -3160,7 +3200,7 @@
         });
 
         // ======================================================================
-        // 19. ACTIVATE VIP (✅ ĐÃ ĐƯỢC TÍCH HỢP TƯƠNG TÁC CLOUD)
+        // 19. ACTIVATE VIP
         // ======================================================================
         async function activateVip() {
             const key = document.getElementById('activation-key-input').value.trim();
@@ -3168,7 +3208,6 @@
 
             let keyData = null;
 
-            // 🔥 1. KIỂM TRA MÃ VIP TRỰC TIẾP TRÊN CLOUD
             try {
                 if (window.fs && window.db) {
                     const keyDoc = await window.fs.getDoc(window.fs.doc(window.db, "vip_keys", key));
@@ -3204,7 +3243,6 @@
                 }
             });
 
-            // 🔥 2. CẬP NHẬT SỐ LẦN SỬ DỤNG MÃ LÊN CLOUD
             keyData.usedCount++;
             try {
                 if (window.fs && window.db) {
@@ -3212,7 +3250,6 @@
                 }
             } catch(e){}
 
-            // 🔥 3. LƯU THÔNG TIN HỌC VIỆN MỚI NÂNG VIP LÊN CLOUD
             await saveUserCloud(currentUser, user);
 
             showToast(`🎉 Kích hoạt VIP thành công!`, 'success');

@@ -5,10 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Luyện Nói Tiếng Trung Qua Video Ngắn</title>
   
-  <!-- ===== CHÈN FIREBASE SDK (Bắt buộc bỏ comment nếu file này chạy độc lập) ===== -->
+  <!-- ================================================================ -->
+  <!-- 👇 BẮT BUỘC: BỎ COMMENT 3 DÒNG DƯỚI ĐÂY NẾU BẠN CHẠY FILE ĐỘC LẬP 👇 -->
+  <!-- ================================================================ -->
   <!-- <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script> -->
   <!-- <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script> -->
   <!-- <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script> -->
+  <!-- ================================================================ -->
 
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/pinyin-pro.min.js">
@@ -33,7 +36,7 @@
     .theme-switch-btn { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
     .theme-switch-btn:hover { border-color: var(--primary); transform: rotate(15deg); }
     
-    /* User/Admin Status Display */
+    /* User/Admin Status Display - Lấy từ Firebase */
     .user-status-display { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-secondary); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
     .user-status-display.admin { color: var(--danger); border-color: var(--danger); background: rgba(244, 63, 94, 0.1); }
 
@@ -70,9 +73,6 @@
     .library-item .video-title-span .fav-icon { color: var(--danger); font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
     .library-item .video-title-span .fav-icon:hover { transform: scale(1.2); }
     .library-item .video-title-span .status-badge { font-size: 0.6rem; padding: 2px 6px; background: var(--warning); color: #000; border-radius: 4px; font-weight: 700; margin-left: auto; }
-    .library-item-modes { display: flex; gap: 6px; flex-wrap: wrap; }
-    .btn-mode { padding: 4px 8px; font-size: 0.7rem; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid var(--border); background: rgba(255, 255, 255, 0.03); color: var(--text-secondary); transition: 0.2s; flex: 0 1 auto; }
-    .btn-mode.active { background: var(--primary) !important; color: #fff !important; border-color: var(--primary); box-shadow: 0 0 8px var(--primary-glow); }
     
     .action-buttons { display: flex; gap: 4px; margin-top: 2px; justify-content: flex-end; }
     .action-btn { background: transparent; border: none; color: var(--text-muted); font-size: 0.9rem; cursor: pointer; padding: 4px; border-radius: 4px; transition: 0.2s; }
@@ -242,7 +242,6 @@
   </style>
 </head>
 <body>
-
   <!-- ===== FLOATING LOG ===== -->
   <div id="floatingLog" style="display:block;">
     <div class="log-header">
@@ -257,6 +256,7 @@
     <div class="top-bar">
       <div class="top-bar-left">
         <span style="font-size:1.5rem;">🇨🇳</span>
+        <!-- User/Admin Status Display -->
         <div class="user-status-display" id="userStatusDisplay">👤 Đang tải User...</div>
         <button id="btnToggleLibrary" class="btn btn-secondary" style="padding:6px 12px; font-size:0.85rem;">📚 Hiện Thư Viện</button>
         <button id="btnOpenVocabHub" class="btn btn-secondary" style="padding:6px 12px; font-size:0.85rem;">📓 Sổ Từ Vựng</button>
@@ -438,9 +438,22 @@
   </div>
 
   <!-- ========================================================== -->
-  <!-- ===== JAVASCRIPT (Đã cập nhật xử lý Firebase) ===== -->
+  <!-- ===== JAVASCRIPT (Firebase Real Database) ===== -->
   <!-- ========================================================== -->
   <script>
+    // ================================================================
+    // 👇 BẮT BUỘC: ĐIỀN FIREBASE CONFIG CỦA DỰ ÁN CỦA BẠN VÀO ĐÂY 👇
+    // ================================================================
+    const FIREBASE_CONFIG = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    // ================================================================
+
     // =====================================================================
     // 0.  LOG HELPER
     // =====================================================================
@@ -469,48 +482,36 @@
     });
 
     // =====================================================================
-    // 1.  FIREBASE BOOTSTRAP (Giải quyết lỗi không tìm thấy Firebase)
+    // 1.  FIREBASE BOOTSTRAP 
     // =====================================================================
-    function getFirebaseInstance() {
-        // 1. Nếu window đã có firebase (trang web chính đã load), trả về luôn
-        if (typeof window.firebase !== 'undefined') {
-            addLog("✅ Đã phát hiện Firebase SDK từ trang web chính.", 'success');
-            return window.firebase;
-        }
-
-        // 2. Nếu chưa có, thử tự init (bạn cần bỏ comment các dòng import SDK ở trên đầu file)
-        addLog("⏳ Đang thử tự động khởi tạo Firebase (nếu SDK đã được tải)...", 'info');
-        try {
-            if (typeof window.firebase !== 'undefined') return window.firebase;
-        } catch(e) {}
-        
+    let firebaseInstance = null;
+    
+    // Kiểm tra xem SDK đã có sẵn chưa
+    if (typeof window.firebase !== 'undefined') {
+        firebaseInstance = window.firebase;
+        addLog("✅ Đã phát hiện Firebase SDK từ trang web chính.", 'success');
+    } else {
         addLog("❌ Lỗi: Không tìm thấy thư viện Firebase.", 'error');
-        addLog("💡 Hướng dẫn: Nếu bạn chạy file này độc lập, hãy bỏ comment 3 dòng <script src='firebase...'> ở đầu file và điền Config bên dưới.", 'warning');
-        return null;
+        addLog("💡 Hướng dẫn: Bạn cần bỏ comment 3 dòng import SDK ở đầu file HTML và điền đúng Config.", 'warning');
     }
 
-    // Cấu hình Firebase của bạn (Điền vào đây nếu chạy độc lập)
-    const LOCAL_FIREBASE_CONFIG = {
-      apiKey: "AIzaSyDHnUhPNokBrXgYLNqlW0kB9tJm3U0Un0I",
-  authDomain: "hocvienngon.firebaseapp.com",
-  projectId: "hocvienngon",
-  storageBucket: "hocvienngon.firebasestorage.app",
-  messagingSenderId: "410660952284",
-  appId: "1:410660952284:web:ee5b5a98d12bef3d45bc19"
-    };
-    
-    let firebaseInstance = getFirebaseInstance();
-    if (firebaseInstance && !firebaseInstance.apps.length && typeof LOCAL_FIREBASE_CONFIG.apiKey !== 'undefined' && LOCAL_FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY") {
+    // Nếu đã tìm thấy SDK, khởi tạo App nếu chưa có
+    if (firebaseInstance && !firebaseInstance.apps.length) {
         try {
-            firebaseInstance.initializeApp(LOCAL_FIREBASE_CONFIG);
-            addLog("✅ Đã khởi tạo thành công Firebase Config cục bộ.", 'success');
+            // Kiểm tra xem config có đã được điền hay chưa
+            if (FIREBASE_CONFIG.apiKey === "YOUR_API_KEY") {
+                addLog("⚠️ Bạn chưa điền Firebase Config thật! Vui lòng điền vào biến FIREBASE_CONFIG trong code.", 'error');
+            } else {
+                firebaseInstance.initializeApp(FIREBASE_CONFIG);
+                addLog("✅ Đã khởi tạo Firebase thành công.", 'success');
+            }
         } catch (initError) {
             addLog("⚠️ Lỗi khởi tạo Firebase: " + initError.message, 'error');
         }
     }
 
     // =====================================================================
-    // 2.  INDEXED DB HELPERS (v8)
+    // 2.  INDEXED DB HELPERS 
     // =====================================================================
     const DB_NAME = "ChineseShadowingDB_v8";
     const DB_VERSION = 8; 
@@ -567,13 +568,11 @@
     function updateVideo(videoData) { return executeTransaction(STORE_NAME, "readwrite", store => new Promise((resolve, reject) => { const req = store.put(videoData); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); })); }
     function deleteVideo(id) { return executeTransaction(STORE_NAME, "readwrite", store => new Promise((resolve, reject) => { const req = store.delete(id); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); })); }
 
-    // --- VOCAB STORE ---
     function getAllVocab(userId) { return executeTransaction(VOCAB_STORE_NAME, "readonly", store => { const req = store.getAll(); return new Promise((resolve, reject) => { req.onsuccess = () => { const items = req.result || []; resolve(items.filter(item => item.userId === userId)); }; req.onerror = () => reject(req.error); }); }); }
     function addVocab(vocabItem) { return executeTransaction(VOCAB_STORE_NAME, "readwrite", store => new Promise((resolve, reject) => { const req = store.add(vocabItem); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); })); }
     function updateVocab(vocabItem) { return executeTransaction(VOCAB_STORE_NAME, "readwrite", store => new Promise((resolve, reject) => { const req = store.put(vocabItem); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); })); }
     function deleteVocab(id) { return executeTransaction(VOCAB_STORE_NAME, "readwrite", store => new Promise((resolve, reject) => { const req = store.delete(id); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); })); }
 
-    // --- USER FAVORITES ---
     function getFavorites(userId) { return executeTransaction(LIBRARY_STORE_NAME, "readonly", store => { const idx = store.index('by_user'); return new Promise((resolve, reject) => { const req = idx.getAll(userId); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); }); }); }
     
     async function toggleFavorite(userId, videoId) {
@@ -768,14 +767,19 @@
         } catch (err) { addLog("❌ Lỗi tải thư viện: " + err.message, 'error'); }
     }
 
-    // ---------- FIRBASE AUTH CHECK ----------
+    // ---------- FIRBASE AUTH CHECK (lấy User thật) ----------
     async function initializeAppWithFirebase() {
-        if (!firebaseInstance) {
+        // Dừng ngay nếu không tìm thấy Firebase
+        if (!firebaseInstance || !firebaseInstance.auth) {
+            userStatusDisplay.innerHTML = "❌ Lỗi Firebase";
             return;
         }
+
         firebaseInstance.auth().onAuthStateChanged(async (user) => {
             if (user) {
                 CURRENT_USER_ID = user.uid;
+                addLog(`✅ Đã lấy được thông tin User thật từ Database. UID: ${CURRENT_USER_ID}`, 'success');
+
                 try {
                     const db = firebaseInstance.firestore();
                     const userDoc = await db.collection('users').doc(CURRENT_USER_ID).get();
@@ -783,7 +787,10 @@
                         const userData = userDoc.data();
                         isAdminMode = (userData.role === 'admin');
                     } else { isAdminMode = false; }
-                } catch (e) { isAdminMode = false; }
+                } catch (e) {
+                    addLog("⚠️ Lỗi đọc role Firestore. Mặc định User.", 'warning');
+                    isAdminMode = false; 
+                }
 
                 if (isAdminMode) {
                     userStatusDisplay.innerHTML = `👑 Admin (${user.displayName || user.email})`;
@@ -796,8 +803,9 @@
                 }
                 startEngine();
             } else {
-                userStatusDisplay.innerHTML = "⛔ Chưa đăng nhập";
+                userStatusDisplay.innerHTML = "⛔ Vui lòng đăng nhập";
                 document.getElementById('currentVideoTitle').innerText = "Vui lòng đăng nhập để học";
+                addLog("⛔ Người dùng chưa đăng nhập.", 'info');
             }
         });
     }
@@ -819,7 +827,7 @@
     }
 
     // =====================================================================
-    // 4.  CÁC HÀM HỖ TRỢ KHÁC (Giữ nguyên)
+    // 4.  CÁC HÀM HỖ TRỢ KHÁC
     // =====================================================================
     function sanitizeHTML(str) { if (!str) return ''; const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return str.replace(/[&<>"']/g, m => map[m]); }
     function openEditModal(e, id) {
@@ -844,11 +852,12 @@
 
     // ---------- INIT ----------
     function init() {
+        // Chỉ khởi chạy nếu có thể
         if (firebaseInstance && firebaseInstance.auth) {
             initializeAppWithFirebase();
         } else {
-            userStatusDisplay.innerHTML = "❌ Lỗi Firebase";
-            addLog("❌ Không thể liên kết Firebase. Vui lòng kiểm tra lại việc tải SDK.", 'error');
+            userStatusDisplay.innerHTML = "❌ Lỗi kết nối DB";
+            addLog("❌ Không thể liên kết Firebase. Vui lòng bỏ comment 3 dòng SDK ở đầu file và điền Config.", 'error');
         }
     }
 

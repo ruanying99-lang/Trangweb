@@ -25,10 +25,6 @@
 
         /* --- NÚT BẤM & Ô NHẬP --- */
         .input-group { width: 100%; display: flex; flex-direction: column; gap: 15px; align-items: center; }
-        .name-input {
-            width: 100%; max-width: 350px; padding: 15px; font-size: 1.4rem; border: 3px solid #8BC34A;
-            border-radius: 10px; text-align: center; outline: none; color: #000000; background-color: #FFFFFF;
-        }
         .btn {
             width: 100%; padding: 16px; font-size: 1.3rem; font-weight: bold; color: #000000; background-color: #FFFFFF;
             border: 3px solid #C5E1A5; border-radius: 12px; cursor: pointer; transition: all 0.2s; margin-bottom: 12px; text-align: center;
@@ -97,18 +93,9 @@
 
     <div class="game-container">
         
-        <!-- MÀN HÌNH 1: ĐĂNG NHẬP -->
-        <div id="screen-login" class="screen active">
-            <div class="menu-title">ENGLISH LEARNING GAME PRO</div>
-            <div class="input-group">
-                <input type="text" id="player-name" class="name-input" placeholder="Nhập tên của bạn..." autocomplete="off">
-                <button class="btn" style="background-color: #DCEDC8;" onclick="submitName()">XÁC NHẬN</button>
-            </div>
-        </div>
-
-        <!-- MÀN HÌNH 2: MENU CHÍNH -->
-        <div id="screen-menu" class="screen">
-            <div class="menu-title" id="welcome-text">Hello!</div>
+        <!-- MÀN HÌNH 2: MENU CHÍNH (Được đặt làm mặc định hiển thị khi vào trang) -->
+        <div id="screen-menu" class="screen active">
+            <div class="menu-title" id="welcome-text">ENGLISH LEARNING GAME PRO</div>
             <button class="btn" onclick="autoStartSmartGame()">🎮 BẮT ĐẦU CHƠI (50 CÂU)</button>
             <button class="btn" onclick="showScreen('screen-vocab-options')">📖 SỔ TỪ VỰNG ANH VĂN</button>
             
@@ -160,7 +147,7 @@
         <!-- MÀN HÌNH 5: GAMEPLAY CHÍNH -->
         <div id="screen-gameplay" class="screen">
             <div class="score-board">
-                <div>👤: <span id="display-name" style="color: #558B2F;"></span></div>
+                <div>👤: <span id="display-name" style="color: #558B2F;">Học viên</span></div>
                 <div>Câu: <span id="current-q-index" style="color: #0288D1;">0</span>/50</div>
                 <div>🏆: <span id="score" style="color: #E65100;">0</span></div>
             </div>
@@ -204,7 +191,7 @@
         ];
 
         let studyLogs = [];
-        let currentPlayerName = "Người chơi";
+        let currentPlayerName = "Học viên";
         let gameQuestions = [];  
         let currentQuestionIndex = 0;
         let currentScore = 0;
@@ -227,22 +214,16 @@
             if (savedLogs) { try { studyLogs = JSON.parse(savedLogs); } catch(e) {} }
         }
         loadDataFromStorage();
+        
+        // Khởi tạo giao diện nhật ký ngay khi tải trang
+        window.onload = function() {
+            renderLogTable();
+        };
 
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             const target = document.getElementById(screenId);
             if (target) target.classList.add('active');
-        }
-
-        function submitName() {
-            const nameField = document.getElementById('player-name');
-            const input = nameField.value.trim();
-            if (input === "") { nameField.style.borderColor = '#F44336'; return; }
-            currentPlayerName = input;
-            document.getElementById('welcome-text').innerText = `Hello, ${input}! 👋`;
-            document.getElementById('display-name').innerText = input;
-            showScreen('screen-menu');
-            renderLogTable();
         }
 
         // --- NẠP FILE EXCEL (5 CỘT TIẾNG ANH) ---
@@ -309,7 +290,6 @@
                 selectedWords.forEach(w => { if(gameQuestions.length < 50) gameQuestions.push({ ...w }); });
             }
 
-            // Đổi tên từ 'type' thành 'qType' để loại bỏ hoàn toàn xung đột dữ liệu
             gameQuestions.forEach((q, idx) => {
                 if (idx < 17) q.qType = 1;      
                 else if (idx < 34) q.qType = 2; 
@@ -331,7 +311,7 @@
 
             document.getElementById('current-q-index').innerText = currentQuestionIndex + 1;
             currentCorrectWord = gameQuestions[currentQuestionIndex];
-            currentQType = currentCorrectWord.qType; // Sử dụng qType mới bảo mật
+            currentQType = currentCorrectWord.qType;
 
             if(wordPerformanceTracker[currentCorrectWord.word]) wordPerformanceTracker[currentCorrectWord.word].total += 1;
 
@@ -371,7 +351,6 @@
 
                 options.push(currentCorrectWord.type);
                 
-                // Lọc sạch các thuộc tính thừa, chỉ lấy chính xác loại từ thật từ file Excel
                 let wrongTypes = Array.from(new Set(vocabulary
                     .map(w => String(w.type).trim())
                     .filter(t => t !== currentCorrectWord.type && t !== "" && t !== "undefined")
@@ -380,7 +359,6 @@
                 wrongTypes.sort(() => Math.random() - 0.5);
                 for(let i=0; i<3 && i<wrongTypes.length; i++) options.push(wrongTypes[i]);
                 
-                // Backup chuẩn sư phạm phòng trường hợp file Excel nạp vào ít loại từ
                 let backupTypes = ["noun", "verb", "adjective", "adverb"];
                 while(options.length < 4) {
                     let b = backupTypes[Math.floor(Math.random() * backupTypes.length)];

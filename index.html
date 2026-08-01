@@ -600,7 +600,7 @@
         }
 
         // ======================================================================
-        // 💬 HỆ THỐNG CHAT CLOUD (FIX 100% LỖI ADMIN BẤM XEM & KHUNG NHẬP VĂN BẢN)
+        // 💬 HỆ THỐNG CHAT CLOUD (FIX GỬI TIN NHẮN CỦA ADMIN & HỌC VIÊN)
         // ======================================================================
         async function sendStudentMessage() {
             if (!currentUser || currentUser === 'admin') return;
@@ -701,9 +701,9 @@
                 if (adminSelectedUser) {
                     document.getElementById('admin-chat-header').textContent = '💬 Đang chat & phát thông báo tới: ' + adminSelectedUser;
                     
-                    // 🟢 MỞ KHÓA HOÀN TOÀN KHUNG NHẬP VĂN BẢN VÀ NÚT GỬI CHO ADMIN
+                    // Mở khóa khung nhập và nút gửi
                     const inputArea = document.getElementById('admin-chat-input');
-                    const sendBtn = document.querySelector('#admin-chat-main .chat-input-area .btn-submit');
+                    const sendBtn = document.querySelector('#page-admin-support .btn-submit');
                     if (inputArea) inputArea.disabled = false;
                     if (sendBtn) sendBtn.disabled = false;
 

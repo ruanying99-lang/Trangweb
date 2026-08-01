@@ -165,6 +165,13 @@
         .card:hover { transform: translateY(-4px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); }
         .card h3 { color: var(--primary-dark); margin-bottom: 8px; }
         .card p { font-size: 14px; color: #666; margin-bottom: 12px; }
+        .game-status-badge {
+            position: absolute; top: 14px; right: 14px; font-size: 11px; padding: 3px 10px; border-radius: 4px; font-weight: bold;
+        }
+        .badge-locked { background: #555; color: #fff; }
+        .badge-vip { background: var(--accent); color: #333; }
+        .badge-new { background: var(--info); color: #fff; }
+        .badge-unlocked { background: var(--success); color: #fff; }
 
         /* ADMIN PANEL */
         .admin-panel {
@@ -323,7 +330,7 @@
                     <p>Hệ thống học phản xạ thông minh tích hợp bảo mật & dữ liệu Cloud.</p>
                 </div>
                 <div id="activation-banner" class="locked-banner" style="display:none;">
-                    <h3>🔒 TÀI KHOẢN CHƯA KÍCH HOẠT VIP</h3>
+                    <h3>🔒 TÀI KHOẢN CHƯA KÍCH HOẠT VIP (CẦN NHẬP MÃ VIP ĐỂ MỞ KHÓA KHÓA HỌC VIP)</h3>
                     <div style="margin-top:10px;">
                         <input type="text" id="activation-key-input" placeholder="Nhập mã kích hoạt..." style="padding:8px;border-radius:4px;border:1px solid #ccc;width:250px;">
                         <button class="btn-submit small" onclick="activateVip()" style="margin:0;width:auto;">Kích hoạt</button>
@@ -359,7 +366,7 @@
                     <div class="admin-form">
                         <div class="form-group full-width"><label>Tên tài liệu</label><input type="text" id="doc-title"></div>
                         <div class="form-group full-width"><label>Mô tả</label><textarea id="doc-desc"></textarea></div>
-                        <div class="form-group"><label>Danh mục</label><select id="doc-category"></select></div>
+                        <div class="form-group full-width"><label>Danh mục</label><select id="doc-category"></select></div>
                         <div class="form-group full-width">
                             <label>Chọn file</label>
                             <div class="file-upload-area" id="file-upload-area" onclick="document.getElementById('doc-file-input').click()">
@@ -429,16 +436,20 @@
                 <div id="admin-courses" class="admin-panel" style="display:none;">
                     <h3>📚 Quản lý khóa học</h3>
                     <div class="admin-form">
-                        <div class="form-group"><label>ID</label><input type="text" id="course-id"></div>
+                        <input type="hidden" id="edit-course-id-hidden" value="">
+                        <div class="form-group"><label>ID</label><input type="text" id="course-id" placeholder="vd: course-en"></div>
                         <div class="form-group"><label>Icon</label><input type="text" id="course-icon" value="📚"></div>
                         <div class="form-group"><label>Tên khóa học</label><input type="text" id="course-name"></div>
-                        <div class="form-group"><label>Trạng thái</label><select id="course-status"><option value="">Thường</option><option value="new">Mới</option><option value="hot">Hot</option><option value="vip">VIP</option></select></div>
+                        <div class="form-group"><label>Trạng thái</label><select id="course-status"><option value="">Thường (Free)</option><option value="new">Mới</option><option value="hot">Hot</option><option value="vip">VIP (Cần mã)</option></select></div>
                         <div class="form-group full-width"><label>Mô tả</label><textarea id="course-desc"></textarea></div>
                         <div class="form-group"><label>File HTML (App con)</label><input type="text" id="course-file" placeholder="games/vocab-en.html"></div>
                         <div class="form-group"><label>Yêu cầu VIP?</label><select id="course-vip"><option value="false">Không</option><option value="true">Có</option></select></div>
-                        <div class="form-group full-width"><button class="btn-submit" onclick="addCourse()">➕ Thêm Khóa Học</button></div>
+                        <div class="form-group full-width">
+                            <button id="btn-save-course" class="btn-submit" onclick="saveCourse()">➕ Thêm Khóa Học</button>
+                            <button id="btn-cancel-edit" class="btn-submit" onclick="resetCourseForm()" style="background:#666;margin-top:5px;display:none;">Hủy Chỉnh Sửa</button>
+                        </div>
                     </div>
-                    <div class="table-container"><table><thead><tr><th>#</th><th>Tên</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody id="courses-table-body"></tbody></table></div>
+                    <div class="table-container"><table><thead><tr><th>#</th><th>ID</th><th>Tên</th><th>Trạng thái / VIP</th><th>Thao tác</th></tr></thead><tbody id="courses-table-body"></tbody></table></div>
                 </div>
 
                 <div id="admin-vip-keys" class="admin-panel" style="display:none;">
@@ -476,7 +487,7 @@
                 <div class="admin-panel"><div id="student-list-container"></div></div>
             </div>
 
-            <!-- ADMIN SUPPORT (HIỆN TẤT CẢ HỌC VIÊN ĐỂ NHẮN TIN / PHÁT THÔNG BÁO) -->
+            <!-- ADMIN SUPPORT (CHAT) -->
             <div id="page-admin-support" class="page">
                 <div class="hero" style="background:linear-gradient(135deg,#E65100,#BF360C);">
                     <h1>📩 Hỗ Trợ & Phát Thông Báo Học Viên</h1>
@@ -599,7 +610,7 @@
         }
 
         // ======================================================================
-        // 💬 HỆ THỐNG CHAT CLOUD (FIX GỬI TIN NHẮN CỦA ADMIN & HỌC VIÊN)
+        // 💬 HỆ THỐNG CHAT CLOUD
         // ======================================================================
         async function sendStudentMessage() {
             if (!currentUser || currentUser === 'admin') return;
@@ -700,7 +711,6 @@
                 if (adminSelectedUser) {
                     document.getElementById('admin-chat-header').textContent = '💬 Đang chat & phát thông báo tới: ' + adminSelectedUser;
                     
-                    // Mở khóa khung nhập và nút gửi sử dụng ID chính xác
                     const inputArea = document.getElementById('admin-chat-input');
                     const sendBtn = document.getElementById('admin-send-btn');
                     if (inputArea) inputArea.disabled = false;
@@ -767,11 +777,11 @@
         }
 
         // ======================================================================
-        // CÁC HÀM QUẢN LÝ KHÁC
+        // 📚 QUẢN LÝ KHÓA HỌC & LOGIC VIP
         // ======================================================================
         let courses = getStorage('courses', [
-            { id: 'course-en', icon: '🇬🇧', name: 'Từ Vựng Tiếng Anh', description: 'Học từ vựng tiếng Anh cơ bản', file: 'games/vocab-en.html', vip: false, status: 'hot', isGlobal: false },
-            { id: 'course-zh', icon: '🇨🇳', name: 'Từ Vựng Tiếng Trung', description: 'Học từ vựng tiếng Trung thông dụng', file: 'games/vocab-zh.html', vip: false, status: 'new', isGlobal: false }
+            { id: 'course-en', icon: '🇬🇧', name: 'Từ Vựng Tiếng Anh', description: 'Học từ vựng tiếng Anh cơ bản', file: 'games/vocab-en.html', vip: false, status: 'hot' },
+            { id: 'course-zh', icon: '🇨🇳', name: 'Từ Vựng Tiếng Trung', description: 'Học từ vựng tiếng Trung thông dụng', file: 'games/vocab-zh.html', vip: false, status: 'new' }
         ]);
         let documents = getStorage('documents', []);
         let categories = getStorage('categories', [{ id: 'file-mau', name: 'File mẫu', isDefault: true }]);
@@ -786,6 +796,7 @@
             if (id === 'support') loadStudentChat();
             if (id === 'admin-support') loadAdminChat();
             if (id === 'students') renderStudents();
+            if (id === 'admin') renderCourses();
         }
 
         function switchAdminTab(tab) {
@@ -798,16 +809,58 @@
             if (tab === 'vip-keys') { renderVipKeys(); renderCourseCheckboxes('vip-course-checkboxes', []); }
         }
 
+        // RENDER KHÓA HỌC CHO HỌC VIÊN (CHỈ KHÓA HỌC NÀO LÀ VIP MỚI CẦN MÃ MỞ KHÓA)
         function renderGames() {
             const container = document.getElementById('game-grid-container');
             if (!container) return;
             container.innerHTML = '';
+            
+            const userData = getUser(currentUser) || {};
+            const unlockedCourses = userData.unlockedCourses || [];
+
             courses.forEach(c => {
+                const isVipCourse = c.vip === true || c.status === 'vip';
+                const isUnlocked = !isVipCourse || unlockedCourses.includes(c.id);
+
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.innerHTML = `<h3>${c.icon} ${c.name}</h3><p>${c.description}</p><button class="btn-submit small" onclick="openGame('${c.id}')">Vào học</button>`;
+                card.innerHTML = `
+                    <h3>${c.icon} ${c.name}</h3>
+                    <p>${c.description || 'Không có mô tả'}</p>
+                    ${isUnlocked 
+                        ? `<button class="btn-submit small" onclick="openGame('${c.id}')">Vào học</button>`
+                        : `<button class="btn-submit small" style="background:#555;" onclick="promptUnlockVip('${c.id}')">🔒 Nhập Mã VIP Để Mở</button>`
+                    }
+                `;
                 container.appendChild(card);
             });
+        }
+
+        function promptUnlockVip(courseId) {
+            const key = prompt("Khóa học này yêu cầu mã VIP. Vui lòng nhập mã kích hoạt:");
+            if (!key) return;
+            
+            let foundKey = vipKeys.find(k => k.key === key);
+            if (!foundKey) {
+                showToast("❌ Mã VIP không tồn tại!", "error");
+                return;
+            }
+
+            if (foundKey.courseIds && !foundKey.courseIds.includes(courseId)) {
+                showToast("❌ Mã VIP này không dùng cho khóa học này!", "error");
+                return;
+            }
+
+            let userData = getUser(currentUser) || { unlockedCourses: [] };
+            if (!userData.unlockedCourses) userData.unlockedCourses = [];
+            
+            if (!userData.unlockedCourses.includes(courseId)) {
+                userData.unlockedCourses.push(courseId);
+                saveUserCloud(currentUser, userData);
+            }
+
+            showToast("✅ Mở khóa khóa học thành công!", "success");
+            renderGames();
         }
 
         function openGame(courseId) {
@@ -823,21 +876,37 @@
             document.getElementById('game-iframe').src = 'about:blank';
         }
 
-        async function addCourse() {
+        // 🛠️ THÊM HOẶC CHỈNH SỬA KHÓA HỌC
+        async function saveCourse() {
+            const hiddenId = document.getElementById('edit-course-id-hidden').value;
             const id = document.getElementById('course-id').value.trim();
             const icon = document.getElementById('course-icon').value.trim() || '📚';
             const name = document.getElementById('course-name').value.trim();
             const desc = document.getElementById('course-desc').value.trim();
             const file = document.getElementById('course-file').value.trim();
-            const vip = document.getElementById('course-vip').value === 'true';
             const status = document.getElementById('course-status').value;
+            const vip = (status === 'vip' || document.getElementById('course-vip').value === 'true');
 
             if (!id || !name || !file) { showToast('Nhập thiếu thông tin khóa học!', 'error'); return; }
-            const newC = { id, icon, name, description: desc, file, vip, status, isGlobal: false };
-            courses.push(newC);
+
+            if (hiddenId) {
+                // Chế độ chỉnh sửa
+                courses = courses.map(c => c.id === hiddenId ? { ...c, id, icon, name, description: desc, file, status, vip } : c);
+                showToast('✅ Đã cập nhật thông tin khóa học!');
+            } else {
+                // Chế độ thêm mới
+                if (courses.some(c => c.id === id)) { showToast('❌ ID khóa học đã tồn tại!', 'error'); return; }
+                const newC = { id, icon, name, description: desc, file, status, vip };
+                courses.push(newC);
+                showToast('✅ Đã thêm khóa học mới!');
+            }
+
             setStorage('courses', courses);
-            if (window.fs && window.db) await window.fs.setDoc(window.fs.doc(window.db, "courses", id), newC);
-            showToast('Đã thêm khóa học!');
+            if (window.fs && window.db) {
+                await window.fs.setDoc(window.fs.doc(window.db, "courses", id), courses.find(c => c.id === id));
+            }
+
+            resetCourseForm();
             renderCourses();
             renderGames();
         }
@@ -847,25 +916,74 @@
             if (!tbody) return;
             tbody.innerHTML = '';
             courses.forEach((c, i) => {
-                tbody.innerHTML += `<tr><td>${i+1}</td><td>${c.name}</td><td>${c.status || 'Thường'}</td><td><button class="btn-action btn-delete" onclick="deleteCourse('${c.id}')">Xóa</button></td></tr>`;
+                const isVip = c.vip || c.status === 'vip';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${i+1}</td>
+                        <td><code>${c.id}</code></td>
+                        <td><strong>${c.icon} ${c.name}</strong></td>
+                        <td><span class="status-badge ${isVip ? 'vip' : 'free'}">${isVip ? '⭐ VIP' : 'Free'}</span></td>
+                        <td>
+                            <button class="btn-action btn-edit" onclick="editCourse('${c.id}')">✏️ Sửa</button>
+                            <button class="btn-action btn-delete" onclick="deleteCourse('${c.id}')">🗑️ Xóa</button>
+                        </td>
+                    </tr>
+                `;
             });
         }
 
+        function editCourse(id) {
+            const c = courses.find(item => item.id === id);
+            if (!c) return;
+            document.getElementById('edit-course-id-hidden').value = c.id;
+            document.getElementById('course-id').value = c.id;
+            document.getElementById('course-icon').value = c.icon || '📚';
+            document.getElementById('course-name').value = c.name;
+            document.getElementById('course-desc').value = c.description || '';
+            document.getElementById('course-file').value = c.file || '';
+            document.getElementById('course-status').value = c.status || (c.vip ? 'vip' : '');
+            document.getElementById('course-vip').value = c.vip ? 'true' : 'false';
+
+            document.getElementById('btn-save-course').textContent = '💾 Lưu Thay Đổi';
+            document.getElementById('btn-cancel-edit').style.display = 'inline-block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetCourseForm() {
+            document.getElementById('edit-course-id-hidden').value = '';
+            document.getElementById('course-id').value = '';
+            document.getElementById('course-icon').value = '📚';
+            document.getElementById('course-name').value = '';
+            document.getElementById('course-desc').value = '';
+            document.getElementById('course-file').value = '';
+            document.getElementById('course-status').value = '';
+            document.getElementById('course-vip').value = 'false';
+
+            document.getElementById('btn-save-course').textContent = '➕ Thêm Khóa Học';
+            document.getElementById('btn-cancel-edit').style.display = 'none';
+        }
+
         function deleteCourse(id) {
+            if (!confirm("Bạn có chắc chắn muốn xóa khóa học này?")) return;
             courses = courses.filter(c => c.id !== id);
             setStorage('courses', courses);
             renderCourses();
             renderGames();
+            showToast("🗑️ Đã xóa khóa học!", "info");
         }
 
         async function createVipKey() {
             const key = document.getElementById('vip-key-input').value.trim();
-            if (!key) return;
-            const newK = { key, courseIds: ['course-en'], duration: 30, maxUses: 1, usedCount: 0 };
+            if (!key) { showToast('Vui lòng nhập mã VIP!', 'warning'); return; }
+            
+            const checkboxes = document.querySelectorAll('#vip-course-checkboxes input[type="checkbox"]:checked');
+            let selectedCourses = Array.from(checkboxes).map(cb => cb.value);
+
+            const newK = { key, courseIds: selectedCourses, duration: 30, maxUses: 1, usedCount: 0 };
             vipKeys.push(newK);
             setStorage('vip_keys', vipKeys);
             if (window.fs && window.db) await window.fs.setDoc(window.fs.doc(window.db, "vip_keys", key), newK);
-            showToast('Đã tạo mã VIP!');
+            showToast('✅ Đã tạo mã VIP thành công!');
             renderVipKeys();
         }
 
@@ -874,7 +992,7 @@
             if (!tbody) return;
             tbody.innerHTML = '';
             vipKeys.forEach(k => {
-                tbody.innerHTML += `<tr><td><strong>${k.key}</strong></td><td>${k.courseIds.join(', ')}</td><td>${k.usedCount}/${k.maxUses}</td><td>-</td></tr>`;
+                tbody.innerHTML += `<tr><td><strong>${k.key}</strong></td><td>${(k.courseIds || []).join(', ')}</td><td>${k.usedCount}/${k.maxUses}</td><td>-</td></tr>`;
             });
         }
 
@@ -883,7 +1001,7 @@
             if (!el) return;
             el.innerHTML = '';
             courses.forEach(c => {
-                el.innerHTML += `<label><input type="checkbox" value="${c.id}" ${sel.includes(c.id)?'checked':''}> ${c.name}</label>`;
+                el.innerHTML += `<label><input type="checkbox" value="${c.id}" ${sel.includes(c.id)?'checked':''}> ${c.icon} ${c.name}</label>`;
             });
         }
 
@@ -933,7 +1051,7 @@
                     if (cloudC.length > 0) { courses = cloudC; setStorage('courses', courses); }
                 } catch(e){}
             }
-            console.log("✅ HỌC VIỆN ĐỎ PRO - Ổn định toàn bộ logic cũ!");
+            console.log("✅ HỌC VIỆN ĐỎ PRO - Sẵn sàng!");
         };
     </script>
 </body>

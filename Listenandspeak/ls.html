@@ -6,16 +6,18 @@
   <title>Luyện Nói Tiếng Trung Qua Video Ngắn</title>
   
   <!-- ================================================================ -->
-  <!-- 👇 BẮT BUỘC: BỎ COMMENT 3 DÒNG DƯỚI ĐÂY NẾU BẠN CHẠY FILE ĐỘC LẬP 👇 -->
+  <!-- 👇 ĐÃ CHÈN 3 DÒNG FIREBASE SDK BẮT BUỘC (ĐÃ BỎ COMMENT) 👇 -->
   <!-- ================================================================ -->
-  
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <!-- ================================================================ -->
 
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/pinyin-pro.min.js">
   </script>
   <style>
-    /* ===== RESET & BASE ===== */
+    /* CSS giữ nguyên không đổi */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #090d16; color: #f8fafc; min-height: 100vh; padding: 20px; background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.08) 0%, transparent 50%); background-attachment: fixed; }
     :root {
@@ -34,7 +36,7 @@
     .theme-switch-btn { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
     .theme-switch-btn:hover { border-color: var(--primary); transform: rotate(15deg); }
     
-    /* User/Admin Status Display - Lấy từ Firebase */
+    /* User/Admin Status Display */
     .user-status-display { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-secondary); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
     .user-status-display.admin { color: var(--danger); border-color: var(--danger); background: rgba(244, 63, 94, 0.1); }
 
@@ -440,7 +442,7 @@
   <!-- ========================================================== -->
   <script>
     // ================================================================
-    // 👇 BẮT BUỘC: ĐIỀN FIREBASE CONFIG CỦA DỰ ÁN CỦA BẠN VÀO ĐÂY 👇
+    // 👇 CONFIG FIREBASE CỦA BẠN (Đã điền đúng) 👇
     // ================================================================
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyDHnUhPNokBrXgYLNqlW0kB9tJm3U0Un0I",
@@ -484,13 +486,12 @@
     // =====================================================================
     let firebaseInstance = null;
     
-    // Kiểm tra xem SDK đã có sẵn chưa
+    // Kiểm tra xem SDK đã có sẵn chưa (Sau khi thêm 3 dòng Script ở trên, cái này sẽ chạy thành công)
     if (typeof window.firebase !== 'undefined') {
         firebaseInstance = window.firebase;
-        addLog("✅ Đã phát hiện Firebase SDK từ trang web chính.", 'success');
+        addLog("✅ Đã phát hiện Firebase SDK từ CDN.", 'success');
     } else {
-        addLog("❌ Lỗi: Không tìm thấy thư viện Firebase.", 'error');
-        addLog("💡 Hướng dẫn: Bạn cần bỏ comment 3 dòng import SDK ở đầu file HTML và điền đúng Config.", 'warning');
+        addLog("❌ Lỗi: Không tìm thấy thư viện Firebase. Kiểm tra lại 3 dòng import ở đầu file.", 'error');
     }
 
     // Nếu đã tìm thấy SDK, khởi tạo App nếu chưa có
@@ -509,7 +510,7 @@
     }
 
     // =====================================================================
-    // 2.  INDEXED DB HELPERS 
+    // 2.  INDEXED DB HELPERS (Giữ nguyên)
     // =====================================================================
     const DB_NAME = "ChineseShadowingDB_v8";
     const DB_VERSION = 8; 
@@ -855,7 +856,7 @@
             initializeAppWithFirebase();
         } else {
             userStatusDisplay.innerHTML = "❌ Lỗi kết nối DB";
-            addLog("❌ Không thể liên kết Firebase. Vui lòng bỏ comment 3 dòng SDK ở đầu file và điền Config.", 'error');
+            addLog("❌ Không thể liên kết Firebase. Kiểm tra lại 3 dòng Script và Config.", 'error');
         }
     }
 

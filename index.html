@@ -704,6 +704,11 @@ async function approveDocument(id) {
             document.getElementById('auth-area').style.display = 'none';
             document.getElementById('member-area').style.display = 'block';
 
+            // 👇 THÊM 2 DÒNG NÀY ĐỂ LƯU USER VÀO LOCALSTORAGE 👇
+            localStorage.setItem('app_current_user', currentUser);
+            localStorage.setItem('app_user_is_admin', currentUser === 'admin' ? 'true' : 'false');
+            // 👆 HẾT PHẦN THÊM 👆
+
             if (currentUser === 'admin') {
                 document.getElementById('nav-admin').style.display = 'inline-block';
                 document.getElementById('nav-admin-support').style.display = 'inline-block';
@@ -772,57 +777,14 @@ async function approveDocument(id) {
             document.getElementById('reg-pass-confirm').value = '';
             toggleAuth(true);
         }
-        async function register() {
-            const u = document.getElementById('reg-user').value.trim();
-            const p = document.getElementById('reg-pass').value.trim();
-            const pConfirm = document.getElementById('reg-pass-confirm').value.trim();
-            const errBox = document.getElementById('register-error');
 
-            if (errBox) { errBox.style.display = 'none'; errBox.textContent = ''; }
-
-            if (!u || !p || !pConfirm) {
-                if (errBox) { errBox.textContent = '❌ Vui lòng điền đầy đủ thông tin!'; errBox.style.display = 'block'; }
-                showToast('Vui lòng điền đầy đủ thông tin!', 'warning');
-                return;
-            }
-
-            if (p !== pConfirm) {
-                if (errBox) { errBox.textContent = '❌ Mật khẩu xác nhận không khớp!'; errBox.style.display = 'block'; }
-                showToast('Mật khẩu xác nhận không khớp!', 'error');
-                return;
-            }
-
-            let users = getUsers();
-            if (users[u] || u === 'admin') {
-                if (errBox) { errBox.textContent = '❌ Tên tài khoản này đã tồn tại!'; errBox.style.display = 'block'; }
-                showToast('Tên tài khoản đã tồn tại!', 'error');
-                return;
-            }
-
-            const newUserObj = {
-                username: u,
-                password: p,
-                isAdmin: false,
-                unlockedCourses: [],
-                createdAt: new Date().toISOString()
-            };
-
-            users[u] = newUserObj;
-            setStorage('study_users', users);
-
-            try {
-                if (window.fs && window.db) {
-                    await window.fs.setDoc(window.fs.doc(window.db, "users", u), newUserObj);
-                }
-            } catch(e) {}
-
-            showToast('🎉 Đăng ký thành công! Hãy đăng nhập.', 'success');
-            document.getElementById('reg-user').value = '';
-            document.getElementById('reg-pass').value = '';
-            document.getElementById('reg-pass-confirm').value = '';
-            toggleAuth(true);
+        function logout() { 
+            // 👇 THÊM DÒNG NÀY ĐỂ XÓA DỮ LIỆU LOCALSTORAGE KHI ĐĂNG XUẤT 👇
+            localStorage.removeItem('app_current_user');
+            localStorage.removeItem('app_user_is_admin');
+            // 👆 HẾT PHẦN THÊM 👆
+            location.reload(); 
         }
-        function logout() { location.reload(); }
         function toggleAuth(show) {
             document.getElementById('login-box').style.display = show ? 'block' : 'none';
             document.getElementById('register-box').style.display = show ? 'none' : 'block';

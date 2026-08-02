@@ -17,7 +17,7 @@
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/pinyin-pro.min.js">
   </script>
   <style>
-    /* CSS giữ nguyên hoàn toàn */
+    /* ===== RESET & BASE ===== */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #090d16; color: #f8fafc; min-height: 100vh; padding: 20px; background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.08) 0%, transparent 50%); background-attachment: fixed; }
     :root {
@@ -30,6 +30,7 @@
     }
     .app-container { max-width: 1400px; margin: 0 auto; display: block; }
 
+    /* ===== TOP BAR ===== */
     .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--bg-card); border: 1px solid var(--border); backdrop-filter: var(--glass-blur); padding: 12px 20px; border-radius: var(--radius-md); box-shadow: 0 4px 20px var(--shadow); flex-wrap: wrap; gap: 10px; }
     .top-bar-left, .top-bar-right { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
     .theme-switch-btn { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
@@ -38,24 +39,29 @@
     .user-status-display { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-secondary); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
     .user-status-display.admin { color: var(--danger); border-color: var(--danger); background: rgba(244, 63, 94, 0.1); }
 
+    /* ===== HEADER ===== */
     header { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 24px; gap: 8px; }
     header h1 { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     header p { color: var(--text-secondary); font-size: 0.95rem; font-weight: 500; }
 
+    /* ===== MAIN LAYOUT ===== */
     .main-layout { display: grid; grid-template-columns: 0px 2.2fr 0.8fr; gap: 24px; align-items: start; transition: grid-template-columns 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
     @media (max-width: 1024px) { .main-layout { grid-template-columns: 1fr; } }
     .main-layout:not(.library-collapsed) { grid-template-columns: 300px 2.2fr 0.8fr; }
     .library-section { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); opacity: 1; visibility: visible; }
     .main-layout.library-collapsed .library-section { width: 0; min-width: 0; max-width: 0; padding: 0; margin: 0; border: none; box-shadow: none; opacity: 0; visibility: hidden; pointer-events: none; }
 
+    /* ===== CARDS ===== */
     .dashboard-card { background: var(--bg-card); border: 1px solid var(--border); backdrop-filter: var(--glass-blur); border-radius: var(--radius-lg); padding: 20px; box-shadow: 0 10px 30px var(--shadow); display: flex; flex-direction: column; gap: 16px; max-height: calc(100vh - 160px); overflow-y: auto; }
     .dashboard-card h2 { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 4px; }
 
+    /* ===== LIBRARY TABS ===== */
     .library-tabs { display: flex; gap: 4px; margin-bottom: 2px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
     .lib-tab { flex: 1; padding: 6px 0; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted); font-weight: 600; font-size: 0.75rem; cursor: pointer; transition: 0.2s; text-align: center; }
     .lib-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
     .lib-tab:hover:not(.active) { color: var(--text-secondary); }
 
+    /* ===== LIBRARY ===== */
     .library-list { display: flex; flex-direction: column; gap: 10px; max-height: 580px; overflow-y: auto; padding-right: 4px; padding-bottom: 60px; }
     .library-item { padding: 12px 14px; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-md); cursor: pointer; transition: 0.25s; display: flex; flex-direction: column; gap: 8px; position: relative; }
     .library-item.pending-item { border-left: 4px solid var(--warning); opacity: 0.7; }
@@ -77,6 +83,7 @@
     .action-btn.edit-btn { color: var(--primary); }
     .action-btn.edit-btn:hover { background: rgba(99, 102, 241, 0.2); }
 
+    /* ===== VIDEO SECTION ===== */
     .video-player-container { position: relative; width: 100%; border-radius: var(--radius-md); overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); border: 1px solid var(--border); background: #000; height: 65vh; min-height: 420px; max-height: 700px; }
     .video-player-container video { width: 100%; height: 100%; display: block; object-fit: contain; }
     .custom-video-controls { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.5) 70%, rgba(0, 0, 0, 0) 100%); display: flex; flex-wrap: wrap; align-items: center; padding: 10px 12px 6px 12px; gap: 8px; opacity: 0; transition: opacity 0.3s; z-index: 10; }
@@ -96,6 +103,7 @@
     .ctrl-btn-toggle { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
     .ctrl-btn-toggle.active { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 8px var(--primary); }
 
+    /* ===== WAVEFORM ===== */
     .visualizer-container { background: #0b0f19; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 6px 10px; min-height: 60px; display: flex; flex-direction: column; }
     .visualizer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
     .visualizer-status { font-size: 0.7rem; color: var(--text-secondary); font-weight: 600; }
@@ -103,6 +111,7 @@
     .waveform-scroll-wrapper:active { cursor: grabbing; }
     .waveform-scroll-wrapper canvas { display: block; width: 100%; height: 40px; min-width: 1000px; }
 
+    /* ===== GLOBAL CONTROLS ===== */
     .global-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 4px; }
     .recording-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .dubbing-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -114,6 +123,7 @@
     .btn-stop-dubbing { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary); padding: 4px 10px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: 0.2s; }
     .btn-stop-dubbing:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
 
+    /* === LOG FLOATING === */
     #floatingLog { position: fixed; bottom: 20px; right: 20px; width: 420px; max-height: 320px; background: rgba(0, 0, 0, 0.88); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px; font-family: monospace; font-size: 0.75rem; color: #0f0; z-index: 9999; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); display: block; flex-direction: column; }
     #floatingLog .log-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 4px; margin-bottom: 6px; flex-shrink: 0; }
     #floatingLog .log-header span { font-size: 0.8rem; color: #aaa; font-weight: 600; }
@@ -129,6 +139,7 @@
     #floatingLog.collapsed .log-body { display: none; }
     #floatingLog.collapsed { max-height: 40px; overflow: hidden; }
 
+    /* ===== BUTTONS ===== */
     .btn { padding: 8px 14px; border: 1px solid transparent; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
     .btn:active { transform: scale(0.97); }
     .btn-primary { background: var(--primary); color: #fff; }
@@ -147,6 +158,7 @@
     .recording-active { animation: pulse-record 1.5s infinite; background: var(--danger-hover) !important; }
     @keyframes pulse-record { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); } 70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); } }
 
+    /* ===== PRACTICE ===== */
     .sentence-list-wrapper { position: relative; overflow: hidden; border-radius: var(--radius-md); flex: 1; }
     .focus-window-overlay { position: absolute; top: 35%; left: -2px; right: -2px; height: 120px; transform: translateY(-50%); pointer-events: none; z-index: 10; border-left: 4px solid rgba(99, 102, 241, 0.15); border-right: 4px solid rgba(99, 102, 241, 0.15); }
     .sentence-list-wrapper.has-active .focus-window-overlay { border-left-color: var(--primary); border-right-color: var(--primary); box-shadow: -5px 0 15px var(--primary-glow), 5px 0 15px var(--primary-glow); }
@@ -163,6 +175,7 @@
     .controls-group { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; width: 100%; }
     .controls-group .btn { width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; border-radius: 6px; }
 
+    /* ===== MODAL ===== */
     .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(2, 6, 23, 0.7); backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s; }
     .modal.show { display: block; opacity: 1; }
     .modal-content { background: var(--bg-card); border: 1px solid var(--border); margin: 40px auto; padding: 24px; border-radius: var(--radius-lg); width: 90%; max-width: 700px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); animation: modal-slide 0.3s ease; }
@@ -187,15 +200,18 @@
     .inline-error.visible { display: block; }
     .import-export-buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
 
+    /* Video preview trong modal */
     .modal-video-preview { background: #000; border-radius: var(--radius-md); overflow: hidden; aspect-ratio: 16/9; max-height: 180px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); position: relative; margin-bottom: 12px; }
     .modal-video-preview video { width: 100%; height: 100%; object-fit: contain; }
     .modal-video-preview .placeholder { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary); text-align: center; padding: 20px; gap: 8px; }
     .modal-video-preview .placeholder span:first-child { font-size: 1.8rem; }
     .modal-video-preview .placeholder span:last-child { font-size: 0.9rem; }
 
+    /* ===== COMPACT MODE ===== */
     .sentence-list.compact-mode .sub-pinyin, .sentence-list.compact-mode .sub-vietnamese { display: none !important; }
     .sentence-list.hide-controls .controls-group { display: none !important; }
 
+    /* ===== LISTENING ===== */
     .listening-input-wrapper { position: relative; display: flex; align-items: center; gap: 8px; margin-top: 6px; width: 100%; }
     .listening-input { flex: 1; padding: 8px 12px; font-size: 0.9rem; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg-card); color: var(--text-primary); outline: none; transition: 0.25s; }
     .listening-input:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
@@ -203,6 +219,7 @@
     .listening-input.incorrect { border-color: var(--danger) !important; background: rgba(244, 63, 94, 0.08) !important; }
     .listening-feedback-icon { font-size: 1.1rem; display: inline-flex; align-items: center; min-width: 24px; }
 
+    /* ===== VOCAB POPUPS ===== */
     .vocab-popup { display: none; position: absolute; z-index: 10000; pointer-events: auto; flex-direction: column; align-items: stretch; padding: 12px 16px; min-width: 250px; gap: 6px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); backdrop-filter: var(--glass-blur); }
     #vocabInfoPopup { display: none; position: fixed; z-index: 10001; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 18px; min-width: 200px; max-width: 300px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); backdrop-filter: var(--glass-blur); flex-direction: column; gap: 6px; }
     .vocab-highlight-word { display: inline-block; background: rgba(245, 158, 11, 0.25); border-radius: 4px; padding: 0 4px; border-bottom: 2px solid #f59e0b; cursor: pointer; transition: 0.2s; font-weight: 600; }
@@ -213,6 +230,7 @@
     .context-cell { cursor: pointer; color: var(--primary); text-decoration: underline dotted; }
     .context-cell.no-context { color: var(--text-muted); text-decoration: none; cursor: default; }
 
+    /* ===== SCROLLBAR ===== */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -223,7 +241,7 @@
   </style>
 </head>
 <body>
-  <!-- FLOATING LOG -->
+  <!-- ===== FLOATING LOG ===== -->
   <div id="floatingLog" style="display:block;">
     <div class="log-header">
       <span>📋 Log</span>
@@ -232,11 +250,12 @@
     <div class="log-body" id="logBody"></div>
   </div>
 
-  <!-- APP CONTAINER -->
+  <!-- ===== APP CONTAINER ===== -->
   <div class="app-container">
     <div class="top-bar">
       <div class="top-bar-left">
         <span style="font-size:1.5rem;">🇨🇳</span>
+        <!-- User/Admin Status Display -->
         <div class="user-status-display" id="userStatusDisplay">👤 Đang tải User...</div>
         <button id="btnToggleLibrary" class="btn btn-secondary" style="padding:6px 12px; font-size:0.85rem;">📚 Hiện Thư Viện</button>
         <button id="btnOpenVocabHub" class="btn btn-secondary" style="padding:6px 12px; font-size:0.85rem;">📓 Sổ Từ Vựng</button>
@@ -254,11 +273,13 @@
       </div>
     </div>
 
+    <!-- HEADER -->
     <header>
       <div class="header-title-wrap"><h1>Short Video Shadowing</h1></div>
       <p id="headerSubtitle">Hệ thống luyện nói & lồng tiếng tiếng Trung trên nền tảng Video ngắn</p>
     </header>
 
+    <!-- MAIN LAYOUT -->
     <main class="main-layout library-collapsed" id="mainLayout">
       <aside class="library-section dashboard-card">
         <div class="library-tabs">
@@ -337,7 +358,7 @@
     </main>
   </div>
 
-  <!-- MODALS -->
+  <!-- ===== MODALS ===== -->
   <div id="uploadModal" class="modal">
     <div class="modal-content">
       <span class="close-modal">&times;</span>
@@ -376,7 +397,6 @@
     </div>
   </div>
 
-  <!-- VOCAB POPUPS -->
   <div id="vocabFloatingPopup" class="vocab-popup" style="display:none; position:absolute; z-index:10000; pointer-events:auto; flex-direction:column; align-items:stretch; padding:12px 16px; min-width:250px; gap:6px;">
     <div style="display:flex; align-items:center; gap:8px;"><span style="font-weight:700; font-size:0.95rem; min-width:60px;">Từ:</span><span id="vocabWordDisplay" style="font-weight:700; color:var(--primary); font-size:1.1rem; font-family:'Noto Sans SC',sans-serif;"></span></div>
     <div style="display:flex; align-items:center; gap:8px;"><label style="font-size:0.8rem; font-weight:600; min-width:60px;">Pinyin:</label><input type="text" id="vocabPinyinInput" placeholder="Tự động" style="flex:1; background:var(--bg-input); border:1px solid var(--border); border-radius:4px; padding:4px 8px; color:var(--text-primary); font-size:0.85rem;" /></div>
@@ -416,7 +436,27 @@
     </div>
   </div>
 
+  <!-- ========================================================== -->
+  <!-- ===== JAVASCRIPT (Tối ưu hóa & Sửa lỗi DOM) ===== -->
+  <!-- ========================================================== -->
   <script>
+    // =====================================================================
+    // 0. KHAI BÁO DOM REFS (BẮT BUỘC ĐỂ TRÁNH LỖI NULL)
+    // =====================================================================
+    const video = document.getElementById('mainVideo');
+    const sentenceListContainer = document.getElementById('sentenceList');
+    const videoLibraryList = document.getElementById('videoLibraryList');
+    const pendingTab = document.getElementById('pendingTab');
+    const userStatusDisplay = document.getElementById('userStatusDisplay');
+    const mainLayout = document.getElementById('mainLayout');
+    const currentVideoTitle = document.getElementById('currentVideoTitle');
+    const uploadModal = document.getElementById('uploadModal');
+    const uploadForm = document.getElementById('uploadForm');
+    const formError = document.getElementById('formError');
+    const subtitleInputsContainer = document.getElementById('subtitleInputsContainer');
+    const btnSubmitForm = document.getElementById('btnSubmitForm');
+    const btnToggleDisplayMode = document.getElementById('btnToggleDisplayMode');
+
     // =====================================================================
     // 1. FIREBASE CONFIG & BOOTSTRAP
     // =====================================================================
@@ -429,6 +469,9 @@
       appId: "1:410660952284:web:ee5b5a98d12bef3d45bc19"
     };
 
+    // =====================================================================
+    // 2. LOG HELPER
+    // =====================================================================
     const logContainer = document.getElementById('floatingLog');
     const logBody = document.getElementById('logBody');
     const logToggleBtn = document.getElementById('logToggleBtn');
@@ -453,6 +496,9 @@
       this.textContent = logCollapsed ? '➕' : '➖';
     });
 
+    // =====================================================================
+    // 3. FIREBASE BOOTSTRAP
+    // =====================================================================
     let firebaseInstance = null;
     if (typeof window.firebase !== 'undefined') {
         firebaseInstance = window.firebase;
@@ -475,7 +521,7 @@
     }
 
     // =====================================================================
-    // 2. INDEXED DB HELPERS
+    // 4. INDEXED DB HELPERS
     // =====================================================================
     const DB_NAME = "ChineseShadowingDB_v8";
     const DB_VERSION = 8; 
@@ -538,7 +584,7 @@
     function deleteVocab(id) { return executeTransaction(VOCAB_STORE_NAME, "readwrite", store => new Promise((resolve, reject) => { const req = store.delete(id); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); })); }
 
     function getFavorites(userId) { return executeTransaction(LIBRARY_STORE_NAME, "readonly", store => { const idx = store.index('by_user'); return new Promise((resolve, reject) => { const req = idx.getAll(userId); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); }); }); }
-
+    
     async function toggleFavorite(userId, videoId) {
       const existingFavs = await getFavorites(userId);
       const favEntry = existingFavs.find(f => f.videoId === videoId);
@@ -568,7 +614,7 @@
     }
 
     // =====================================================================
-    // 3. APP STATE
+    // 5. APP STATE
     // =====================================================================
     let currentVideoData = null;
     let CURRENT_USER_ID = null;
@@ -576,14 +622,9 @@
     let currentLibraryTab = 'public';
     let vocabWords = [];
     
-    const video = document.getElementById('mainVideo');
-    const sentenceListContainer = document.getElementById('sentenceList');
-    const videoLibraryList = document.getElementById('videoLibraryList');
-    const pendingTab = document.getElementById('pendingTab');
-    const userStatusDisplay = document.getElementById('userStatusDisplay');
-    const mainLayout = document.getElementById('mainLayout');
-
-    // RENDER LIBRARY
+    // =====================================================================
+    // 6. RENDER PUBLIC / MY LIBRARY
+    // =====================================================================
     async function renderLibraryList() {
         if (!videoLibraryList) return;
         videoLibraryList.innerHTML = '';
@@ -674,9 +715,8 @@
                             await deleteVideo(vid);
                             if (currentVideoData && currentVideoData.id === vid) {
                                 currentVideoData = null;
-                                document.getElementById('currentVideoTitle').innerText = "Chọn một video để học";
-                                video.pause();
-                                video.src = "";
+                                if (currentVideoTitle) currentVideoTitle.innerText = "Chọn một video để học";
+                                if (video) { video.pause(); video.src = ""; }
                             }
                             renderLibraryList();
                             addLog(`🗑️ Đã xóa video ID ${vid}`, 'info');
@@ -733,11 +773,11 @@
     }
 
     // =====================================================================
-    // [QUAN TRỌNG] FIRBASE AUTH CHECK - Đã sửa đúng Key LocalStorage
+    // 7. FIRBASE AUTH CHECK (Lấy dữ liệu từ localStorage)
     // =====================================================================
     async function initializeAppWithFirebase() {
         if (!firebaseInstance || !firebaseInstance.auth) {
-            userStatusDisplay.innerHTML = "❌ Lỗi Firebase";
+            if (userStatusDisplay) userStatusDisplay.innerHTML = "❌ Lỗi Firebase";
             return;
         }
 
@@ -745,7 +785,6 @@
             let currentUid = null;
             let currentRole = 'user';
 
-            // 1. Nếu trực tiếp lấy được user từ Firebase (đã đăng nhập ở tab này)
             if (user) {
                 currentUid = user.uid;
                 localStorage.setItem('app_current_user', currentUid);
@@ -755,22 +794,19 @@
                     if (doc.exists && doc.data().role === 'admin') {
                         currentRole = 'admin';
                     }
-                    localStorage.setItem('app_user_is_admin', currentRole);
+                    localStorage.setItem('app_user_is_admin', currentRole === 'admin' ? 'true' : 'false');
                 } catch (e) { /* Bỏ qua lỗi đọc role */ }
             } 
-            // 2. Nếu Firebase trả về null (chưa đăng nhập ở tab này), check LocalStorage từ trang chính
-            // 👇 ĐÃ SỬA TÊN KEY Ở ĐÂY: app_current_user VÀ app_user_is_admin (Thay vì shared_uid)
             else if (localStorage.getItem('app_current_user')) {
                 currentUid = localStorage.getItem('app_current_user');
                 currentRole = localStorage.getItem('app_user_is_admin') === 'true' ? 'admin' : 'user';
-                addLog(`🔄 Phát hiện đăng nhập từ LocalStorage (Chuyển trang từ Index). UID: ${currentUid}`, 'info');
+                addLog(`🔄 Phát hiện đăng nhập từ LocalStorage. UID: ${currentUid}`, 'info');
             }
-            // 3. Nếu không tìm thấy gì cả
             else {
-                userStatusDisplay.innerHTML = "⛔ Vui lòng đăng nhập ở trang chính";
-                document.getElementById('currentVideoTitle').innerText = "Vui lòng đăng nhập để học";
+                if (userStatusDisplay) userStatusDisplay.innerHTML = "⛔ Vui lòng đăng nhập ở trang chính";
+                if (currentVideoTitle) currentVideoTitle.innerText = "Vui lòng đăng nhập để học";
                 addLog("⛔ Chưa đăng nhập (Không có dữ liệu từ trang chính)", 'info');
-                return; // Dừng lại, không chạy app
+                return;
             }
 
             // === Cập nhật trạng thái App ===
@@ -778,17 +814,22 @@
             isAdminMode = (currentRole === 'admin');
 
             if (isAdminMode) {
-                userStatusDisplay.innerHTML = `👑 Admin (${currentUid.substring(0, 6)}...)`;
-                userStatusDisplay.classList.add('admin');
+                if (userStatusDisplay) {
+                    userStatusDisplay.innerHTML = `👑 Admin (${currentUid.substring(0, 6)}...)`;
+                    userStatusDisplay.classList.add('admin');
+                }
                 if (pendingTab) pendingTab.style.display = 'block';
             } else {
-                userStatusDisplay.innerHTML = `👤 User (${currentUid.substring(0, 6)}...)`;
-                userStatusDisplay.classList.remove('admin');
+                if (userStatusDisplay) {
+                    userStatusDisplay.innerHTML = `👤 User (${currentUid.substring(0, 6)}...)`;
+                    userStatusDisplay.classList.remove('admin');
+                }
                 if (pendingTab) pendingTab.style.display = 'none';
             }
 
-            // === Khởi chạy Engine ===
+            // === Khởi chạy tất cả Engine và Sự kiện ===
             startEngine();
+            setupEventListeners();
         });
     }
 
@@ -809,7 +850,162 @@
     }
 
     // =====================================================================
-    // 4.  CÁC HÀM HỖ TRỢ KHÁC
+    // 8. SETUP EVENT LISTENERS (GIÚP CÁC NÚT BẤM HOẠT ĐỘNG)
+    // =====================================================================
+    function setupEventListeners() {
+        // Mở Modal
+        document.getElementById('btnOpenUploadModal')?.addEventListener('click', () => {
+            if (uploadModal) uploadModal.classList.add('show');
+        });
+        document.querySelector('.close-modal')?.addEventListener('click', () => {
+            if (uploadModal) uploadModal.classList.remove('show');
+        });
+        window.addEventListener('click', (e) => {
+            if (e.target === uploadModal) {
+                if (uploadModal) uploadModal.classList.remove('show');
+            }
+        });
+
+        // Tab Thư viện
+        document.querySelectorAll('.lib-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.lib-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentLibraryTab = this.dataset.tab;
+                renderLibraryList();
+            });
+        });
+
+        // Button Toggle Library
+        document.getElementById('btnToggleLibrary')?.addEventListener('click', () => {
+            if (mainLayout) {
+                const collapsed = mainLayout.classList.toggle('library-collapsed');
+                const btn = document.getElementById('btnToggleLibrary');
+                if (btn) {
+                    btn.innerText = collapsed ? "📚 Hiện Thư Viện" : "📂 Ẩn Thư Viện";
+                    btn.classList.toggle('btn-primary', !collapsed);
+                    btn.classList.toggle('btn-secondary', collapsed);
+                }
+            }
+        });
+
+        // Chuyển đổi giao diện Dark/Light
+        document.getElementById('themeToggle')?.addEventListener('click', () => {
+            document.documentElement.classList.toggle('light');
+        });
+
+        // Xử lý gửi Form tạo video (Đã sửa lỗi DOM)
+        if (btnSubmitForm) {
+            btnSubmitForm.addEventListener('click', async (e) => {
+                e.preventDefault();
+                if (formError) { formError.classList.remove('visible'); formError.innerText = ''; }
+                const editId = document.getElementById("editVideoId").value.trim();
+                const title = document.getElementById("inputVideoTitle").value.trim();
+                const fileInput = document.getElementById("inputVideoFile");
+                const videoFile = fileInput ? fileInput.files[0] : null;
+                if (!title) {
+                    if (formError) { formError.innerText = "⚠️ Vui lòng nhập tên bài học / video!"; formError.classList.add('visible'); }
+                    return;
+                }
+                if (!editId && !videoFile) {
+                    if (formError) { formError.innerText = "⚠️ Vui lòng chọn một tệp video (MP4)!"; formError.classList.add('visible'); }
+                    return;
+                }
+                const rows = document.querySelectorAll(".subtitle-row");
+                if (rows.length === 0) {
+                    if (formError) { formError.innerText = "⚠️ Vui lòng thêm ít nhất một dòng phụ đề!"; formError.classList.add('visible'); }
+                    return;
+                }
+                const sentences = [];
+                let hasError = false;
+                rows.forEach((row, idx) => {
+                    if (hasError) return;
+                    const start = row.querySelector(".sub-start")?.value;
+                    const end = row.querySelector(".sub-end")?.value;
+                    const hanzi = row.querySelector(".sub-hanzi")?.value.trim();
+                    if (!start || !end || !hanzi) {
+                        if (formError) { formError.innerText = `⚠️ Dòng thoại số ${idx+1} chưa điền đầy đủ thông tin!`; formError.classList.add('visible'); }
+                        hasError = true; return;
+                    }
+                    const startNum = parseFloat(start); const endNum = parseFloat(end);
+                    if (isNaN(startNum) || isNaN(endNum)) {
+                        if (formError) { formError.innerText = `⚠️ Dòng thoại số ${idx+1} có thời gian không hợp lệ!`; formError.classList.add('visible'); }
+                        hasError = true; return;
+                    }
+                    if (startNum >= endNum) {
+                        if (formError) { formError.innerText = `⚠️ Dòng thoại số ${idx+1} có thời gian bắt đầu phải nhỏ hơn kết thúc!`; formError.classList.add('visible'); }
+                        hasError = true; return;
+                    }
+                    sentences.push({ id: idx + 1, startTime: startNum, endTime: endNum, hanzi: hanzi, pinyin: row.querySelector(".sub-pinyin")?.value.trim() || "", vietnamese: row.querySelector(".sub-viet")?.value.trim() || "" });
+                });
+                if (hasError) return;
+
+                try {
+                    let newId = null;
+                    let status = 'approved';
+                    let scope = 'public';
+                    let isPrivateClone = false;
+                    let uploadedBy = 'admin';
+
+                    if (!isAdminMode) {
+                        scope = 'private';
+                        uploadedBy = CURRENT_USER_ID;
+                        isPrivateClone = false;
+                    } else {
+                        scope = 'public';
+                        uploadedBy = 'admin';
+                        isPrivateClone = false;
+                    }
+
+                    if (editId) {
+                        const existing = await getVideo(parseInt(editId));
+                        if (!existing) throw new Error("Không tìm thấy video cần sửa.");
+                        existing.title = title;
+                        existing.sentences = sentences;
+                        if (videoFile) existing.videoBlob = videoFile;
+                        await updateVideo(existing);
+                        newId = parseInt(editId);
+                        addLog(`✅ Cập nhật video thành công ID: ${newId}`, 'success');
+                    } else {
+                        const newVideo = { title, videoBlob: videoFile, sentences, status, scope, uploadedBy, is_private_clone: isPrivateClone, created_at: Date.now() };
+                        newId = await addVideo(newVideo);
+                        if (!isAdminMode) {
+                            await executeTransaction(LIBRARY_STORE_NAME, "readwrite", store => {
+                                return new Promise((resolve, reject) => {
+                                    const req = store.add({ userId: CURRENT_USER_ID, videoId: newId, added_at: Date.now() });
+                                    req.onsuccess = resolve;
+                                    req.onerror = reject;
+                                });
+                            });
+                            addLog(`✅ User tải video cá nhân thành công! Video đã có trong Thư viện.`, 'success');
+                        } else {
+                            addLog(`✅ Admin tải video công khai thành công! Mọi người đều có thể xem.`, 'success');
+                        }
+                    }
+
+                    if (uploadForm) uploadForm.reset();
+                    if (subtitleInputsContainer) subtitleInputsContainer.innerHTML = "";
+                    if (formError) { formError.classList.remove('visible'); formError.innerText = ''; }
+                    if (uploadModal) uploadModal.classList.remove("show");
+
+                    renderLibraryList();
+                    if (newId) {
+                        const newVideo = await getVideo(newId);
+                        if (newVideo) {
+                            addLog(`🔄 Tự động mở video vừa thêm!`, 'info');
+                            selectVideo(newVideo);
+                        }
+                    }
+                } catch (err) {
+                    addLog("❌ Lỗi khi lưu video: " + err.message, 'error');
+                    if (formError) { formError.innerText = "Lỗi khi lưu video: " + err.message; formError.classList.add('visible'); }
+                }
+            });
+        }
+    }
+
+    // =====================================================================
+    // 9.  CÁC HÀM HỖ TRỢ KHÁC
     // =====================================================================
     function sanitizeHTML(str) { if (!str) return ''; const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return str.replace(/[&<>"']/g, m => map[m]); }
     
@@ -822,143 +1018,38 @@
             document.getElementById("inputVideoTitle").value = item.title;
             const modalVideo = document.getElementById("modalPreviewVideo");
             if (modalVideo && item.videoBlob) modalVideo.src = URL.createObjectURL(item.videoBlob);
-            const container = document.getElementById("subtitleInputsContainer");
-            if (container) {
-                container.innerHTML = "";
+            if (subtitleInputsContainer) {
+                subtitleInputsContainer.innerHTML = "";
                 for (const s of item.sentences) addSubtitleRow(s);
             }
-            document.getElementById('uploadModal').classList.add("show");
+            if (uploadModal) uploadModal.classList.add("show");
         });
     }
     
-    function addSubtitleRow(data = {}) { /* Hàm render dòng phụ đề */ }
-    function renderSentences() { /* Hàm render câu thoại */ }
+    function addSubtitleRow(data = {}) {
+        // Hàm placeholder để không bị lỗi, user đã có sẵn hàm này trong code cũ
+    }
+    
+    function renderSentences() {
+        // Hàm placeholder
+    }
     
     function selectVideo(item) {
-        // Hàm chọn video (lưu vào currentVideoData...)
         currentVideoData = item;
-        document.getElementById('currentVideoTitle').innerText = item.title;
-        // Logic phát video ở đây (đã có sẵn trong code cũ)
+        if (currentVideoTitle) currentVideoTitle.innerText = item.title;
+        if (video) {
+            // Logic phát video gốc...
+        }
     }
 
     // =====================================================================
-    // 5.  Btn Submit Form
-    // =====================================================================
-    document.getElementById('btnSubmitForm').addEventListener('click', async (e) => {
-        e.preventDefault();
-        if (formError) { formError.classList.remove('visible'); formError.innerText = ''; }
-        const editId = document.getElementById("editVideoId").value.trim();
-        const title = document.getElementById("inputVideoTitle").value.trim();
-        const fileInput = document.getElementById("inputVideoFile");
-        const videoFile = fileInput ? fileInput.files[0] : null;
-        if (!title) {
-            if (formError) { formError.innerText = "⚠️ Vui lòng nhập tên bài học / video!"; formError.classList.add('visible'); }
-            return;
-        }
-        if (!editId && !videoFile) {
-            if (formError) { formError.innerText = "⚠️ Vui lòng chọn một tệp video (MP4)!"; formError.classList.add('visible'); }
-            return;
-        }
-        const rows = document.querySelectorAll(".subtitle-row");
-        if (rows.length === 0) {
-            if (formError) { formError.innerText = "⚠️ Vui lòng thêm ít nhất một dòng phụ đề!"; formError.classList.add('visible'); }
-            return;
-        }
-        const sentences = [];
-        let hasError = false;
-        rows.forEach((row, idx) => {
-            if (hasError) return;
-            const start = row.querySelector(".sub-start")?.value;
-            const end = row.querySelector(".sub-end")?.value;
-            const hanzi = row.querySelector(".sub-hanzi")?.value.trim();
-            if (!start || !end || !hanzi) {
-                if (formError) { formError.innerText = `⚠️ Dòng thoại số ${idx+1} chưa điền đầy đủ thông tin!`; formError.classList.add('visible'); }
-                hasError = true; return;
-            }
-            const startNum = parseFloat(start); const endNum = parseFloat(end);
-            if (isNaN(startNum) || isNaN(endNum)) {
-                if (formError) { formError.innerText = `⚠️ Dòng thoại số ${idx+1} có thời gian không hợp lệ!`; formError.classList.add('visible'); }
-                hasError = true; return;
-            }
-            if (startNum >= endNum) {
-                if (formError) { formError.innerText = `⚠️ Dòng thoại số ${idx+1} có thời gian bắt đầu phải nhỏ hơn kết thúc!`; formError.classList.add('visible'); }
-                hasError = true; return;
-            }
-            sentences.push({ id: idx + 1, startTime: startNum, endTime: endNum, hanzi: hanzi, pinyin: row.querySelector(".sub-pinyin")?.value.trim() || "", vietnamese: row.querySelector(".sub-viet")?.value.trim() || "" });
-        });
-        if (hasError) return;
-
-        try {
-            let newId = null;
-            let status = 'approved';
-            let scope = 'public';
-            let isPrivateClone = false;
-            let uploadedBy = 'admin';
-
-            if (!isAdminMode) {
-                scope = 'private';
-                uploadedBy = CURRENT_USER_ID;
-                isPrivateClone = false;
-            } else {
-                scope = 'public';
-                uploadedBy = 'admin';
-                isPrivateClone = false;
-            }
-
-            if (editId) {
-                const existing = await getVideo(parseInt(editId));
-                if (!existing) throw new Error("Không tìm thấy video cần sửa.");
-                existing.title = title;
-                existing.sentences = sentences;
-                if (videoFile) existing.videoBlob = videoFile;
-                await updateVideo(existing);
-                newId = parseInt(editId);
-                addLog(`✅ Cập nhật video thành công ID: ${newId}`, 'success');
-            } else {
-                const newVideo = { title, videoBlob: videoFile, sentences, status, scope, uploadedBy, is_private_clone: isPrivateClone, created_at: Date.now() };
-                newId = await addVideo(newVideo);
-                
-                if (!isAdminMode) {
-                    await executeTransaction(LIBRARY_STORE_NAME, "readwrite", store => {
-                        return new Promise((resolve, reject) => {
-                            const req = store.add({ userId: CURRENT_USER_ID, videoId: newId, added_at: Date.now() });
-                            req.onsuccess = resolve;
-                            req.onerror = reject;
-                        });
-                    });
-                    addLog(`✅ User tải video cá nhân thành công! Video đã có trong Thư viện của tôi.`, 'success');
-                } else {
-                    addLog(`✅ Admin tải video công khai thành công! Mọi người đều có thể xem.`, 'success');
-                }
-            }
-
-            if (uploadForm) uploadForm.reset();
-            if (subtitleInputsContainer) subtitleInputsContainer.innerHTML = "";
-            if (formError) { formError.classList.remove('visible'); formError.innerText = ''; }
-            modal.classList.remove("show");
-
-            renderLibraryList();
-            if (newId) {
-                const newVideo = await getVideo(newId);
-                if (newVideo) {
-                    addLog(`🔄 Tự động mở video vừa thêm!`, 'info');
-                    selectVideo(newVideo);
-                }
-            }
-        } catch (err) {
-            addLog("❌ Lỗi khi lưu video: " + err.message, 'error');
-            if (formError) { formError.innerText = "Lỗi khi lưu video: " + err.message; formError.classList.add('visible'); }
-        }
-    });
-
-    // =====================================================================
-    // INIT
+    // 10. INIT (CHỈ GỌI MỘT LẦN DUY NHẤT)
     // =====================================================================
     function init() {
         if (firebaseInstance && firebaseInstance.auth) {
             initializeAppWithFirebase();
         } else {
-            userStatusDisplay.innerHTML = "❌ Lỗi kết nối DB";
+            if (userStatusDisplay) userStatusDisplay.innerHTML = "❌ Lỗi kết nối DB";
             addLog("❌ Không thể liên kết Firebase. Kiểm tra lại 3 dòng Script và Config.", 'error');
         }
     }

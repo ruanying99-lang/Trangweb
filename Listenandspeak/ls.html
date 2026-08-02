@@ -437,7 +437,7 @@
   </div>
 
   <!-- ========================================================== -->
-  <!-- ===== JAVASCRIPT (Logic mới: Public/Private Video) ===== -->
+  <!-- ===== JAVASCRIPT (Logic mới: Public/Private Video + LocalStorage Auth) ===== -->
   <!-- ========================================================== -->
   <script>
     // ================================================================
@@ -774,7 +774,9 @@
         } catch (err) { addLog("❌ Lỗi tải thư viện: " + err.message, 'error'); }
     }
 
-    // ---------- FIRBASE AUTH CHECK ----------
+    // =====================================================================
+    // [Đã sửa] FIRBASE AUTH CHECK (Lấy dữ liệu từ localStorage của trang chính)
+    // =====================================================================
     async function initializeAppWithFirebase() {
         if (!firebaseInstance || !firebaseInstance.auth) {
             userStatusDisplay.innerHTML = "❌ Lỗi Firebase";
@@ -782,37 +784,52 @@
         }
 
         firebaseInstance.auth().onAuthStateChanged(async (user) => {
+            let currentUid = null;
+            let currentRole = 'user';
+
+            // 1. Nếu trực tiếp lấy được user từ Firebase (đã đăng nhập ở tab này)
             if (user) {
-                CURRENT_USER_ID = user.uid;
-                addLog(`✅ Đã đăng nhập thành công (UID: ${CURRENT_USER_ID})`, 'success');
-
+                currentUid = user.uid;
+                localStorage.setItem('shared_uid', currentUid);
+                addLog(`✅ Đã lấy User từ Firebase. UID: ${currentUid}`, 'success');
                 try {
-                    const db = firebaseInstance.firestore();
-                    const userDoc = await db.collection('users').doc(CURRENT_USER_ID).get();
-                    if (userDoc.exists) {
-                        const userData = userDoc.data();
-                        isAdminMode = (userData.role === 'admin');
-                    } else { isAdminMode = false; }
-                } catch (e) {
-                    addLog("⚠️ Không check được role Admin, mặc định là User.", 'warning');
-                    isAdminMode = false; 
-                }
-
-                if (isAdminMode) {
-                    userStatusDisplay.innerHTML = `👑 Admin (${user.displayName || user.email})`;
-                    userStatusDisplay.classList.add('admin');
-                    if (pendingTab) pendingTab.style.display = 'block';
-                } else {
-                    userStatusDisplay.innerHTML = `👤 User (${user.displayName || user.email})`;
-                    userStatusDisplay.classList.remove('admin');
-                    if (pendingTab) pendingTab.style.display = 'none';
-                }
-                startEngine();
-            } else {
-                userStatusDisplay.innerHTML = "⛔ Vui lòng đăng nhập";
-                document.getElementById('currentVideoTitle').innerText = "Vui lòng đăng nhập để học";
-                addLog("⛔ Người dùng chưa đăng nhập.", 'info');
+                    const doc = await firebaseInstance.firestore().collection('users').doc(currentUid).get();
+                    if (doc.exists && doc.data().role === 'admin') {
+                        currentRole = 'admin';
+                    }
+                    localStorage.setItem('shared_role', currentRole);
+                } catch (e) { /* Bỏ qua lỗi đọc role */ }
+            } 
+            // 2. Nếu Firebase trả về null (chưa đăng nhập ở tab này), check LocalStorage từ trang chính
+            else if (localStorage.getItem('shared_uid')) {
+                currentUid = localStorage.getItem('shared_uid');
+                currentRole = localStorage.getItem('shared_role') || 'user';
+                addLog(`🔄 Phát hiện đăng nhập từ LocalStorage (Chuyển trang từ Index). UID: ${currentUid}`, 'info');
             }
+            // 3. Nếu không tìm thấy gì cả
+            else {
+                userStatusDisplay.innerHTML = "⛔ Vui lòng đăng nhập ở trang chính";
+                document.getElementById('currentVideoTitle').innerText = "Vui lòng đăng nhập để học";
+                addLog("⛔ Chưa đăng nhập (Không có dữ liệu từ trang chính)", 'info');
+                return; // Dừng lại, không chạy app
+            }
+
+            // === Cập nhật trạng thái App ===
+            CURRENT_USER_ID = currentUid;
+            isAdminMode = (currentRole === 'admin');
+
+            if (isAdminMode) {
+                userStatusDisplay.innerHTML = `👑 Admin (${currentUid.substring(0, 6)}...)`;
+                userStatusDisplay.classList.add('admin');
+                if (pendingTab) pendingTab.style.display = 'block';
+            } else {
+                userStatusDisplay.innerHTML = `👤 User (${currentUid.substring(0, 6)}...)`;
+                userStatusDisplay.classList.remove('admin');
+                if (pendingTab) pendingTab.style.display = 'none';
+            }
+
+            // === Khởi chạy Engine ===
+            startEngine();
         });
     }
 

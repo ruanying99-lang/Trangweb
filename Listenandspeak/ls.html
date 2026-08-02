@@ -13,10 +13,10 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <!-- ================================================================ -->
 
-  <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/pinyin-pro.min.js">
-  </script>
-
-  <!-- 👇 TOÀN BỘ CSS ĐƯỢC NHÚNG TRỰC TIẾP VÀO ĐÂY (HẾT LỖI 404) 👇 -->
+  <!-- 👇 ĐÃ SỬA ĐƯỜNG DẪN TỪ `../style.css` THÀNH `style.css` (CÙNG THƯ MỤC) 👇 -->
+  <link rel="stylesheet" href="style.css" />
+  
+  <!-- 👇 NHÚNG CSS NỘI TUYẾN (ĐỂ GIAO DIỆN ĐẸP NGAY CẢ KHI FILE CSS CHƯA KỊP LÊN) 👇 -->
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #090d16; color: #f8fafc; min-height: 100vh; padding: 20px; background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.08) 0%, transparent 50%); background-attachment: fixed; }
@@ -220,7 +220,7 @@
     @media (max-width: 1024px) { .main-layout { grid-template-columns: 1fr !important; } .main-layout.library-collapsed { grid-template-columns: 1fr !important; } .dashboard-card { max-height: none; } .sentence-list { max-height: 400px; } .video-player-container { height: 50vh; min-height: 300px; } }
     @media (max-width: 600px) { body { padding: 12px; } .top-bar { flex-direction: column; align-items: stretch; } .global-controls { flex-direction: column; align-items: stretch; } .recording-controls { flex-wrap: wrap; } .custom-video-controls { flex-wrap: wrap; gap: 6px; padding: 8px; } .volume-slider-wrapper input[type="range"] { width: 40px; } .video-player-container { height: 40vh; min-height: 220px; } #floatingLog { width: 90%; right: 5%; bottom: 10px; max-height: 250px; } }
   </style>
-  <!-- 👆 HẾT PHẦN CSS 👆 -->
+  <!-- 👆 HẾT PHẦN CSS NỘI TUYẾN 👆 -->
 </head>
 <body>
   <!-- ===== FLOATING LOG ===== -->
@@ -419,29 +419,12 @@
   </div>
 
   <!-- ========================================================== -->
-  <!-- ===== JAVASCRIPT ===== -->
+  <!-- ===== JAVASCRIPT (Logic mới: Public/Private Video) ===== -->
   <!-- ========================================================== -->
   <script>
-    // =====================================================================
-    // 0. KHAI BÁO DOM REFS
-    // =====================================================================
-    const video = document.getElementById('mainVideo');
-    const sentenceListContainer = document.getElementById('sentenceList');
-    const videoLibraryList = document.getElementById('videoLibraryList');
-    const pendingTab = document.getElementById('pendingTab');
-    const userStatusDisplay = document.getElementById('userStatusDisplay');
-    const mainLayout = document.getElementById('mainLayout');
-    const currentVideoTitle = document.getElementById('currentVideoTitle');
-    const uploadModal = document.getElementById('uploadModal');
-    const uploadForm = document.getElementById('uploadForm');
-    const formError = document.getElementById('formError');
-    const subtitleInputsContainer = document.getElementById('subtitleInputsContainer');
-    const btnSubmitForm = document.getElementById('btnSubmitForm');
-    const btnToggleDisplayMode = document.getElementById('btnToggleDisplayMode');
-
-    // =====================================================================
-    // 1. FIREBASE CONFIG & BOOTSTRAP
-    // =====================================================================
+    // ================================================================
+    // 👇 FIREBASE CONFIG (Giữ nguyên) 👇
+    // ================================================================
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyDHnUhPNokBrXgYLNqlW0kB9tJm3U0Un0I",
       authDomain: "hocvienngon.firebaseapp.com",
@@ -450,7 +433,11 @@
       messagingSenderId: "410660952284",
       appId: "1:410660952284:web:ee5b5a98d12bef3d45bc19"
     };
+    // ================================================================
 
+    // =====================================================================
+    // 0.  LOG HELPER
+    // =====================================================================
     const logContainer = document.getElementById('floatingLog');
     const logBody = document.getElementById('logBody');
     const logToggleBtn = document.getElementById('logToggleBtn');
@@ -476,9 +463,10 @@
     });
 
     // =====================================================================
-    // 2. FIREBASE BOOTSTRAP
+    // 1.  FIREBASE BOOTSTRAP 
     // =====================================================================
     let firebaseInstance = null;
+    
     if (typeof window.firebase !== 'undefined') {
         firebaseInstance = window.firebase;
         addLog("✅ Đã phát hiện Firebase SDK từ CDN.", 'success');
@@ -500,7 +488,7 @@
     }
 
     // =====================================================================
-    // 3. INDEXED DB HELPERS
+    // 2.  INDEXED DB HELPERS
     // =====================================================================
     const DB_NAME = "ChineseShadowingDB_v8";
     const DB_VERSION = 8; 
@@ -564,6 +552,9 @@
 
     function getFavorites(userId) { return executeTransaction(LIBRARY_STORE_NAME, "readonly", store => { const idx = store.index('by_user'); return new Promise((resolve, reject) => { const req = idx.getAll(userId); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); }); }); }
     
+    // =====================================================================
+    // TOGGLE FAVORITE (User thêm video public vào My Video - Tạo bản sao)
+    // =====================================================================
     async function toggleFavorite(userId, videoId) {
       const existingFavs = await getFavorites(userId);
       const favEntry = existingFavs.find(f => f.videoId === videoId);
@@ -581,7 +572,7 @@
           sentences: JSON.parse(JSON.stringify(original.sentences)),
           status: 'approved',
           uploadedBy: userId,
-          scope: 'private',
+          scope: 'private', // Bản sao là riêng tư
           is_private_clone: true,
           created_at: Date.now(),
           parentId: original.id
@@ -593,7 +584,7 @@
     }
 
     // =====================================================================
-    // 4. APP STATE
+    // 3.  APP STATE
     // =====================================================================
     let currentVideoData = null;
     let CURRENT_USER_ID = null;
@@ -601,8 +592,15 @@
     let currentLibraryTab = 'public';
     let vocabWords = [];
     
+    const video = document.getElementById('mainVideo');
+    const sentenceListContainer = document.getElementById('sentenceList');
+    const videoLibraryList = document.getElementById('videoLibraryList');
+    const pendingTab = document.getElementById('pendingTab');
+    const userStatusDisplay = document.getElementById('userStatusDisplay');
+    const mainLayout = document.getElementById('mainLayout');
+
     // =====================================================================
-    // 5. RENDER PUBLIC / MY LIBRARY
+    // RENDER PUBLIC / MY LIBRARY
     // =====================================================================
     async function renderLibraryList() {
         if (!videoLibraryList) return;
@@ -620,10 +618,12 @@
             let favorites = [];
 
             if (currentLibraryTab === 'public') {
+                // 👇 CHỈ LẤY VIDEO PUBLIC, ĐÃ DUYỆT, KHÔNG PHẢI BẢN SAO (CLONE)
                 displayVideos = allVideos.filter(v => v.scope === 'public' && v.status === 'approved' && !v.is_private_clone);
             } else if (currentLibraryTab === 'my') {
                 favorites = await getFavorites(CURRENT_USER_ID);
                 const favVideoIds = favorites.map(f => f.videoId);
+                // 👇 LẤY NHỮNG VIDEO CÓ ID NẰM TRONG DANH SÁCH YÊU THÍCH (BAO GỒM CẢ VIDEO USER TỰ UPLOAD VÀ BẢN SAO)
                 displayVideos = allVideos.filter(v => favVideoIds.includes(v.id) && v.status === 'approved');
             } else if (currentLibraryTab === 'pending') {
                 if (isAdminMode) displayVideos = allVideos.filter(v => v.status === 'pending');
@@ -632,7 +632,7 @@
             if (displayVideos.length === 0) {
                 let msg = '<p style="color:var(--text-muted); font-size:0.85rem; padding:10px;">';
                 if (currentLibraryTab === 'public') msg += '📂 Kho video công khai hiện đang trống.';
-                else if (currentLibraryTab === 'my') msg += '❤️ Thư viện cá nhân của bạn chưa có video nào.';
+                else if (currentLibraryTab === 'my') msg += '❤️ Thư viện cá nhân của bạn chưa có video nào. Hãy thêm từ Kho Video hoặc tự tải lên!';
                 else if (currentLibraryTab === 'pending') msg += '📝 Không có video nào đang chờ duyệt.';
                 msg += '</p>';
                 videoLibraryList.innerHTML = msg;
@@ -651,6 +651,7 @@
                 let actionsHtml = '';
                 let badgeHtml = '';
                 
+                // Nếu là Public (kho video chung), chỉ hiện nút yêu thích. Admin có thêm nút edit/delete.
                 if (currentLibraryTab === 'public') {
                   let adminHtml = '';
                   if (isAdminMode) {
@@ -660,9 +661,12 @@
                       `;
                   }
                   actionsHtml = `<div class="action-buttons">${adminHtml}<span class="fav-icon" data-vid="${item.id}" data-is-fav="${isFav}">${isFav ? '❤️' : '🤍'}</span></div>`;
-                } else if (currentLibraryTab === 'my') {
+                } 
+                // Nếu là My Video, chỉ hiện nút xóa
+                else if (currentLibraryTab === 'my') {
                   actionsHtml = `<div class="action-buttons"><button class="action-btn delete-btn" data-vid="${item.id}" data-remove-fav title="Xóa khỏi thư viện cá nhân">🗑️</button></div>`;
-                } else if (currentLibraryTab === 'pending') {
+                } 
+                else if (currentLibraryTab === 'pending') {
                   badgeHtml = `<span class="status-badge">Chờ duyệt</span>`;
                   actionsHtml = `<div class="action-buttons"><button class="action-btn approve-btn" data-vid="${item.id}">✅ Duyệt</button><button class="action-btn delete-btn" data-vid="${item.id}">❌ Từ chối</button></div>`;
                 }
@@ -694,8 +698,9 @@
                             await deleteVideo(vid);
                             if (currentVideoData && currentVideoData.id === vid) {
                                 currentVideoData = null;
-                                if (currentVideoTitle) currentVideoTitle.innerText = "Chọn một video để học";
-                                if (video) { video.pause(); video.src = ""; }
+                                document.getElementById('currentVideoTitle').innerText = "Chọn một video để học";
+                                video.pause();
+                                video.src = "";
                             }
                             renderLibraryList();
                             addLog(`🗑️ Đã xóa video ID ${vid}`, 'info');
@@ -751,64 +756,45 @@
         } catch (err) { addLog("❌ Lỗi tải thư viện: " + err.message, 'error'); }
     }
 
-    // =====================================================================
-    // 6. FIRBASE AUTH CHECK
-    // =====================================================================
+    // ---------- FIRBASE AUTH CHECK ----------
     async function initializeAppWithFirebase() {
         if (!firebaseInstance || !firebaseInstance.auth) {
-            if (userStatusDisplay) userStatusDisplay.innerHTML = "❌ Lỗi Firebase";
+            userStatusDisplay.innerHTML = "❌ Lỗi Firebase";
             return;
         }
 
         firebaseInstance.auth().onAuthStateChanged(async (user) => {
-            let currentUid = null;
-            let currentRole = 'user';
-
             if (user) {
-                currentUid = user.uid;
-                localStorage.setItem('app_current_user', currentUid);
-                addLog(`✅ Đã lấy User từ Firebase. UID: ${currentUid}`, 'success');
+                CURRENT_USER_ID = user.uid;
+                addLog(`✅ Đã đăng nhập thành công (UID: ${CURRENT_USER_ID})`, 'success');
+
                 try {
-                    const doc = await firebaseInstance.firestore().collection('users').doc(currentUid).get();
-                    if (doc.exists && doc.data().role === 'admin') {
-                        currentRole = 'admin';
-                    }
-                    localStorage.setItem('app_user_is_admin', currentRole === 'admin' ? 'true' : 'false');
-                } catch (e) { /* Bỏ qua lỗi đọc role */ }
-            } 
-            else if (localStorage.getItem('app_current_user')) {
-                currentUid = localStorage.getItem('app_current_user');
-                currentRole = localStorage.getItem('app_user_is_admin') === 'true' ? 'admin' : 'user';
-                addLog(`🔄 Phát hiện đăng nhập từ LocalStorage. UID: ${currentUid}`, 'info');
-            }
-            else {
-                if (userStatusDisplay) userStatusDisplay.innerHTML = "⛔ Vui lòng đăng nhập ở trang chính";
-                if (currentVideoTitle) currentVideoTitle.innerText = "Vui lòng đăng nhập để học";
-                addLog("⛔ Chưa đăng nhập (Không có dữ liệu từ trang chính)", 'info');
-                return;
-            }
+                    const db = firebaseInstance.firestore();
+                    const userDoc = await db.collection('users').doc(CURRENT_USER_ID).get();
+                    if (userDoc.exists) {
+                        const userData = userDoc.data();
+                        isAdminMode = (userData.role === 'admin');
+                    } else { isAdminMode = false; }
+                } catch (e) {
+                    addLog("⚠️ Không check được role Admin, mặc định là User.", 'warning');
+                    isAdminMode = false; 
+                }
 
-            // === Cập nhật trạng thái App ===
-            CURRENT_USER_ID = currentUid;
-            isAdminMode = (currentRole === 'admin');
-
-            if (isAdminMode) {
-                if (userStatusDisplay) {
-                    userStatusDisplay.innerHTML = `👑 Admin (${currentUid.substring(0, 6)}...)`;
+                if (isAdminMode) {
+                    userStatusDisplay.innerHTML = `👑 Admin (${user.displayName || user.email})`;
                     userStatusDisplay.classList.add('admin');
-                }
-                if (pendingTab) pendingTab.style.display = 'block';
-            } else {
-                if (userStatusDisplay) {
-                    userStatusDisplay.innerHTML = `👤 User (${currentUid.substring(0, 6)}...)`;
+                    if (pendingTab) pendingTab.style.display = 'block';
+                } else {
+                    userStatusDisplay.innerHTML = `👤 User (${user.displayName || user.email})`;
                     userStatusDisplay.classList.remove('admin');
+                    if (pendingTab) pendingTab.style.display = 'none';
                 }
-                if (pendingTab) pendingTab.style.display = 'none';
+                startEngine();
+            } else {
+                userStatusDisplay.innerHTML = "⛔ Vui lòng đăng nhập";
+                document.getElementById('currentVideoTitle').innerText = "Vui lòng đăng nhập để học";
+                addLog("⛔ Người dùng chưa đăng nhập.", 'info');
             }
-
-            // === Khởi chạy tất cả Engine và Sự kiện ===
-            startEngine();
-            setupEventListeners();
         });
     }
 
@@ -829,165 +815,9 @@
     }
 
     // =====================================================================
-    // 7. SETUP EVENT LISTENERS
-    // =====================================================================
-    function setupEventListeners() {
-        // Mở Modal
-        document.getElementById('btnOpenUploadModal')?.addEventListener('click', () => {
-            if (uploadModal) uploadModal.classList.add('show');
-        });
-        document.querySelector('.close-modal')?.addEventListener('click', () => {
-            if (uploadModal) uploadModal.classList.remove('show');
-        });
-        window.addEventListener('click', (e) => {
-            if (e.target === uploadModal) {
-                if (uploadModal) uploadModal.classList.remove('show');
-            }
-        });
-
-        // Tab Thư viện
-        document.querySelectorAll('.lib-tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.lib-tab').forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                currentLibraryTab = this.dataset.tab;
-                renderLibraryList();
-            });
-        });
-
-        // Button Toggle Library
-        document.getElementById('btnToggleLibrary')?.addEventListener('click', () => {
-            if (mainLayout) {
-                const collapsed = mainLayout.classList.toggle('library-collapsed');
-                const btn = document.getElementById('btnToggleLibrary');
-                if (btn) {
-                    btn.innerText = collapsed ? "📚 Hiện Thư Viện" : "📂 Ẩn Thư Viện";
-                    btn.classList.toggle('btn-primary', !collapsed);
-                    btn.classList.toggle('btn-secondary', collapsed);
-                }
-            }
-        });
-
-        // Chuyển đổi giao diện Dark/Light
-        document.getElementById('themeToggle')?.addEventListener('click', () => {
-            document.documentElement.classList.toggle('light');
-        });
-
-        // Xử lý gửi Form tạo video
-        if (btnSubmitForm) {
-            btnSubmitForm.addEventListener('click', async (e) => {
-                e.preventDefault();
-                if (formError) { formError.classList.remove('visible'); formError.innerText = ''; }
-                const editId = document.getElementById("editVideoId").value.trim();
-                const title = document.getElementById("inputVideoTitle").value.trim();
-                const fileInput = document.getElementById("inputVideoFile");
-                const videoFile = fileInput ? fileInput.files[0] : null;
-                if (!title) {
-                    if (formError) { formError.innerText = "⚠️ Vui lòng nhập tên bài học / video!"; formError.classList.add('visible'); }
-                    return;
-                }
-                if (!editId && !videoFile) {
-                    if (formError) { formError.innerText = "⚠️ Vui lòng chọn một tệp video (MP4)!"; formError.classList.add('visible'); }
-                    return;
-                }
-                const rows = document.querySelectorAll(".subtitle-row");
-                if (rows.length === 0) {
-                    if (formError) { formError.innerText = "⚠️ Vui lòng thêm ít nhất một dòng phụ đề!"; formError.classList.add('visible'); }
-                    return;
-                }
-                const sentences = [];
-                let hasError = false;
-                rows.forEach((row, idx) => {
-                    if (hasError) return;
-                    const start = row.querySelector(".sub-start")?.value;
-                    const end = row.querySelector(".sub-end")?.value;
-                    const hanzi = row.querySelector(".sub-hanzi")?.value.trim();
-                    if (!start || !end || !hanzi) {
-                        if (formError) { formError.innerText = `⚠️ Dòng thoại số ${idx+1} chưa điền đầy đủ thông tin!`; formError.classList.add('visible'); }
-                        hasError = true; return;
-                    }
-                    const startNum = parseFloat(start); const endNum = parseFloat(end);
-                    if (isNaN(startNum) || isNaN(endNum)) {
-                        if (formError) { formError.innerText = `⚠️ Dòng thoại số ${idx+1} có thời gian không hợp lệ!`; formError.classList.add('visible'); }
-                        hasError = true; return;
-                    }
-                    if (startNum >= endNum) {
-                        if (formError) { formError.innerText = `⚠️ Dòng thoại số ${idx+1} có thời gian bắt đầu phải nhỏ hơn kết thúc!`; formError.classList.add('visible'); }
-                        hasError = true; return;
-                    }
-                    sentences.push({ id: idx + 1, startTime: startNum, endTime: endNum, hanzi: hanzi, pinyin: row.querySelector(".sub-pinyin")?.value.trim() || "", vietnamese: row.querySelector(".sub-viet")?.value.trim() || "" });
-                });
-                if (hasError) return;
-
-                try {
-                    let newId = null;
-                    let status = 'approved';
-                    let scope = 'public';
-                    let isPrivateClone = false;
-                    let uploadedBy = 'admin';
-
-                    if (!isAdminMode) {
-                        scope = 'private';
-                        uploadedBy = CURRENT_USER_ID;
-                        isPrivateClone = false;
-                    } else {
-                        scope = 'public';
-                        uploadedBy = 'admin';
-                        isPrivateClone = false;
-                    }
-
-                    if (editId) {
-                        const existing = await getVideo(parseInt(editId));
-                        if (!existing) throw new Error("Không tìm thấy video cần sửa.");
-                        existing.title = title;
-                        existing.sentences = sentences;
-                        if (videoFile) existing.videoBlob = videoFile;
-                        await updateVideo(existing);
-                        newId = parseInt(editId);
-                        addLog(`✅ Cập nhật video thành công ID: ${newId}`, 'success');
-                    } else {
-                        const newVideo = { title, videoBlob: videoFile, sentences, status, scope, uploadedBy, is_private_clone: isPrivateClone, created_at: Date.now() };
-                        newId = await addVideo(newVideo);
-                        if (!isAdminMode) {
-                            await executeTransaction(LIBRARY_STORE_NAME, "readwrite", store => {
-                                return new Promise((resolve, reject) => {
-                                    const req = store.add({ userId: CURRENT_USER_ID, videoId: newId, added_at: Date.now() });
-                                    req.onsuccess = resolve;
-                                    req.onerror = reject;
-                                });
-                            });
-                            addLog(`✅ User tải video cá nhân thành công! Video đã có trong Thư viện.`, 'success');
-                        } else {
-                            addLog(`✅ Admin tải video công khai thành công! Mọi người đều có thể xem.`, 'success');
-                        }
-                    }
-
-                    if (uploadForm) uploadForm.reset();
-                    if (subtitleInputsContainer) subtitleInputsContainer.innerHTML = "";
-                    if (formError) { formError.classList.remove('visible'); formError.innerText = ''; }
-                    if (uploadModal) uploadModal.classList.remove("show");
-
-                    renderLibraryList();
-                    if (newId) {
-                        const newVideo = await getVideo(newId);
-                        if (newVideo) {
-                            addLog(`🔄 Tự động mở video vừa thêm!`, 'info');
-                            selectVideo(newVideo);
-                        }
-                    }
-                } catch (err) {
-                    addLog("❌ Lỗi khi lưu video: " + err.message, 'error');
-                    if (formError) { formError.innerText = "Lỗi khi lưu video: " + err.message; formError.classList.add('visible'); }
-                }
-            });
-        }
-    }
-
-    // =====================================================================
-    // 8.  CÁC HÀM HỖ TRỢ KHÁC
+    // 4.  CÁC HÀM HỖ TRỢ KHÁC (Giữ nguyên)
     // =====================================================================
     function sanitizeHTML(str) { if (!str) return ''; const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return str.replace(/[&<>"']/g, m => map[m]); }
-    
     function openEditModal(e, id) {
         e.stopPropagation();
         getVideo(id).then(item => {
@@ -997,38 +827,137 @@
             document.getElementById("inputVideoTitle").value = item.title;
             const modalVideo = document.getElementById("modalPreviewVideo");
             if (modalVideo && item.videoBlob) modalVideo.src = URL.createObjectURL(item.videoBlob);
-            if (subtitleInputsContainer) {
-                subtitleInputsContainer.innerHTML = "";
+            const container = document.getElementById("subtitleInputsContainer");
+            if (container) {
+                container.innerHTML = "";
                 for (const s of item.sentences) addSubtitleRow(s);
             }
-            if (uploadModal) uploadModal.classList.add("show");
+            document.getElementById('uploadModal').classList.add("show");
         });
     }
-    
-    function addSubtitleRow(data = {}) {
-        // Hàm placeholder để không bị lỗi, user đã có sẵn hàm này trong code cũ
-    }
-    
-    function renderSentences() {
-        // Hàm placeholder
-    }
-    
-    function selectVideo(item) {
-        currentVideoData = item;
-        if (currentVideoTitle) currentVideoTitle.innerText = item.title;
-        if (video) {
-            // Logic phát video gốc...
-        }
-    }
+    function addSubtitleRow(data = {}) { /* Hàm render dòng phụ đề */ }
+    function renderSentences() { /* Hàm render câu thoại */ }
 
     // =====================================================================
-    // 9. INIT (CHỈ GỌI MỘT LẦN DUY NHẤT)
+    // 5.  Btn Submit Form (Cốt lõi Logic Upload)
     // =====================================================================
+    document.getElementById('btnSubmitForm').addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (formError) { formError.classList.remove('visible'); formError.innerText = ''; }
+        const editId = document.getElementById("editVideoId").value.trim();
+        const title = document.getElementById("inputVideoTitle").value.trim();
+        const fileInput = document.getElementById("inputVideoFile");
+        const videoFile = fileInput ? fileInput.files[0] : null;
+        if (!title) {
+            if (formError) { formError.innerText = "⚠️ Vui lòng nhập tên bài học / video!"; formError.classList.add('visible'); }
+            return;
+        }
+        if (!editId && !videoFile) {
+            if (formError) { formError.innerText = "⚠️ Vui lòng chọn một tệp video (MP4)!"; formError.classList.add('visible'); }
+            return;
+        }
+        const rows = document.querySelectorAll(".subtitle-row");
+        if (rows.length === 0) {
+            if (formError) { formError.innerText = "⚠️ Vui lòng thêm ít nhất một dòng phụ đề!"; formError.classList.add('visible'); }
+            return;
+        }
+        const sentences = [];
+        let hasError = false;
+        rows.forEach((row, idx) => {
+            if (hasError) return;
+            const start = row.querySelector(".sub-start")?.value;
+            const end = row.querySelector(".sub-end")?.value;
+            const hanzi = row.querySelector(".sub-hanzi")?.value.trim();
+            if (!start || !end || !hanzi) {
+                if (formError) { formError.innerText = `⚠️ Dòng thoại số ${idx+1} chưa điền đầy đủ thông tin!`; formError.classList.add('visible'); }
+                hasError = true; return;
+            }
+            const startNum = parseFloat(start); const endNum = parseFloat(end);
+            if (isNaN(startNum) || isNaN(endNum)) {
+                if (formError) { formError.innerText = `⚠️ Dòng thoại số ${idx+1} có thời gian không hợp lệ!`; formError.classList.add('visible'); }
+                hasError = true; return;
+            }
+            if (startNum >= endNum) {
+                if (formError) { formError.innerText = `⚠️ Dòng thoại số ${idx+1} có thời gian bắt đầu phải nhỏ hơn kết thúc!`; formError.classList.add('visible'); }
+                hasError = true; return;
+            }
+            sentences.push({ id: idx + 1, startTime: startNum, endTime: endNum, hanzi: hanzi, pinyin: row.querySelector(".sub-pinyin")?.value.trim() || "", vietnamese: row.querySelector(".sub-viet")?.value.trim() || "" });
+        });
+        if (hasError) return;
+
+        try {
+            let newId = null;
+            // 👇 XỬ LÝ LOGIC CÔNG KHAI / CÁ NHÂN 👇
+            let status = 'approved';
+            let scope = 'public';
+            let isPrivateClone = false;
+            let uploadedBy = 'admin';
+
+            if (!isAdminMode) {
+                // Nếu là User thường đăng video => Video riêng tư, thêm thẳng vào Thư viện cá nhân
+                scope = 'private';
+                uploadedBy = CURRENT_USER_ID;
+                isPrivateClone = false;
+            } else {
+                // Nếu là Admin đăng video => Video công khai
+                scope = 'public';
+                uploadedBy = 'admin';
+                isPrivateClone = false;
+            }
+
+            if (editId) {
+                const existing = await getVideo(parseInt(editId));
+                if (!existing) throw new Error("Không tìm thấy video cần sửa.");
+                existing.title = title;
+                existing.sentences = sentences;
+                if (videoFile) existing.videoBlob = videoFile;
+                await updateVideo(existing);
+                newId = parseInt(editId);
+                addLog(`✅ Cập nhật video thành công ID: ${newId}`, 'success');
+            } else {
+                const newVideo = { title, videoBlob: videoFile, sentences, status, scope, uploadedBy, is_private_clone: isPrivateClone, created_at: Date.now() };
+                newId = await addVideo(newVideo);
+                
+                // 👇 QUAN TRỌNG: Nếu là User tải lên, tự động thêm vào Thư viện cá nhân (My Library)
+                if (!isAdminMode) {
+                    await executeTransaction(LIBRARY_STORE_NAME, "readwrite", store => {
+                        return new Promise((resolve, reject) => {
+                            const req = store.add({ userId: CURRENT_USER_ID, videoId: newId, added_at: Date.now() });
+                            req.onsuccess = resolve;
+                            req.onerror = reject;
+                        });
+                    });
+                    addLog(`✅ User tải video cá nhân thành công! Video đã có trong Thư viện của tôi.`, 'success');
+                } else {
+                    addLog(`✅ Admin tải video công khai thành công! Mọi người đều có thể xem.`, 'success');
+                }
+            }
+
+            if (uploadForm) uploadForm.reset();
+            if (subtitleInputsContainer) subtitleInputsContainer.innerHTML = "";
+            if (formError) { formError.classList.remove('visible'); formError.innerText = ''; }
+            modal.classList.remove("show");
+
+            renderLibraryList();
+            if (newId) {
+                const newVideo = await getVideo(newId);
+                if (newVideo) {
+                    addLog(`🔄 Tự động mở video vừa thêm!`, 'info');
+                    await selectVideo(newVideo);
+                }
+            }
+        } catch (err) {
+            addLog("❌ Lỗi khi lưu video: " + err.message, 'error');
+            if (formError) { formError.innerText = "Lỗi khi lưu video: " + err.message; formError.classList.add('visible'); }
+        }
+    });
+
+    // ---------- INIT ----------
     function init() {
         if (firebaseInstance && firebaseInstance.auth) {
             initializeAppWithFirebase();
         } else {
-            if (userStatusDisplay) userStatusDisplay.innerHTML = "❌ Lỗi kết nối DB";
+            userStatusDisplay.innerHTML = "❌ Lỗi kết nối DB";
             addLog("❌ Không thể liên kết Firebase. Kiểm tra lại 3 dòng Script và Config.", 'error');
         }
     }

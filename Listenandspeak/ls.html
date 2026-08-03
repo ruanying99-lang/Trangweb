@@ -13,9 +13,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <!-- ================================================================ -->
 
-  <!-- 👇 ĐÃ SỬA ĐƯỜNG DẪN TỪ `../style.css` THÀNH `style.css` (CÙNG THƯ MỤC) 👇 -->
   <link rel="stylesheet" href="style.css" />
-  
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/pinyin-pro.min.js">
   </script>
 
@@ -468,7 +466,57 @@
     }
 
     // =====================================================================
-    // 2.  INDEXED DB HELPERS
+    // 2.  PARSERS (Phân tích file SRT / CSV / TXT)
+    // =====================================================================
+    function parseCSVorTXT(text) {
+      const normalized = text.replace(/\r\n/g, '\n');
+      const lines = normalized.split('\n');
+      const sentences = [];
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        const parts = trimmed.includes('|') ? trimmed.split('|') : trimmed.split(',');
+        if (parts.length >= 3) {
+          sentences.push({
+            startTime: parseFloat(parts[0].trim()) || 0,
+            endTime: parseFloat(parts[1].trim()) || 0,
+            hanzi: parts[2]?.trim() || '',
+            pinyin: parts[3]?.trim() || '',
+            vietnamese: parts[4]?.trim() || ''
+          });
+        }
+      }
+      return sentences;
+    }
+
+    function parseSRT(data) {
+      const normalized = data.replace(/\r\n/g, '\n');
+      const pattern = /(\d+)\n(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})\n([\s\S]*?)(?=\n\n|\n*$)/g;
+      const sentences = [];
+
+      function timeToSeconds(str) {
+        const parts = str.split(':');
+        const secParts = parts[2].split(',');
+        return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(secParts[0]) + parseInt(secParts[1]) / 1000;
+      }
+      let match;
+      while ((match = pattern.exec(normalized)) !== null) {
+        const start = timeToSeconds(match[2]);
+        const end = timeToSeconds(match[3]);
+        const textLines = match[4].split('\n').map(l => l.trim()).filter(l => l);
+        sentences.push({
+          startTime: parseFloat(start.toFixed(1)),
+          endTime: parseFloat(end.toFixed(1)),
+          hanzi: textLines[0] || '',
+          pinyin: textLines[1] || '',
+          vietnamese: textLines[2] || ''
+        });
+      }
+      return sentences;
+    }
+
+    // =====================================================================
+    // 3.  INDEXED DB HELPERS
     // =====================================================================
     const DB_NAME = "ChineseShadowingDB_v8";
     const DB_VERSION = 8; 
@@ -561,7 +609,7 @@
     }
 
     // =====================================================================
-    // 3.  APP STATE
+    // 4.  APP STATE
     // =====================================================================
     let currentVideoData = null;
     let CURRENT_USER_ID = null;
@@ -575,6 +623,130 @@
     const pendingTab = document.getElementById('pendingTab');
     const userStatusDisplay = document.getElementById('userStatusDisplay');
     const mainLayout = document.getElementById('mainLayout');
+
+    // =====================================================================
+    // [ĐÃ SỬA] HÀM ADD SUBTITLE ROW (ĐỂ HIỂN THỊ PHỤ ĐỀ)
+    // =====================================================================
+    function addSubtitleRow(data = {}) {
+        const container = document.getElementById('subtitleInputsContainer');
+        if (!container) return;
+        const div = document.createElement("div");
+        div.className = "subtitle-row";
+        div.innerHTML = `
+          <button type="button" class="btn-remove-row" title="Xóa dòng thoại này">❌</button>
+          <div class="time-inputs">
+            <div style="display:flex;gap:4px;align-items:center;">
+              <input type="number" step="0.1" placeholder="Bắt đầu (s)" class="sub-start" value="${data.startTime ?? ''}" style="flex:1;">
+              <button type="button" class="btn-capture-start" style="background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);color:#38bdf8;border-radius:4px;padding:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex-shrink:0;font-size:0.75rem;">🎯</button>
+            </div>
+            <span style="color:var(--text-muted);font-size:0.85rem;">~</span>
+            <div style="display:flex;gap:4px;align-items:center;">
+              <input type="number" step="0.1" placeholder="Kết thúc (s)" class="sub-end" value="${data.endTime ?? ''}" style="flex:1;">
+              <button type="button" class="btn-capture-end" style="background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);color:#38bdf8;border-radius:4px;padding:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex-shrink:0;font-size:0.75rem;">🎯</button>
+            </div>
+          </div>
+          <input type="text" placeholder="Chữ Hán (bắt buộc)" class="sub-hanzi" value="${sanitizeHTML(data.hanzi ?? '')}">
+          <input type="text" placeholder="Pinyin (tùy chọn)" class="sub-pinyin" value="${sanitizeHTML(data.pinyin ?? '')}">
+          <input type="text" placeholder="Dịch nghĩa (tùy chọn)" class="sub-viet" value="${sanitizeHTML(data.vietnamese ?? '')}">
+          <div class="row-actions">
+            <button type="button" class="btn-merge" title="Gộp câu này với câu tiếp theo">🔗 Gộp xuống</button>
+            <button type="button" class="btn-split" title="Tách câu này thành hai">✂️ Tách</button>
+          </div>
+        `;
+        div.querySelector('.btn-remove-row').addEventListener('click', () => div.remove());
+        const modalVideo = document.getElementById("modalPreviewVideo");
+        div.querySelector('.btn-capture-start').addEventListener('click', () => {
+          const inp = div.querySelector('.sub-start');
+          if (modalVideo && inp) inp.value = modalVideo.currentTime.toFixed(1);
+        });
+        div.querySelector('.btn-capture-end').addEventListener('click', () => {
+          const inp = div.querySelector('.sub-end');
+          if (modalVideo && inp) inp.value = modalVideo.currentTime.toFixed(1);
+        });
+        div.querySelector('.btn-merge').addEventListener('click', function() {
+          const currentRow = div;
+          const nextRow = currentRow.nextElementSibling;
+          if (!nextRow || !nextRow.classList.contains('subtitle-row')) { alert('Không có câu phía dưới để gộp!'); return; }
+          const start1 = currentRow.querySelector('.sub-start');
+          const end1 = currentRow.querySelector('.sub-end');
+          const hanzi1 = currentRow.querySelector('.sub-hanzi');
+          const pinyin1 = currentRow.querySelector('.sub-pinyin');
+          const viet1 = currentRow.querySelector('.sub-viet');
+          const start2 = nextRow.querySelector('.sub-start');
+          const end2 = nextRow.querySelector('.sub-end');
+          const hanzi2 = nextRow.querySelector('.sub-hanzi');
+          const pinyin2 = nextRow.querySelector('.sub-pinyin');
+          const viet2 = nextRow.querySelector('.sub-viet');
+          const newHanzi = (hanzi1.value.trim() + ' ' + hanzi2.value.trim()).trim();
+          const newPinyin = (pinyin1.value.trim() + ' ' + pinyin2.value.trim()).trim();
+          const newViet = (viet1.value.trim() + ' ' + viet2.value.trim()).trim();
+          end1.value = end2.value;
+          hanzi1.value = newHanzi;
+          pinyin1.value = newPinyin;
+          viet1.value = newViet;
+          nextRow.remove();
+        });
+        div.querySelector('.btn-split').addEventListener('click', function() {
+          const currentRow = div;
+          const startInput = currentRow.querySelector('.sub-start');
+          const endInput = currentRow.querySelector('.sub-end');
+          const hanziInput = currentRow.querySelector('.sub-hanzi');
+          const currentStart = parseFloat(startInput.value) || 0;
+          const currentEnd = parseFloat(endInput.value) || 0;
+          const text = hanziInput.value.trim();
+          if (!text) { alert('Không có nội dung để tách!'); return; }
+          const input = prompt('Nhập thời gian tách (giây) hoặc vị trí ký tự (số nguyên).\nVí dụ: 2.5 hoặc 5', '');
+          if (input === null) return;
+          const val = parseFloat(input);
+          if (isNaN(val) || val <= 0) { alert('Giá trị không hợp lệ!'); return; }
+          let splitTime = null, splitPos = null;
+          if (val < text.length && Number.isInteger(val)) splitPos = Math.floor(val);
+          else splitTime = val;
+          if (splitTime !== null) {
+            if (splitTime <= currentStart || splitTime >= currentEnd) { alert('Thời gian tách phải nằm giữa!'); return; }
+            const newText2 = prompt('Nhập nội dung cho câu thứ hai (phần sau khi tách):', text);
+            if (newText2 === null) return;
+            const newText1 = prompt('Nhập nội dung cho câu thứ nhất (phần trước khi tách):', text);
+            if (newText1 === null) return;
+            endInput.value = splitTime.toFixed(1);
+            hanziInput.value = newText1.trim();
+            const data = { startTime: splitTime, endTime: currentEnd, hanzi: newText2.trim(), pinyin: '', vietnamese: '' };
+            addSubtitleRow(data);
+            const rows = container.querySelectorAll('.subtitle-row');
+            const lastRow = rows[rows.length - 1];
+            if (lastRow) {
+              lastRow.querySelector('.sub-start').value = splitTime.toFixed(1);
+              lastRow.querySelector('.sub-end').value = currentEnd.toFixed(1);
+              lastRow.querySelector('.sub-hanzi').value = newText2.trim();
+              lastRow.querySelector('.sub-pinyin').value = '';
+              lastRow.querySelector('.sub-viet').value = '';
+              currentRow.parentNode.insertBefore(lastRow, currentRow.nextSibling);
+            }
+          } else if (splitPos !== null) {
+            if (splitPos <= 0 || splitPos >= text.length) { alert('Vị trí tách không hợp lệ!'); return; }
+            const part1 = text.substring(0, splitPos).trim();
+            const part2 = text.substring(splitPos).trim();
+            if (!part1 || !part2) { alert('Một phần rỗng!'); return; }
+            const ratio = splitPos / text.length;
+            const splitTimeVal = currentStart + (currentEnd - currentStart) * ratio;
+            endInput.value = splitTimeVal.toFixed(1);
+            hanziInput.value = part1;
+            const data = { startTime: splitTimeVal, endTime: currentEnd, hanzi: part2, pinyin: '', vietnamese: '' };
+            addSubtitleRow(data);
+            const rows = container.querySelectorAll('.subtitle-row');
+            const lastRow = rows[rows.length - 1];
+            if (lastRow) {
+              lastRow.querySelector('.sub-start').value = splitTimeVal.toFixed(1);
+              lastRow.querySelector('.sub-end').value = currentEnd.toFixed(1);
+              lastRow.querySelector('.sub-hanzi').value = part2;
+              lastRow.querySelector('.sub-pinyin').value = '';
+              lastRow.querySelector('.sub-viet').value = '';
+              currentRow.parentNode.insertBefore(lastRow, currentRow.nextSibling);
+            }
+          }
+        });
+        container.appendChild(div);
+    }
 
     // =====================================================================
     // RENDER PUBLIC / MY LIBRARY
@@ -728,7 +900,7 @@
     }
 
     // =====================================================================
-    // [ĐÃ SỬA LOGIC] FIRBASE AUTH CHECK - Dùng đúng key localStorage
+    // AUTH CHECK
     // =====================================================================
     async function initializeAppWithFirebase() {
         if (!firebaseInstance || !firebaseInstance.auth) {
@@ -740,7 +912,6 @@
             let currentUid = null;
             let currentRole = 'user';
 
-            // 1. Nếu trực tiếp lấy được user từ Firebase (đã đăng nhập ở tab này)
             if (user) {
                 currentUid = user.uid;
                 localStorage.setItem('app_current_user', currentUid);
@@ -753,22 +924,18 @@
                     localStorage.setItem('app_user_is_admin', currentRole === 'admin' ? 'true' : 'false');
                 } catch (e) { /* Bỏ qua lỗi đọc role */ }
             } 
-            // 2. Nếu Firebase trả về null (chưa đăng nhập ở tab này), check LocalStorage từ trang chính
-            // 👇 ĐÃ SỬA KEY THÀNH `app_current_user` VÀ `app_user_is_admin` ĐỂ KHỚP VỚI INDEX.HTML 👇
             else if (localStorage.getItem('app_current_user')) {
                 currentUid = localStorage.getItem('app_current_user');
                 currentRole = localStorage.getItem('app_user_is_admin') === 'true' ? 'admin' : 'user';
-                addLog(`🔄 Phát hiện đăng nhập từ LocalStorage (Chuyển trang từ Index). UID: ${currentUid}`, 'info');
+                addLog(`🔄 Phát hiện đăng nhập từ LocalStorage. UID: ${currentUid}`, 'info');
             }
-            // 3. Nếu không tìm thấy gì cả
             else {
                 userStatusDisplay.innerHTML = "⛔ Vui lòng đăng nhập ở trang chính";
                 document.getElementById('currentVideoTitle').innerText = "Vui lòng đăng nhập để học";
                 addLog("⛔ Chưa đăng nhập (Không có dữ liệu từ trang chính)", 'info');
-                return; // Dừng lại, không chạy app
+                return;
             }
 
-            // === Cập nhật trạng thái App ===
             CURRENT_USER_ID = currentUid;
             isAdminMode = (currentRole === 'admin');
 
@@ -781,8 +948,6 @@
                 userStatusDisplay.classList.remove('admin');
                 if (pendingTab) pendingTab.style.display = 'none';
             }
-
-            // === Khởi chạy Engine ===
             startEngine();
             setupEventListeners();
         });
@@ -805,7 +970,7 @@
     }
 
     // =====================================================================
-    // SETUP EVENT LISTENERS
+    // SETUP EVENT LISTENERS (Đã sửa để đọc file phụ đề)
     // =====================================================================
     function setupEventListeners() {
         document.getElementById('btnOpenUploadModal')?.addEventListener('click', () => {
@@ -841,6 +1006,30 @@
         document.getElementById('themeToggle')?.addEventListener('click', () => {
             document.documentElement.classList.toggle('light');
         });
+
+        // =====> SỰ KIỆN ĐỌC FILE PHỤ ĐỀ (Đã được bổ sung) <=====
+        document.getElementById('inputSubtitleFile')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const text = ev.target.result;
+                const ext = file.name.split('.').pop().toLowerCase();
+                const container = document.getElementById('subtitleInputsContainer');
+                if (container) container.innerHTML = "";
+                let sentences = [];
+                if (ext === 'srt') sentences = parseSRT(text);
+                else if (ext === 'csv' || ext === 'txt') sentences = parseCSVorTXT(text);
+                
+                if(sentences.length === 0) {
+                    addLog("⚠️ Không parse được câu thoại từ file.", 'warning');
+                    return;
+                }
+                for (const s of sentences) addSubtitleRow(s);
+            };
+            reader.readAsText(file);
+        });
+
         document.getElementById('btnSubmitForm')?.addEventListener('click', async (e) => {
             e.preventDefault();
             if (formError) { formError.classList.remove('visible'); formError.innerText = ''; }
@@ -968,7 +1157,6 @@
             if (uploadModal) uploadModal.classList.add("show");
         });
     }
-    function addSubtitleRow(data = {}) { /* Hàm render dòng phụ đề */ }
     function renderSentences() { /* Hàm render câu thoại */ }
     function selectVideo(item) {
         currentVideoData = item;

@@ -467,7 +467,19 @@
     }
 
     // =====================================================================
-    // 2.  PARSERS (Phân tích file SRT / CSV / TXT)
+    // 2.  UTILITIES
+    // =====================================================================
+    function formatTime(seconds) {
+      if (isNaN(seconds) || seconds === Infinity) return "00:00";
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }
+
+    function sanitizeHTML(str) { if (!str) return ''; const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return str.replace(/[&<>"']/g, m => map[m]); }
+
+    // =====================================================================
+    // 3.  PARSERS (Phân tích file SRT / CSV / TXT)
     // =====================================================================
     function parseCSVorTXT(text) {
       const normalized = text.replace(/\r\n/g, '\n');
@@ -517,11 +529,8 @@
     }
 
     // =====================================================================
-    // 3.  FIRESTORE & STORAGE HELPERS (Thay thế IndexedDB cho Videos & Favorites)
+    // 4.  FIRESTORE & STORAGE HELPERS (Thay thế IndexedDB cho Videos & Favorites)
     // =====================================================================
-    // Lưu ý: Chúng ta vẫn giữ IndexedDB cho Vocab (từ vựng)
-    // Chuyển video và user_libraries sang Firestore để đồng bộ giữa các máy
-
     const FS_COLLECTION_VIDEOS = "videos";
     const FS_COLLECTION_LIBRARIES = "user_libraries";
 
@@ -550,7 +559,6 @@
     }
 
     async function addVideo(videoData) {
-      // videoData phải có storageUrl (đã upload lên Storage trước)
       try {
         const docRef = firebaseInstance.firestore().collection(FS_COLLECTION_VIDEOS).doc();
         const newId = docRef.id;
@@ -575,18 +583,14 @@
 
     async function deleteVideo(id) {
       try {
-        // Xóa document
         await firebaseInstance.firestore().collection(FS_COLLECTION_VIDEOS).doc(id).delete();
-        // Xóa file video trên Storage (nếu có)
         const video = await getVideo(id);
         if (video && video.storageUrl) {
           const ref = firebaseInstance.storage().refFromURL(video.storageUrl);
           try {
             await ref.delete();
             addLog(`🗑️ Đã xóa file video trên Storage.`, 'info');
-          } catch (e) {
-            // File có thể đã bị xóa từ trước, bỏ qua
-          }
+          } catch (e) {}
         }
         return true;
       } catch (e) {
@@ -612,7 +616,6 @@
     }
 
     async function toggleFavorite(userId, videoId) {
-      // Kiểm tra xem đã có chưa
       try {
         const existingSnap = await firebaseInstance.firestore()
           .collection(FS_COLLECTION_LIBRARIES)
@@ -621,27 +624,16 @@
           .get();
         
         if (!existingSnap.empty) {
-          // Đã có -> Xóa
           const docId = existingSnap.docs[0].id;
           await firebaseInstance.firestore().collection(FS_COLLECTION_LIBRARIES).doc(docId).delete();
-          
-          // Nếu video này là clone của user, ta cũng nên xóa video clone đó để dọn dẹp
-          // (Tùy logic, có thể giữ lại, nhưng thường khi bỏ yêu thích thì clone cũng nên xóa)
-          // Tạm thời chỉ xóa record library
           return false;
         } else {
-          // Chưa có -> Thêm
-          // Lưu ý: Khi user thêm yêu thích, ta nên tạo 1 bản sao (clone) để user có thể chỉnh sửa riêng
-          // Nhưng bản sao cũng cần được lưu dưới dạng video riêng (clone) với scope private.
-          // Để đơn giản, ta thêm record library trỏ đến video gốc (hoặc clone nếu muốn)
-          // Trong trường hợp này, để user có thể chỉnh sửa riêng, ta sẽ tạo clone và lưu vào library
           const original = await getVideo(videoId);
           if (!original) return false;
           
-          // Clone video (copy data, nhưng storageUrl dùng chung file gốc để tiết kiệm)
           const clonedData = {
             title: original.title,
-            storageUrl: original.storageUrl, // Dùng chung file gốc
+            storageUrl: original.storageUrl,
             sentences: JSON.parse(JSON.stringify(original.sentences)),
             status: 'approved',
             uploadedBy: userId,
@@ -653,7 +645,6 @@
           const newCloneId = await addVideo(clonedData);
           if (!newCloneId) return false;
           
-          // Thêm record library trỏ đến clone
           await firebaseInstance.firestore().collection(FS_COLLECTION_LIBRARIES).add({
             userId: userId,
             videoId: newCloneId,
@@ -668,10 +659,9 @@
     }
 
     // =====================================================================
-    // 4.  INDEXED DB HELPERS (Giữ nguyên cho VOCABULARY & RECORDINGS)
+    // 5.  INDEXED DB HELPERS (Giữ nguyên cho VOCABULARY & RECORDINGS)
     // =====================================================================
     const VOCAB_STORE_NAME = "vocabulary";
-    // Mở DB cho từ vựng và các dữ liệu cá nhân khác
     const DB_NAME = "ChineseShadowingDB_v8";
     const DB_VERSION = 8; 
     let dbInstance = null;
@@ -687,7 +677,6 @@
             if (!db.objectStoreNames.contains(VOCAB_STORE_NAME)) {
               db.createObjectStore(VOCAB_STORE_NAME, { keyPath: "id", autoIncrement: true });
             }
-            // Không còn dùng cho video và user_libraries
           };
           request.onsuccess = (evt) => {
             dbInstance = evt.target.result;
@@ -713,14 +702,13 @@
       });
     }
 
-    // --- VOCAB STORE ---
     function getAllVocab(userId) { return executeTransaction(VOCAB_STORE_NAME, "readonly", store => { const req = store.getAll(); return new Promise((resolve, reject) => { req.onsuccess = () => { const items = req.result || []; resolve(items.filter(item => item.userId === userId)); }; req.onerror = () => reject(req.error); }); }); }
     function addVocab(vocabItem) { return executeTransaction(VOCAB_STORE_NAME, "readwrite", store => new Promise((resolve, reject) => { const req = store.add(vocabItem); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); })); }
     function updateVocab(vocabItem) { return executeTransaction(VOCAB_STORE_NAME, "readwrite", store => new Promise((resolve, reject) => { const req = store.put(vocabItem); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); })); }
     function deleteVocab(id) { return executeTransaction(VOCAB_STORE_NAME, "readwrite", store => new Promise((resolve, reject) => { const req = store.delete(id); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); })); }
 
     // =====================================================================
-    // 5.  APP STATE
+    // 6.  APP STATE
     // =====================================================================
     let currentVideoData = null;
     let CURRENT_USER_ID = null;
@@ -736,7 +724,110 @@
     const mainLayout = document.getElementById('mainLayout');
 
     // =====================================================================
-    // 6.  RENDER PUBLIC / MY LIBRARY (Sử dụng Firestore)
+    // 7.  CUSTOM VIDEO PLAYER (PHẦN QUAN TRỌNG BỊ THIẾU ĐÃ ĐƯỢC THÊM VÀO)
+    // =====================================================================
+    function setupCustomVideoPlayer() {
+        const btnPlayPause = document.getElementById('btnPlayPause');
+        const timeline = document.getElementById('videoTimeline');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const speedSelect = document.getElementById('videoSpeed');
+        const volumeSlider = document.getElementById('videoVolumeSlider');
+
+        if (!btnPlayPause || !video) return;
+
+        btnPlayPause.addEventListener('click', () => {
+            if (video.paused) {
+                video.play().catch(e => addLog("⚠️ Lỗi phát video: " + e.message, 'warning'));
+            } else {
+                video.pause();
+            }
+        });
+
+        video.addEventListener('play', () => { btnPlayPause.innerText = '⏸'; });
+        video.addEventListener('pause', () => { btnPlayPause.innerText = '▶'; });
+
+        video.addEventListener('timeupdate', () => {
+            if (!video.duration) return;
+            const pct = (video.currentTime / video.duration) * 100;
+            timeline.value = pct;
+            timeDisplay.innerText = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+        });
+
+        timeline.addEventListener('input', () => {
+            if (video.duration) video.currentTime = (timeline.value / 100) * video.duration;
+        });
+
+        speedSelect.addEventListener('change', () => {
+            video.playbackRate = parseFloat(speedSelect.value);
+        });
+
+        volumeSlider.addEventListener('input', () => {
+            video.volume = parseFloat(volumeSlider.value) / 100;
+        });
+    }
+
+    // =====================================================================
+    // 8.  SENTENCE PLAYBACK (KHÔI PHỤC CHỨC NĂNG PHÁT CÂU THEO PHỤ ĐỀ)
+    // =====================================================================
+    let sentenceTimingInterval = null;
+
+    function playSentence(id) {
+        if (!currentVideoData || !video) return;
+        const sentence = currentVideoData.sentences.find(s => s.id === id);
+        if (!sentence) return;
+
+        // Dừng các sự kiện cũ
+        if (sentenceTimingInterval) clearInterval(sentenceTimingInterval);
+
+        // Tua đến đoạn cần phát
+        video.currentTime = sentence.startTime;
+        video.play().catch(e => addLog("❌ Lỗi phát câu: " + e.message, 'error'));
+
+        // Tự động dừng khi hết câu
+        sentenceTimingInterval = setInterval(() => {
+            if (!video.paused && video.currentTime >= sentence.endTime) {
+                video.pause();
+                clearInterval(sentenceTimingInterval);
+                sentenceTimingInterval = null;
+                addLog(`⏹️ Đã phát xong câu thoại.`, 'info');
+            }
+        }, 100);
+    }
+
+    // =====================================================================
+    // 9.  RENDER SENTENCES (KHÔI PHỤC HIỂN THỊ CÂU THOẠI)
+    // =====================================================================
+    function renderSentences() {
+        if (!sentenceListContainer) return;
+        if (!currentVideoData || !currentVideoData.sentences) {
+            sentenceListContainer.innerHTML = '<p style="color:var(--text-muted);padding:20px;text-align:center;">Chưa có câu thoại cho video này.</p>';
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        for (const sentence of currentVideoData.sentences) {
+            const card = document.createElement('div');
+            card.className = 'sentence-card';
+            card.id = `card-${sentence.id}`;
+
+            card.innerHTML = `
+                <div class="sub-chinese">${sanitizeHTML(sentence.hanzi)}</div>
+                <div class="sub-pinyin">${sanitizeHTML(sentence.pinyin || '')}</div>
+                <div class="sub-vietnamese">${sanitizeHTML(sentence.vietnamese || '')}</div>
+                <div class="controls-group">
+                    <button class="btn btn-primary btn-play-sen" title="Nghe Mẫu">🔊</button>
+                </div>
+            `;
+            // Gán sự kiện phát câu
+            card.querySelector('.btn-play-sen').addEventListener('click', () => playSentence(sentence.id));
+            fragment.appendChild(card);
+        }
+        sentenceListContainer.innerHTML = '';
+        sentenceListContainer.appendChild(fragment);
+    }
+
+    // =====================================================================
+    // 10. RENDER PUBLIC / MY LIBRARY (Dùng Firestore)
     // =====================================================================
     async function renderLibraryList() {
         if (!videoLibraryList) return;
@@ -875,7 +966,7 @@
                     const v = await getVideo(vid);
                     if (v) { 
                       v.status = 'approved';
-                      v.scope = 'public'; // Chuyển thành công khai
+                      v.scope = 'public';
                       await updateVideo(v); 
                       renderLibraryList(); 
                     }
@@ -892,7 +983,7 @@
     }
 
     // =====================================================================
-    // 7.  FIRBASE AUTH CHECK
+    // 11. FIRBASE AUTH CHECK
     // =====================================================================
     async function initializeAppWithFirebase() {
         if (!firebaseInstance || !firebaseInstance.auth) {
@@ -946,6 +1037,9 @@
     }
 
     function startEngine() {
+        // Khởi tạo Player trước
+        setupCustomVideoPlayer();
+        
         openDB().then(() => {
             renderLibraryList();
             loadVocabWords();
@@ -962,7 +1056,7 @@
     }
 
     // =====================================================================
-    // 8.  ADD SUBTITLE ROW (Giữ nguyên)
+    // 12. ADD SUBTITLE ROW (Giữ nguyên)
     // =====================================================================
     function addSubtitleRow(data = {}) {
         const container = document.getElementById('subtitleInputsContainer');
@@ -1086,7 +1180,7 @@
     }
 
     // =====================================================================
-    // 9.  SETUP EVENT LISTENERS (Upload video lên Storage & Firestore)
+    // 13. SETUP EVENT LISTENERS (Upload video lên Storage & Firestore)
     // =====================================================================
     function setupEventListeners() {
         document.getElementById('btnOpenUploadModal')?.addEventListener('click', () => {
@@ -1123,7 +1217,6 @@
             document.documentElement.classList.toggle('light');
         });
 
-        // Đọc file phụ đề
         document.getElementById('inputSubtitleFile')?.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1146,7 +1239,6 @@
             reader.readAsText(file);
         });
 
-        // Submit Form Upload Video
         document.getElementById('btnSubmitForm')?.addEventListener('click', async (e) => {
             e.preventDefault();
             if (formError) { formError.classList.remove('visible'); formError.innerText = ''; }
@@ -1191,7 +1283,6 @@
             });
             if (hasError) return;
 
-            // Bắt đầu upload file lên Storage
             try {
                 let storageUrl = null;
                 if (videoFile) {
@@ -1199,7 +1290,7 @@
                     addLog(`⏳ Đang upload video lên Firebase Storage...`, 'info');
                     const snapshot = await storageRef.put(videoFile);
                     storageUrl = await snapshot.ref.getDownloadURL();
-                    addLog(`✅ Upload video thành công! URL: ${storageUrl.substring(0, 50)}...`, 'success');
+                    addLog(`✅ Upload video thành công!`, 'success');
                 }
 
                 let newId = null;
@@ -1210,7 +1301,7 @@
 
                 if (!isAdminMode) {
                     scope = 'private';
-                    status = 'pending'; // User upload cần duyệt
+                    status = 'pending';
                     uploadedBy = CURRENT_USER_ID;
                     isPrivateClone = false;
                 } else {
@@ -1220,7 +1311,6 @@
                     isPrivateClone = false;
                 }
 
-                // Tạo đối tượng video
                 const videoData = {
                     title: title,
                     storageUrl: storageUrl,
@@ -1232,24 +1322,20 @@
                     created_at: Date.now()
                 };
 
-                // Thêm vào Firestore
                 if (editId) {
                     const existing = await getVideo(editId);
                     if (!existing) throw new Error("Không tìm thấy video cần sửa.");
                     existing.title = title;
                     existing.sentences = sentences;
-                    // Nếu có file mới, cập nhật storageUrl, nếu không giữ nguyên
                     if (storageUrl) existing.storageUrl = storageUrl;
                     await updateVideo(existing);
                     newId = editId;
                     addLog(`✅ Cập nhật video thành công ID: ${newId}`, 'success');
                 } else {
-                    // Thêm mới
                     newId = await addVideo(videoData);
                     if (!newId) throw new Error("Lỗi khi thêm video vào Firestore");
                     
                     if (!isAdminMode) {
-                        // Tự động thêm vào user_libraries (yêu thích cá nhân)
                         await firebaseInstance.firestore().collection(FS_COLLECTION_LIBRARIES).add({
                             userId: CURRENT_USER_ID,
                             videoId: newId,
@@ -1282,9 +1368,19 @@
     }
 
     // =====================================================================
-    // 10.  CÁC HÀM HỖ TRỢ KHÁC
+    // 14. SELECT VIDEO (Khôi phục chức năng chọn video để phát)
     // =====================================================================
-    function sanitizeHTML(str) { if (!str) return ''; const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return str.replace(/[&<>"']/g, m => map[m]); }
+    function selectVideo(item) {
+        currentVideoData = item;
+        if (currentVideoTitle) currentVideoTitle.innerText = item.title;
+        if (video && item.storageUrl) {
+            video.src = item.storageUrl;
+            video.load();
+            renderSentences(); // Cập nhật lại danh sách câu thoại
+            // Gợi ý: video.play().catch(...) -> Không gọi tự động để tránh trình duyệt chặn autoplay, người dùng bấm Play là chạy
+        }
+    }
+
     function openEditModal(e, id) {
         e.stopPropagation();
         getVideo(id).then(item => {
@@ -1307,19 +1403,9 @@
             if (uploadModal) uploadModal.classList.add("show");
         });
     }
-    function renderSentences() { /* Hàm render câu thoại */ }
-    function selectVideo(item) {
-        currentVideoData = item;
-        if (currentVideoTitle) currentVideoTitle.innerText = item.title;
-        if (video && item.storageUrl) {
-            video.src = item.storageUrl;
-            video.load();
-            // Bạn có thể thêm logic phát video tại đây
-        }
-    }
 
     // =====================================================================
-    // 11. INIT
+    // 15. INIT
     // =====================================================================
     function init() {
         if (firebaseInstance && firebaseInstance.auth) {

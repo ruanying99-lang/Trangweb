@@ -5,16 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Luyện Nói Tiếng Trung Qua Video Ngắn</title>
   
+  <!-- ================================================================ -->
+  <!-- 👇 3 DÒNG FIREBASE SDK BẮT BUỘC 👇 -->
+  <!-- ================================================================ -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <!-- ================================================================ -->
 
+  <!-- 👇 ĐÃ SỬA ĐƯỜNG DẪN TỪ `../style.css` THÀNH `style.css` (CÙNG THƯ MỤC) 👇 -->
   <link rel="stylesheet" href="style.css" />
+  
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/pinyin-pro.min.js">
   </script>
 
+  <!-- 👇 CSS NỘI TUYẾN ĐỂ TRÁNH LỖI 404 👇 -->
   <style>
-    /* Toàn bộ CSS giữ nguyên */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #090d16; color: #f8fafc; min-height: 100vh; padding: 20px; background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.08) 0%, transparent 50%); background-attachment: fixed; }
     :root {
@@ -199,6 +205,7 @@
   </style>
 </head>
 <body>
+  <!-- ===== FLOATING LOG ===== -->
   <div id="floatingLog" style="display:block;">
     <div class="log-header">
       <span>📋 Log</span>
@@ -207,10 +214,12 @@
     <div class="log-body" id="logBody"></div>
   </div>
 
+  <!-- ===== APP CONTAINER ===== -->
   <div class="app-container">
     <div class="top-bar">
       <div class="top-bar-left">
         <span style="font-size:1.5rem;">🇨🇳</span>
+        <!-- User/Admin Status Display -->
         <div class="user-status-display" id="userStatusDisplay">👤 Đang tải User...</div>
         <button id="btnToggleLibrary" class="btn btn-secondary" style="padding:6px 12px; font-size:0.85rem;">📚 Hiện Thư Viện</button>
         <button id="btnOpenVocabHub" class="btn btn-secondary" style="padding:6px 12px; font-size:0.85rem;">📓 Sổ Từ Vựng</button>
@@ -228,11 +237,13 @@
       </div>
     </div>
 
+    <!-- HEADER -->
     <header>
       <div class="header-title-wrap"><h1>Short Video Shadowing</h1></div>
       <p id="headerSubtitle">Hệ thống luyện nói & lồng tiếng tiếng Trung trên nền tảng Video ngắn</p>
     </header>
 
+    <!-- MAIN LAYOUT -->
     <main class="main-layout library-collapsed" id="mainLayout">
       <aside class="library-section dashboard-card">
         <div class="library-tabs">
@@ -311,6 +322,7 @@
     </main>
   </div>
 
+  <!-- ===== MODALS ===== -->
   <div id="uploadModal" class="modal">
     <div class="modal-content">
       <span class="close-modal">&times;</span>
@@ -388,7 +400,12 @@
     </div>
   </div>
 
+  <!-- ========================================================== -->
+  <!-- ===== JAVASCRIPT ===== -->
+  <!-- ========================================================== -->
   <script>
+    // ================================================================
+    // 👇 FIREBASE CONFIG 👇
     // ================================================================
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyDHnUhPNokBrXgYLNqlW0kB9tJm3U0Un0I",
@@ -399,6 +416,9 @@
       appId: "1:410660952284:web:ee5b5a98d12bef3d45bc19"
     };
 
+    // =====================================================================
+    // 0.  LOG HELPER
+    // =====================================================================
     const logContainer = document.getElementById('floatingLog');
     const logBody = document.getElementById('logBody');
     const logToggleBtn = document.getElementById('logToggleBtn');
@@ -423,6 +443,9 @@
       this.textContent = logCollapsed ? '➕' : '➖';
     });
 
+    // =====================================================================
+    // 1.  FIREBASE BOOTSTRAP 
+    // =====================================================================
     let firebaseInstance = null;
     if (typeof window.firebase !== 'undefined') {
         firebaseInstance = window.firebase;
@@ -444,11 +467,15 @@
         }
     }
 
+    // =====================================================================
+    // 2.  INDEXED DB HELPERS
+    // =====================================================================
     const DB_NAME = "ChineseShadowingDB_v8";
     const DB_VERSION = 8; 
     const STORE_NAME = "videos";
     const VOCAB_STORE_NAME = "vocabulary";
     const LIBRARY_STORE_NAME = "user_libraries"; 
+
     let dbInstance = null;
 
     function openDB() {
@@ -533,6 +560,9 @@
       }
     }
 
+    // =====================================================================
+    // 3.  APP STATE
+    // =====================================================================
     let currentVideoData = null;
     let CURRENT_USER_ID = null;
     let isAdminMode = false;
@@ -546,6 +576,9 @@
     const userStatusDisplay = document.getElementById('userStatusDisplay');
     const mainLayout = document.getElementById('mainLayout');
 
+    // =====================================================================
+    // RENDER PUBLIC / MY LIBRARY
+    // =====================================================================
     async function renderLibraryList() {
         if (!videoLibraryList) return;
         videoLibraryList.innerHTML = '';
@@ -694,6 +727,9 @@
         } catch (err) { addLog("❌ Lỗi tải thư viện: " + err.message, 'error'); }
     }
 
+    // =====================================================================
+    // [ĐÃ SỬA LOGIC] FIRBASE AUTH CHECK - Dùng đúng key localStorage
+    // =====================================================================
     async function initializeAppWithFirebase() {
         if (!firebaseInstance || !firebaseInstance.auth) {
             userStatusDisplay.innerHTML = "❌ Lỗi Firebase";
@@ -704,6 +740,7 @@
             let currentUid = null;
             let currentRole = 'user';
 
+            // 1. Nếu trực tiếp lấy được user từ Firebase (đã đăng nhập ở tab này)
             if (user) {
                 currentUid = user.uid;
                 localStorage.setItem('app_current_user', currentUid);
@@ -716,18 +753,22 @@
                     localStorage.setItem('app_user_is_admin', currentRole === 'admin' ? 'true' : 'false');
                 } catch (e) { /* Bỏ qua lỗi đọc role */ }
             } 
+            // 2. Nếu Firebase trả về null (chưa đăng nhập ở tab này), check LocalStorage từ trang chính
+            // 👇 ĐÃ SỬA KEY THÀNH `app_current_user` VÀ `app_user_is_admin` ĐỂ KHỚP VỚI INDEX.HTML 👇
             else if (localStorage.getItem('app_current_user')) {
                 currentUid = localStorage.getItem('app_current_user');
                 currentRole = localStorage.getItem('app_user_is_admin') === 'true' ? 'admin' : 'user';
-                addLog(`🔄 Phát hiện đăng nhập từ LocalStorage. UID: ${currentUid}`, 'info');
+                addLog(`🔄 Phát hiện đăng nhập từ LocalStorage (Chuyển trang từ Index). UID: ${currentUid}`, 'info');
             }
+            // 3. Nếu không tìm thấy gì cả
             else {
                 userStatusDisplay.innerHTML = "⛔ Vui lòng đăng nhập ở trang chính";
                 document.getElementById('currentVideoTitle').innerText = "Vui lòng đăng nhập để học";
-                addLog("⛔ Người dùng chưa đăng nhập.", 'info');
-                return;
+                addLog("⛔ Chưa đăng nhập (Không có dữ liệu từ trang chính)", 'info');
+                return; // Dừng lại, không chạy app
             }
 
+            // === Cập nhật trạng thái App ===
             CURRENT_USER_ID = currentUid;
             isAdminMode = (currentRole === 'admin');
 
@@ -740,6 +781,8 @@
                 userStatusDisplay.classList.remove('admin');
                 if (pendingTab) pendingTab.style.display = 'none';
             }
+
+            // === Khởi chạy Engine ===
             startEngine();
             setupEventListeners();
         });
@@ -761,6 +804,9 @@
         } catch (e) { addLog("⚠️ Không thể tải từ vựng: " + e.message, 'warning'); }
     }
 
+    // =====================================================================
+    // SETUP EVENT LISTENERS
+    // =====================================================================
     function setupEventListeners() {
         document.getElementById('btnOpenUploadModal')?.addEventListener('click', () => {
             if (uploadModal) uploadModal.classList.add('show');
@@ -902,6 +948,9 @@
         });
     }
 
+    // =====================================================================
+    // 4.  CÁC HÀM HỖ TRỢ KHÁC
+    // =====================================================================
     function sanitizeHTML(str) { if (!str) return ''; const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return str.replace(/[&<>"']/g, m => map[m]); }
     function openEditModal(e, id) {
         e.stopPropagation();
@@ -929,6 +978,9 @@
         }
     }
 
+    // =====================================================================
+    // INIT
+    // =====================================================================
     function init() {
         if (firebaseInstance && firebaseInstance.auth) {
             initializeAppWithFirebase();

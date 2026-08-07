@@ -198,7 +198,7 @@
     @media (max-width: 1024px) { .main-layout { grid-template-columns: 1fr !important; } .main-layout.library-collapsed { grid-template-columns: 1fr !important; } .dashboard-card { max-height: none; } .sentence-list { max-height: 400px; } .video-player-container { height: 50vh; min-height: 300px; } }
     @media (max-width: 600px) { body { padding: 12px; } .top-bar { flex-direction: column; align-items: stretch; } .global-controls { flex-direction: column; align-items: stretch; } .recording-controls { flex-wrap: wrap; } .custom-video-controls { flex-wrap: wrap; gap: 6px; padding: 8px; } .volume-slider-wrapper input[type="range"] { width: 40px; } .video-player-container { height: 40vh; min-height: 220px; } #floatingLog { width: 90%; right: 5%; bottom: 10px; max-height: 250px; } }
 
-    /* ---- THÊM PROGRESS BAR CHO UPLOAD ---- */
+    /* ---- PROGRESS BAR ---- */
     .upload-progress-wrapper {
       margin-top: 12px;
       display: none;
@@ -377,7 +377,7 @@
             <button type="button" id="btnAddSubtitleRow" class="btn btn-secondary" style="flex:1; padding:8px;">➕ Thêm Câu Thủ Công</button>
             <button type="button" id="btnClearSubtitles" class="btn btn-secondary" style="background:rgba(244,63,94,0.1); border-color:rgba(244,63,94,0.2); color:var(--danger); flex:1; padding:8px;">🗑️ Xóa Hết Câu</button>
           </div>
-          <!-- PROGRESS BAR UPLOAD -->
+          <!-- PROGRESS BAR -->
           <div id="uploadProgressWrapper" class="upload-progress-wrapper">
             <div class="upload-progress-bar"><div class="progress-fill" id="uploadProgressFill" style="width:0%;"></div></div>
             <div class="upload-progress-text"><span id="uploadStatusText">Đang chuẩn bị...</span><span id="uploadPercentText">0%</span></div>
@@ -517,6 +517,11 @@
 
     function sanitizeHTML(str) { if (!str) return ''; const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return str.replace(/[&<>"']/g, m => map[m]); }
 
+    // Hàm làm sạch tên file (loại bỏ ký tự đặc biệt)
+    function sanitizeFilename(name) {
+      return name.replace(/[^a-zA-Z0-9.]/g, '_');
+    }
+
     // =====================================================================
     // 3.  PARSERS
     // =====================================================================
@@ -568,79 +573,12 @@
     }
 
     // =====================================================================
-    // 4.  FIRESTORE & STORAGE HELPERS (có sửa để hiển thị progress)
+    // 4.  FIRESTORE & STORAGE HELPERS (có sửa để hiển thị progress và sanitize tên)
     // =====================================================================
     const FS_COLLECTION_VIDEOS = "videos";
     const FS_COLLECTION_LIBRARIES = "user_libraries";
 
-    // ----- NÉN VIDEO TRƯỚC KHI UPLOAD (GIẢM DUNG LƯỢNG) -----
-    async function compressVideo(file) {
-      return new Promise((resolve, reject) => {
-        const maxWidth = 1280;   // giảm xuống 720p để nhẹ
-        const maxHeight = 720;
-        const bitrate = 1500000; // 1.5 Mbps
-
-        const video = document.createElement('video');
-        video.src = URL.createObjectURL(file);
-        video.muted = true;
-        video.preload = 'metadata';
-        video.onloadedmetadata = async () => {
-          let width = video.videoWidth;
-          let height = video.videoHeight;
-          // Giữ tỷ lệ
-          if (width > maxWidth || height > maxHeight) {
-            const ratio = Math.min(maxWidth / width, maxHeight / height);
-            width = Math.floor(width * ratio);
-            height = Math.floor(height * ratio);
-          }
-          // Tạo canvas
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          
-          // Tạo stream từ canvas
-          const stream = canvas.captureStream(30);
-          const recorder = new MediaRecorder(stream, {
-            mimeType: 'video/mp4',
-            videoBitsPerSecond: bitrate
-          });
-
-          const chunks = [];
-          recorder.ondataavailable = (e) => chunks.push(e.data);
-          recorder.onstop = () => {
-            const blob = new Blob(chunks, { type: 'video/mp4' });
-            const newFile = new File([blob], file.name.replace(/\.[^.]+$/, '') + '_compressed.mp4', {
-              type: 'video/mp4',
-              lastModified: Date.now()
-            });
-            resolve(newFile);
-          };
-
-          recorder.start();
-          // Vẽ từng frame
-          video.currentTime = 0;
-          video.play();
-          const drawFrame = () => {
-            if (video.paused || video.ended) {
-              recorder.stop();
-              return;
-            }
-            ctx.drawImage(video, 0, 0, width, height);
-            requestAnimationFrame(drawFrame);
-          };
-          drawFrame();
-
-          // Tự động dừng khi hết video
-          video.onended = () => {
-            recorder.stop();
-          };
-        };
-        video.onerror = () => reject(new Error('Không thể đọc video để nén.'));
-      });
-    }
-
-    // ----- UPLOAD VỚI PROGRESS -----
+    // ----- UPLOAD VỚI PROGRESS VÀ SANITIZE TÊN FILE -----
     async function uploadVideoWithProgress(file, path, onProgress) {
       return new Promise((resolve, reject) => {
         const storageRef = firebaseInstance.storage().ref(path);
@@ -651,7 +589,10 @@
             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             if (onProgress) onProgress(progress, snapshot);
           },
-          (error) => reject(error),
+          (error) => {
+            addLog("❌ Upload thất bại: " + error.message, 'error');
+            reject(error);
+          },
           () => {
             uploadTask.snapshot.ref.getDownloadURL().then(url => resolve(url));
           }
@@ -1263,7 +1204,7 @@
     }
 
     // =====================================================================
-    // 13. ADD SUBTITLE ROW
+    // 13. ADD SUBTITLE ROW (giữ nguyên)
     // =====================================================================
     function addSubtitleRow(data = {}) {
         const container = document.getElementById('subtitleInputsContainer');
@@ -1416,7 +1357,7 @@
     }
 
     // =====================================================================
-    // 14. SETUP EVENT LISTENERS (có sửa upload để nén + progress)
+    // 14. SETUP EVENT LISTENERS (đã sửa upload để sanitize tên file)
     // =====================================================================
     function setupEventListeners() {
         const openUploadBtn = document.getElementById('btnOpenUploadModal');
@@ -1555,52 +1496,44 @@
                 });
                 if (hasError) return;
 
-                // ===== BẮT ĐẦU UPLOAD VỚI NÉN + PROGRESS =====
+                // ===== BẮT ĐẦU UPLOAD =====
                 const progressWrapper = document.getElementById('uploadProgressWrapper');
                 const progressFill = document.getElementById('uploadProgressFill');
                 const statusText = document.getElementById('uploadStatusText');
                 const percentText = document.getElementById('uploadPercentText');
                 progressWrapper.classList.add('visible');
                 progressFill.style.width = '0%';
-                statusText.innerText = 'Đang nén video...';
+                statusText.innerText = 'Bắt đầu upload...';
                 percentText.innerText = '0%';
 
                 try {
                     if (!firebaseInstance || !firebaseInstance.storage) {
                         throw new Error("Firebase Storage chưa sẵn sàng.");
                     }
-                    let finalFile = videoFile;
-                    let storageUrl = null;
+                    
+                    // Sanitize tên file (loại bỏ ký tự đặc biệt)
+                    const originalName = videoFile.name;
+                    const safeName = sanitizeFilename(originalName);
+                    const path = `videos/${Date.now()}_${safeName}`;
+                    
+                    addLog(`📤 Đang upload video: ${originalName} -> ${path}`, 'info');
+                    statusText.innerText = `Đang upload (${(videoFile.size / 1024 / 1024).toFixed(1)} MB)...`;
+                    
+                    // Tạo metadata (có thể thêm Content-Type)
+                    const metadata = { contentType: 'video/mp4' };
 
-                    // Nếu có file và kích thước > 20MB thì nén
-                    if (videoFile && videoFile.size > 20 * 1024 * 1024) {
-                        addLog(`⏳ Video lớn (${(videoFile.size / 1024 / 1024).toFixed(1)} MB), đang nén...`, 'info');
-                        statusText.innerText = 'Đang nén video (giảm dung lượng)...';
-                        try {
-                            finalFile = await compressVideo(videoFile);
-                            addLog(`✅ Nén xong, dung lượng: ${(finalFile.size / 1024 / 1024).toFixed(1)} MB`, 'success');
-                            statusText.innerText = 'Nén thành công, bắt đầu upload...';
-                        } catch (compressErr) {
-                            addLog(`⚠️ Không thể nén video, vẫn upload file gốc: ${compressErr.message}`, 'warning');
-                            statusText.innerText = 'Không nén được, upload file gốc...';
-                            finalFile = videoFile;
-                        }
-                    } else {
-                        statusText.innerText = 'Đang upload video...';
-                    }
-
-                    const path = `videos/${Date.now()}_${finalFile.name}`;
-                    const url = await uploadVideoWithProgress(finalFile, path, (progress, snapshot) => {
+                    // Upload
+                    const url = await uploadVideoWithProgress(videoFile, path, (progress, snapshot) => {
                         const pct = Math.round(progress);
                         progressFill.style.width = pct + '%';
                         percentText.innerText = pct + '%';
                         if (pct < 100) statusText.innerText = `Đang upload... ${pct}%`;
                     });
-                    storageUrl = url;
+                    
                     progressFill.style.width = '100%';
                     percentText.innerText = '100%';
                     statusText.innerText = '✅ Upload hoàn tất!';
-                    addLog(`✅ Upload video thành công! URL: ${storageUrl.substring(0, 50)}...`, 'success');
+                    addLog(`✅ Upload video thành công! URL: ${url.substring(0, 50)}...`, 'success');
 
                     // Lưu vào Firestore
                     let newId = null;
@@ -1623,7 +1556,7 @@
 
                     const videoData = {
                         title: title,
-                        storageUrl: storageUrl,
+                        storageUrl: url,
                         sentences: sentences,
                         status: status,
                         scope: scope,
@@ -1637,7 +1570,7 @@
                         if (!existing) throw new Error("Không tìm thấy video cần sửa.");
                         existing.title = title;
                         existing.sentences = sentences;
-                        if (storageUrl) existing.storageUrl = storageUrl;
+                        if (url) existing.storageUrl = url;
                         await updateVideo(existing);
                         newId = editId;
                         addLog(`✅ Cập nhật video thành công ID: ${newId}`, 'success');
@@ -1673,7 +1606,10 @@
                     }
                 } catch (err) {
                     addLog("❌ Lỗi khi upload/lưu video: " + err.message, 'error');
-                    if (formError) { formError.innerText = "Lỗi: " + err.message; formError.classList.add('visible'); }
+                    if (formError) { 
+                        formError.innerText = "Lỗi: " + err.message + ". Kiểm tra CORS bucket hoặc thử video nhỏ hơn.";
+                        formError.classList.add('visible'); 
+                    }
                     progressWrapper.classList.remove('visible');
                 }
             });

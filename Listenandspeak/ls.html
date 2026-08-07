@@ -4,18 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Luyện Nói Tiếng Trung Qua Video Ngắn</title>
-  
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
-  <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/pinyin-pro.min.js"></script>
 
   <style>
-    /* ---- CSS GIỮ NGUYÊN NHƯ CŨ (đã có đầy đủ) ---- */
+    /* ---- Toàn bộ CSS giữ nguyên như cũ, chỉ bổ sung style cho radio chọn chế độ ---- */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #090d16; color: #f8fafc; min-height: 100vh; padding: 20px; background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.08) 0%, transparent 50%); background-attachment: fixed; }
     :root {
@@ -57,6 +56,9 @@
     .library-item .video-title-span .fav-icon { color: var(--danger); font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
     .library-item .video-title-span .fav-icon:hover { transform: scale(1.2); }
     .library-item .video-title-span .status-badge { font-size: 0.6rem; padding: 2px 6px; background: var(--warning); color: #000; border-radius: 4px; font-weight: 700; margin-left: auto; }
+    .library-item .video-title-span .privacy-badge { font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; margin-left: 4px; }
+    .library-item .video-title-span .privacy-badge.public { background: var(--success); color: #fff; }
+    .library-item .video-title-span .privacy-badge.private { background: var(--text-muted); color: #fff; }
     .action-buttons { display: flex; gap: 4px; margin-top: 2px; justify-content: flex-end; }
     .action-btn { background: transparent; border: none; color: var(--text-muted); font-size: 0.9rem; cursor: pointer; padding: 4px; border-radius: 4px; transition: 0.2s; }
     .action-btn:hover { background: var(--border); }
@@ -198,60 +200,68 @@
     @media (max-width: 1024px) { .main-layout { grid-template-columns: 1fr !important; } .main-layout.library-collapsed { grid-template-columns: 1fr !important; } .dashboard-card { max-height: none; } .sentence-list { max-height: 400px; } .video-player-container { height: 50vh; min-height: 300px; } }
     @media (max-width: 600px) { body { padding: 12px; } .top-bar { flex-direction: column; align-items: stretch; } .global-controls { flex-direction: column; align-items: stretch; } .recording-controls { flex-wrap: wrap; } .custom-video-controls { flex-wrap: wrap; gap: 6px; padding: 8px; } .volume-slider-wrapper input[type="range"] { width: 40px; } .video-player-container { height: 40vh; min-height: 220px; } #floatingLog { width: 90%; right: 5%; bottom: 10px; max-height: 250px; } }
 
-    /* ---- Style cho form nhập URL ---- */
-    .url-input-area {
-      background: var(--bg-input);
-      padding: 16px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-      margin-bottom: 16px;
+    /* ---- Bổ sung style cho radio privacy ---- */
+    .privacy-options {
+      display: flex;
+      gap: 20px;
+      margin: 8px 0 12px;
     }
-    .url-input-area label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 8px;
+    .privacy-options label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
       color: var(--text-secondary);
-      font-size: 0.88rem;
+      cursor: pointer;
     }
-    .url-input-area input {
+    .privacy-options label input[type="radio"] {
+      accent-color: var(--primary);
+      transform: scale(1.1);
+    }
+    .upload-mode-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .upload-mode-tab {
+      padding: 6px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.8rem;
+      transition: 0.2s;
+    }
+    .upload-mode-tab.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .upload-mode-tab:hover:not(.active) {
+      border-color: var(--primary);
+      color: var(--text-primary);
+    }
+    .upload-mode-panel {
+      display: none;
+    }
+    .upload-mode-panel.active {
+      display: block;
+    }
+    .video-url-input {
       width: 100%;
       padding: 10px 14px;
-      background: var(--bg-card);
+      background: var(--bg-input);
       border: 1px solid var(--border);
       color: var(--text-primary);
       border-radius: var(--radius-sm);
       outline: none;
       font-size: 0.9rem;
+      margin-bottom: 8px;
     }
-    .url-input-area input:focus {
+    .video-url-input:focus {
       border-color: var(--primary);
-    }
-    .url-input-area .hint {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-top: 6px;
-    }
-    .url-input-area .hint a {
-      color: var(--primary);
-      text-decoration: none;
-    }
-    .url-input-area .hint a:hover {
-      text-decoration: underline;
-    }
-    .upload-btn {
-      width: 100%;
-      padding: 12px;
-      background: var(--success);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .upload-btn:hover {
-      background: var(--success-hover);
     }
   </style>
 </head>
@@ -374,37 +384,64 @@
   <div id="uploadModal" class="modal">
     <div class="modal-content">
       <span class="close-modal">&times;</span>
-      <h2 id="modalTitle">Tạo Video Mới</h2>
+      <h2 id="modalTitle">Tải Video Mới & Tạo Phụ Đề</h2>
       <form id="uploadForm" style="margin-top:0; display:flex; flex-direction:column; flex:1; overflow:hidden;">
         <input type="hidden" id="editVideoId" value="" />
         <div class="modal-body-scroll">
-          <!-- Preview video -->
           <div class="modal-video-preview">
             <video id="modalPreviewVideo" style="width:100%; height:100%; object-fit:contain;" controls></video>
-            <div class="placeholder" id="modalVideoPlaceholder"><span>📹</span><span>Nhập URL video bên dưới để xem trước</span></div>
+            <div class="placeholder" id="modalVideoPlaceholder"><span>📹</span><span>Chọn tệp video để xem trước</span></div>
+          </div>
+          <div style="background:var(--bg-input); padding:12px; border-radius:var(--radius-md); border:1px solid var(--border); margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between;"><span style="font-size:0.8rem; font-weight:700; color:var(--text-secondary);">Thời gian hiện tại:</span><span id="modalVideoTimeDisplay" style="font-family:monospace; font-size:1.1rem; font-weight:bold; color:var(--primary);">0.0s</span></div>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <button type="button" id="btnModalRewind" class="btn btn-secondary" style="flex:1; padding:6px; font-size:0.75rem;">⏪ Tua lại 1s</button>
+              <button type="button" id="btnModalForward" class="btn btn-secondary" style="flex:1; padding:6px; font-size:0.75rem;">⏩ Tua đi 1s</button>
+            </div>
+          </div>
+          <div class="form-group"><label>Tên bài học / Video:</label><input type="text" id="inputVideoTitle" placeholder="Ví dụ: Luyện chào hỏi hàng ngày" /></div>
+
+          <!-- ===== CHỌN CHẾ ĐỘ UPLOAD ===== -->
+          <div class="upload-mode-tabs">
+            <button type="button" class="upload-mode-tab active" data-mode="file">📁 Tải từ máy</button>
+            <button type="button" class="upload-mode-tab" data-mode="url">🔗 Nhập URL video</button>
           </div>
 
-          <!-- Form nhập thông tin -->
-          <div class="form-group"><label>Tên bài học / Video:</label><input type="text" id="inputVideoTitle" placeholder="Ví dụ: Luyện chào hỏi hàng ngày" /></div>
-          
-          <!-- NHẬP URL VIDEO (BẮT BUỘC) -->
-          <div class="url-input-area">
-            <label>🔗 URL video (bắt buộc):</label>
-            <input type="text" id="inputVideoUrl" placeholder="https://firebasestorage.googleapis.com/.../video.mp4" />
-            <div class="hint">
-              💡 <strong>Hướng dẫn:</strong> 
-              <a href="#" onclick="event.preventDefault(); alert('1. Vào Firebase Console → Storage\n2. Upload file video lên\n3. Click vào file → Copy link')">Cách lấy URL từ Firebase Storage</a>
+          <!-- Panel 1: Upload file -->
+          <div class="upload-mode-panel active" id="panel-file">
+            <div class="form-group"><label>Chọn File Video (MP4):</label><input type="file" id="inputVideoFile" accept="video/mp4,video/*" /></div>
+            <div id="uploadProgressWrapper" class="upload-progress-wrapper" style="display:none; margin-top:8px;">
+              <div class="upload-progress-bar"><div class="progress-fill" id="uploadProgressFill" style="width:0%;"></div></div>
+              <div class="upload-progress-text"><span id="uploadStatusText">Đang upload...</span><span id="uploadPercentText">0%</span></div>
+            </div>
+          </div>
+
+          <!-- Panel 2: Nhập URL -->
+          <div class="upload-mode-panel" id="panel-url">
+            <div class="form-group">
+              <label>URL video (đã upload lên Firebase Storage hoặc host khác):</label>
+              <input type="text" id="inputVideoUrl" class="video-url-input" placeholder="https://firebasestorage.googleapis.com/.../video.mp4" />
+              <p style="font-size:0.75rem; color:var(--text-muted);">📌 Bạn có thể upload video lên Firebase Console → Storage, copy link và dán vào đây.</p>
+            </div>
+          </div>
+
+          <!-- ===== CHỌN CHẾ ĐỘ CÔNG KHAI / RIÊNG TƯ ===== -->
+          <div class="form-group" id="privacyGroup">
+            <label>Chế độ hiển thị video:</label>
+            <div class="privacy-options">
+              <label><input type="radio" name="privacy" value="public" checked /> 🌍 Công khai (mọi người xem được)</label>
+              <label><input type="radio" name="privacy" value="private" /> 🔒 Riêng tư (chỉ mình tôi)</label>
+            </div>
+            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">
+              * Video công khai sẽ được đưa vào kho chung và phải được Admin phê duyệt (nếu bạn không phải Admin). Video riêng tư luôn có hiệu lực ngay.
             </div>
           </div>
 
           <hr style="border:0; border-top:1px solid var(--border); margin:8px 0;" />
-          
-          <!-- Import phụ đề -->
           <div class="form-group file-import-box" style="padding:8px 12px; background:rgba(56,189,248,0.05); border:1px dashed rgba(56,189,248,0.2); border-radius:var(--radius-md);">
             <label style="font-size:0.8rem;">📁 Nhập nhanh câu thoại bằng File phụ đề (.txt, .csv, .srt):</label>
             <input type="file" id="inputSubtitleFile" accept=".txt,.csv,.srt" style="margin-top:4px; font-size:0.8rem;" />
           </div>
-          
           <div><h3 style="font-size:1rem; font-weight:700; margin:0 0 8px 0;">Danh Sách Câu Thoại</h3></div>
           <div id="subtitleInputsContainer" style="max-height:260px; overflow-y:auto; padding-right:5px; margin-bottom:8px;"></div>
           <div style="display:flex; gap:10px; margin-bottom:12px;">
@@ -412,7 +449,7 @@
             <button type="button" id="btnClearSubtitles" class="btn btn-secondary" style="background:rgba(244,63,94,0.1); border-color:rgba(244,63,94,0.2); color:var(--danger); flex:1; padding:8px;">🗑️ Xóa Hết Câu</button>
           </div>
           <div id="formError" class="inline-error"></div>
-          <button type="submit" id="btnSubmitForm" class="upload-btn">💾 Lưu Vào Thư Viện</button>
+          <button type="submit" id="btnSubmitForm" class="btn btn-success" style="width:100%; padding:12px; font-size:1rem;">💾 Lưu Vào Thư Viện</button>
         </div>
       </form>
     </div>
@@ -601,11 +638,35 @@
     }
 
     // =====================================================================
-    // FIRESTORE CRUD (KHÔNG CÒN UPLOAD)
+    // FIRESTORE & STORAGE HELPERS
     // =====================================================================
     const FS_COLLECTION_VIDEOS = "videos";
     const FS_COLLECTION_LIBRARIES = "user_libraries";
 
+    async function uploadVideoWithProgress(file, path, onProgress) {
+      return new Promise((resolve, reject) => {
+        const storageRef = firebaseInstance.storage().ref(path);
+        const uploadTask = storageRef.put(file);
+
+        uploadTask.on('state_changed', 
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            if (onProgress) onProgress(progress, snapshot);
+          },
+          (error) => {
+            addLog("❌ Upload thất bại: " + error.message, 'error');
+            reject(error);
+          },
+          () => {
+            uploadTask.snapshot.ref.getDownloadURL().then(url => resolve(url));
+          }
+        );
+      });
+    }
+
+    // =====================================================================
+    // FIRESTORE CRUD (có bổ sung lọc theo user)
+    // =====================================================================
     async function getAllVideos() {
       try {
         if (!firebaseInstance || !firebaseInstance.firestore) {
@@ -683,6 +744,24 @@
       }
     }
 
+    // Lấy danh sách video của một user (uploadedBy)
+    async function getUserVideos(userId) {
+      try {
+        if (!firebaseInstance || !firebaseInstance.firestore || !userId) return [];
+        const db = firebaseInstance.firestore();
+        const snap = await db.collection(FS_COLLECTION_VIDEOS)
+          .where('uploadedBy', '==', userId)
+          .get();
+        const list = [];
+        snap.forEach(doc => list.push({ id: doc.id, ...doc.data() }));
+        return list;
+      } catch (e) {
+        addLog("❌ Lỗi lấy video của user: " + e.message, 'error');
+        return [];
+      }
+    }
+
+    // Lấy danh sách yêu thích (vẫn giữ)
     async function getFavorites(userId) {
       try {
         if (!firebaseInstance || !firebaseInstance.firestore || !userId) return [];
@@ -720,9 +799,9 @@
             title: original.title,
             storageUrl: original.storageUrl,
             sentences: JSON.parse(JSON.stringify(original.sentences)),
-            status: 'approved',
+            status: 'approved', // clone luôn approved
+            scope: 'private',   // clone mặc định private (của riêng user)
             uploadedBy: userId,
-            scope: 'private',
             is_private_clone: true,
             parentId: original.id,
             created_at: Date.now()
@@ -744,7 +823,7 @@
     }
 
     // =====================================================================
-    // INDEXED DB (vocabulary)
+    // INDEXED DB (vocabulary) - giữ nguyên
     // =====================================================================
     const VOCAB_STORE_NAME = "vocabulary";
     const DB_NAME = "ChineseShadowingDB_v8";
@@ -816,7 +895,7 @@
     const btnPlayPause = document.getElementById('btnPlayPause');
 
     // =====================================================================
-    // CUSTOM VIDEO PLAYER
+    // CUSTOM VIDEO PLAYER (giữ nguyên)
     // =====================================================================
     function setupCustomVideoPlayer() {
         if (!video) {
@@ -890,7 +969,7 @@
     }
 
     // =====================================================================
-    // SENTENCE PLAYBACK
+    // SENTENCE PLAYBACK (giữ nguyên)
     // =====================================================================
     function playSentence(id) {
         if (!currentVideoData || !video) {
@@ -922,7 +1001,7 @@
     }
 
     // =====================================================================
-    // RENDER SENTENCES
+    // RENDER SENTENCES (giữ nguyên)
     // =====================================================================
     function renderSentences() {
         if (!sentenceListContainer) return;
@@ -959,7 +1038,7 @@
     }
 
     // =====================================================================
-    // RENDER LIBRARY LIST
+    // RENDER LIBRARY LIST (quan trọng: thay đổi logic lọc)
     // =====================================================================
     async function renderLibraryList() {
         if (!videoLibraryList) return;
@@ -978,13 +1057,36 @@
             let favorites = [];
 
             if (currentLibraryTab === 'public') {
-                displayVideos = allVideos.filter(v => v.scope === 'public' && v.status === 'approved' && !v.is_private_clone);
+                // Kho video: chỉ hiển thị public và approved (không phải clone)
+                displayVideos = allVideos.filter(v => 
+                    v.scope === 'public' && 
+                    v.status === 'approved' && 
+                    !v.is_private_clone
+                );
             } else if (currentLibraryTab === 'my') {
+                // Thư viện của tôi: tất cả video do user tạo (uploadedBy = CURRENT_USER_ID) và các video yêu thích (clone)
+                // Lấy danh sách video của user
+                const userVideos = await getUserVideos(CURRENT_USER_ID);
+                // Lấy danh sách yêu thích
                 favorites = await getFavorites(CURRENT_USER_ID);
                 const favVideoIds = favorites.map(f => f.videoId);
-                displayVideos = allVideos.filter(v => favVideoIds.includes(v.id) && v.status === 'approved');
+                // Lấy các video yêu thích (clone)
+                const favVideos = allVideos.filter(v => favVideoIds.includes(v.id));
+                // Kết hợp, loại trùng
+                const combined = [...userVideos, ...favVideos];
+                // Loại bỏ trùng id
+                const idSet = new Set();
+                displayVideos = combined.filter(v => {
+                    if (idSet.has(v.id)) return false;
+                    idSet.add(v.id);
+                    return true;
+                });
+                // Sắp xếp theo created_at mới nhất
+                displayVideos.sort((a,b) => (b.created_at || 0) - (a.created_at || 0));
             } else if (currentLibraryTab === 'pending') {
-                if (isAdminMode) displayVideos = allVideos.filter(v => v.status === 'pending');
+                if (isAdminMode) {
+                    displayVideos = allVideos.filter(v => v.status === 'pending' && !v.is_private_clone);
+                }
             }
 
             if (displayVideos.length === 0) {
@@ -1000,29 +1102,46 @@
             for (const item of displayVideos) {
                 const div = document.createElement('div');
                 const isActive = currentVideoData && currentVideoData.id === item.id;
-                const isFav = currentLibraryTab === 'my' || favorites.some(f => f.videoId === item.id);
+                const isFav = favorites.some(f => f.videoId === item.id);
                 
                 div.className = `library-item ${isActive ? 'active' : ''}`;
                 if (currentLibraryTab === 'pending') div.classList.add('pending-item');
-                if (currentLibraryTab === 'my') div.classList.add('favorite-item');
+                if (currentLibraryTab === 'my' && isFav) div.classList.add('favorite-item');
 
                 let actionsHtml = '';
                 let badgeHtml = '';
                 
+                // Badge trạng thái
+                if (item.status === 'pending') badgeHtml += `<span class="status-badge">Chờ duyệt</span>`;
+                // Badge riêng tư
+                if (item.scope === 'private' && !item.is_private_clone) {
+                    badgeHtml += `<span class="privacy-badge private">Riêng tư</span>`;
+                } else if (item.scope === 'public' && item.status === 'approved') {
+                    badgeHtml += `<span class="privacy-badge public">Công khai</span>`;
+                }
+
+                // Nút hành động
                 if (currentLibraryTab === 'public') {
-                  let adminHtml = '';
-                  if (isAdminMode) {
-                      adminHtml = `
-                          <button class="action-btn edit-btn" data-vid="${item.id}" title="Chỉnh sửa video">✏️</button>
-                          <button class="action-btn delete-btn" data-vid="${item.id}" title="Xóa video">🗑️</button>
-                      `;
-                  }
-                  actionsHtml = `<div class="action-buttons">${adminHtml}<span class="fav-icon" data-vid="${item.id}" data-is-fav="${isFav}">${isFav ? '❤️' : '🤍'}</span></div>`;
+                    // Nếu admin, hiện nút edit (có thể sửa video công khai)
+                    let adminHtml = '';
+                    if (isAdminMode) {
+                        adminHtml = `
+                            <button class="action-btn edit-btn" data-vid="${item.id}" title="Chỉnh sửa video">✏️</button>
+                            <button class="action-btn delete-btn" data-vid="${item.id}" title="Xóa video">🗑️</button>
+                        `;
+                    }
+                    actionsHtml = `<div class="action-buttons">${adminHtml}<span class="fav-icon" data-vid="${item.id}" data-is-fav="${isFav}">${isFav ? '❤️' : '🤍'}</span></div>`;
                 } else if (currentLibraryTab === 'my') {
-                  actionsHtml = `<div class="action-buttons"><button class="action-btn delete-btn" data-vid="${item.id}" data-remove-fav title="Xóa khỏi thư viện cá nhân">🗑️</button></div>`;
+                    // User có thể edit/xóa video của mình (nếu là chủ sở hữu)
+                    const isOwner = item.uploadedBy === CURRENT_USER_ID;
+                    if (isOwner) {
+                        actionsHtml = `<div class="action-buttons"><button class="action-btn edit-btn" data-vid="${item.id}" title="Chỉnh sửa">✏️</button><button class="action-btn delete-btn" data-vid="${item.id}" title="Xóa video">🗑️</button></div>`;
+                    } else {
+                        // Nếu là video yêu thích (clone) thì chỉ có xóa khỏi yêu thích
+                        actionsHtml = `<div class="action-buttons"><button class="action-btn delete-btn" data-vid="${item.id}" data-remove-fav title="Xóa khỏi thư viện cá nhân">🗑️</button></div>`;
+                    }
                 } else if (currentLibraryTab === 'pending') {
-                  badgeHtml = `<span class="status-badge">Chờ duyệt</span>`;
-                  actionsHtml = `<div class="action-buttons"><button class="action-btn approve-btn" data-vid="${item.id}">✅ Duyệt</button><button class="action-btn delete-btn" data-vid="${item.id}">❌ Từ chối</button></div>`;
+                    actionsHtml = `<div class="action-buttons"><button class="action-btn approve-btn" data-vid="${item.id}">✅ Duyệt</button><button class="action-btn delete-btn" data-vid="${item.id}">❌ Từ chối</button></div>`;
                 }
 
                 div.innerHTML = `
@@ -1051,6 +1170,14 @@
                     delBtn.addEventListener('click', async function(e) {
                         e.stopPropagation();
                         const vid = this.dataset.vid;
+                        // Nếu là xóa khỏi yêu thích (data-remove-fav)
+                        if (this.dataset.removeFav !== undefined) {
+                            await toggleFavorite(CURRENT_USER_ID, vid);
+                            div.remove();
+                            if (videoLibraryList.children.length === 0) renderLibraryList();
+                            return;
+                        }
+                        // Xóa vĩnh viễn (chỉ chủ sở hữu hoặc admin)
                         if (confirm("⚠️ Xác nhận xóa video vĩnh viễn?")) {
                             await deleteVideo(vid);
                             if (currentVideoData && currentVideoData.id === vid) {
@@ -1089,19 +1216,6 @@
                   }
                 }
 
-                if (currentLibraryTab === 'my') {
-                  const removeBtn = div.querySelector('.action-btn.delete-btn');
-                  if (removeBtn) {
-                      removeBtn.addEventListener('click', async function(e) {
-                        e.stopPropagation();
-                        const vid = this.dataset.vid;
-                        await toggleFavorite(CURRENT_USER_ID, vid);
-                        div.remove();
-                        if (videoLibraryList.children.length === 0) renderLibraryList();
-                      });
-                  }
-                }
-                
                 if (currentLibraryTab === 'pending') {
                   const approveBtn = div.querySelector('.action-btn.approve-btn');
                   if (approveBtn) {
@@ -1114,6 +1228,7 @@
                           v.scope = 'public';
                           await updateVideo(v); 
                           renderLibraryList(); 
+                          addLog(`✅ Đã duyệt video: ${v.title}`, 'success');
                         }
                       });
                   }
@@ -1207,7 +1322,7 @@
     }
 
     // =====================================================================
-    // ADD SUBTITLE ROW
+    // ADD SUBTITLE ROW (giữ nguyên)
     // =====================================================================
     function addSubtitleRow(data = {}) {
         const container = document.getElementById('subtitleInputsContainer');
@@ -1360,24 +1475,32 @@
     }
 
     // =====================================================================
-    // SETUP EVENT LISTENERS (CHỈ DÙNG URL, KHÔNG UPLOAD)
+    // SETUP EVENT LISTENERS (có bổ sung xử lý privacy)
     // =====================================================================
     function setupEventListeners() {
-        // Mở/đóng modal
+        // ---- Mở / đóng modal ----
         const openUploadBtn = document.getElementById('btnOpenUploadModal');
         if (openUploadBtn) {
             openUploadBtn.addEventListener('click', () => {
-                if (uploadModal) uploadModal.classList.add('show');
-                // Reset form
-                document.getElementById('editVideoId').value = '';
-                document.getElementById('inputVideoTitle').value = '';
-                document.getElementById('inputVideoUrl').value = '';
-                if (subtitleInputsContainer) subtitleInputsContainer.innerHTML = '';
-                addSubtitleRow(); // Thêm 1 dòng mặc định
-                const placeholder = document.getElementById('modalVideoPlaceholder');
-                if (placeholder) placeholder.style.display = 'flex';
-                const modalVideo = document.getElementById('modalPreviewVideo');
-                if (modalVideo) modalVideo.src = '';
+                if (uploadModal) {
+                    // Reset form (trừ editId)
+                    document.getElementById('editVideoId').value = '';
+                    document.getElementById('inputVideoTitle').value = '';
+                    document.getElementById('inputVideoFile').value = '';
+                    document.getElementById('inputVideoUrl').value = '';
+                    document.getElementById('modalPreviewVideo').removeAttribute('src');
+                    document.getElementById('modalPreviewVideo').load();
+                    document.getElementById('modalVideoPlaceholder').style.display = 'flex';
+                    document.getElementById('subtitleInputsContainer').innerHTML = '';
+                    document.getElementById('uploadProgressWrapper').style.display = 'none';
+                    document.getElementById('formError').classList.remove('visible');
+                    document.getElementById('modalTitle').innerText = 'Tải Video Mới & Tạo Phụ Đề';
+                    // Mặc định chọn public
+                    document.querySelector('input[name="privacy"][value="public"]').checked = true;
+                    // Nếu admin, hiển thị privacy options, nếu không admin vẫn hiển thị (cho user chọn)
+                    // Không ẩn đi để user có thể chọn private
+                    uploadModal.classList.add('show');
+                }
             });
         }
         const closeModalBtn = document.querySelector('.close-modal');
@@ -1392,25 +1515,18 @@
             }
         });
 
-        // Khi nhập URL, tự động preview video
-        const urlInput = document.getElementById('inputVideoUrl');
-        if (urlInput) {
-            urlInput.addEventListener('input', function() {
-                const url = this.value.trim();
-                const modalVideo = document.getElementById('modalPreviewVideo');
-                const placeholder = document.getElementById('modalVideoPlaceholder');
-                if (url && modalVideo) {
-                    modalVideo.src = url;
-                    modalVideo.load();
-                    if (placeholder) placeholder.style.display = 'none';
-                } else if (modalVideo) {
-                    modalVideo.src = '';
-                    if (placeholder) placeholder.style.display = 'flex';
-                }
+        // ---- Tab chọn chế độ upload ----
+        document.querySelectorAll('.upload-mode-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.upload-mode-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                const mode = this.dataset.mode;
+                document.querySelectorAll('.upload-mode-panel').forEach(p => p.classList.remove('active'));
+                document.getElementById('panel-' + mode).classList.add('active');
             });
-        }
+        });
 
-        // Tab thư viện
+        // ---- Tab thư viện ----
         document.querySelectorAll('.lib-tab').forEach(tab => {
             tab.addEventListener('click', function() {
                 document.querySelectorAll('.lib-tab').forEach(t => t.classList.remove('active'));
@@ -1420,7 +1536,7 @@
             });
         });
 
-        // Toggle library
+        // ---- Toggle library ----
         const toggleLibBtn = document.getElementById('btnToggleLibrary');
         if (toggleLibBtn && mainLayout) {
             toggleLibBtn.addEventListener('click', () => {
@@ -1431,7 +1547,7 @@
             });
         }
 
-        // Theme
+        // ---- Theme ----
         const themeToggle = document.getElementById('themeToggle');
         if (themeToggle) {
             themeToggle.addEventListener('click', () => {
@@ -1439,7 +1555,7 @@
             });
         }
 
-        // Import subtitle file
+        // ---- Import subtitle file ----
         const subtitleFileInput = document.getElementById('inputSubtitleFile');
         if (subtitleFileInput) {
             subtitleFileInput.addEventListener('change', function(e) {
@@ -1465,7 +1581,7 @@
             });
         }
 
-        // Add / Clear subtitle rows
+        // ---- Add / Clear subtitle rows ----
         const btnAddRow = document.getElementById('btnAddSubtitleRow');
         if (btnAddRow) {
             btnAddRow.addEventListener('click', () => addSubtitleRow());
@@ -1480,23 +1596,87 @@
             });
         }
 
-        // ===== SUBMIT FORM (CHỈ DÙNG URL, KHÔNG UPLOAD) =====
+        // ===== NÚT SUBMIT (XỬ LÝ CẢ 2 CHẾ ĐỘ + privacy) =====
         const btnSubmit = document.getElementById('btnSubmitForm');
         if (btnSubmit && uploadForm) {
             btnSubmit.addEventListener('click', async (e) => {
                 e.preventDefault();
                 if (formError) { formError.classList.remove('visible'); formError.innerText = ''; }
-                
                 const editId = document.getElementById("editVideoId").value.trim();
                 const title = document.getElementById("inputVideoTitle").value.trim();
-                const videoUrl = document.getElementById("inputVideoUrl").value.trim();
-                
-                if (!title) {
-                    if (formError) { formError.innerText = "⚠️ Vui lòng nhập tên bài học / video!"; formError.classList.add('visible'); }
-                    return;
+                const privacyRadios = document.querySelectorAll('input[name="privacy"]');
+                let privacy = 'public';
+                for (const radio of privacyRadios) {
+                    if (radio.checked) { privacy = radio.value; break; }
                 }
-                if (!videoUrl) {
-                    if (formError) { formError.innerText = "⚠️ Vui lòng nhập URL video!"; formError.classList.add('visible'); }
+                
+                // Kiểm tra chế độ upload
+                const activeModeTab = document.querySelector('.upload-mode-tab.active');
+                const mode = activeModeTab ? activeModeTab.dataset.mode : 'file';
+                
+                let videoUrl = null;
+                let uploadError = false;
+
+                if (mode === 'file') {
+                    const fileInput = document.getElementById("inputVideoFile");
+                    const videoFile = fileInput ? fileInput.files[0] : null;
+                    if (!editId && !videoFile) {
+                        if (formError) { formError.innerText = "⚠️ Vui lòng chọn một tệp video (MP4)!"; formError.classList.add('visible'); }
+                        return;
+                    }
+                    if (videoFile) {
+                        const progressWrapper = document.getElementById('uploadProgressWrapper');
+                        const progressFill = document.getElementById('uploadProgressFill');
+                        const statusText = document.getElementById('uploadStatusText');
+                        const percentText = document.getElementById('uploadPercentText');
+                        progressWrapper.style.display = 'block';
+                        progressFill.style.width = '0%';
+                        statusText.innerText = 'Đang upload...';
+                        percentText.innerText = '0%';
+
+                        try {
+                            if (!firebaseInstance || !firebaseInstance.storage) {
+                                throw new Error("Firebase Storage chưa sẵn sàng.");
+                            }
+                            const safeName = sanitizeFilename(videoFile.name);
+                            const path = `videos/${Date.now()}_${safeName}`;
+                            addLog(`📤 Đang upload video: ${videoFile.name} (${(videoFile.size / 1024 / 1024).toFixed(1)} MB)`, 'info');
+
+                            const url = await uploadVideoWithProgress(videoFile, path, (progress) => {
+                                const pct = Math.round(progress);
+                                progressFill.style.width = pct + '%';
+                                percentText.innerText = pct + '%';
+                                statusText.innerText = `Đang upload... ${pct}%`;
+                            });
+
+                            progressFill.style.width = '100%';
+                            percentText.innerText = '100%';
+                            statusText.innerText = '✅ Upload hoàn tất!';
+                            videoUrl = url;
+                            addLog(`✅ Upload thành công!`, 'success');
+                        } catch (err) {
+                            addLog("❌ Upload thất bại: " + err.message, 'error');
+                            if (formError) { formError.innerText = "Lỗi upload: " + err.message; formError.classList.add('visible'); }
+                            uploadError = true;
+                            progressWrapper.style.display = 'none';
+                        }
+                    } else if (editId) {
+                        const existing = await getVideo(editId);
+                        if (existing) videoUrl = existing.storageUrl;
+                    }
+                } else {
+                    const urlInput = document.getElementById('inputVideoUrl');
+                    videoUrl = urlInput ? urlInput.value.trim() : '';
+                    if (!videoUrl) {
+                        if (formError) { formError.innerText = "⚠️ Vui lòng nhập URL video!"; formError.classList.add('visible'); }
+                        return;
+                    }
+                    addLog(`🔗 Sử dụng URL: ${videoUrl.substring(0, 50)}...`, 'info');
+                }
+
+                if (uploadError) return;
+                if (!videoUrl && !editId) {
+                    if (formError) { formError.innerText = "⚠️ Không có URL video!"; formError.classList.add('visible'); }
                     return;
                 }
 
@@ -1537,26 +1717,51 @@
                 });
                 if (hasError) return;
 
-                // Lưu vào Firestore
-                try {
-                    let newId = null;
-                    let status = 'approved';
-                    let scope = 'public';
-                    let isPrivateClone = false;
-                    let uploadedBy = 'admin';
+                // Xác định status và scope
+                let status = 'approved';
+                let scope = privacy; // 'public' hoặc 'private'
+                let uploadedBy = CURRENT_USER_ID;
 
-                    if (!isAdminMode) {
-                        scope = 'private';
+                // Nếu là edit
+                if (editId) {
+                    const existing = await getVideo(editId);
+                    if (!existing) throw new Error("Không tìm thấy video cần sửa.");
+                    // Giữ nguyên uploadedBy, status, scope trừ khi user thay đổi privacy
+                    // Nhưng nếu user thay đổi privacy từ private -> public và không admin, cần duyệt
+                    if (privacy === 'public' && existing.scope === 'private' && !isAdminMode) {
                         status = 'pending';
-                        uploadedBy = CURRENT_USER_ID;
-                        isPrivateClone = false;
-                    } else {
-                        scope = 'public';
+                    } else if (privacy === 'private') {
+                        status = 'approved'; // private không cần duyệt
+                    } else if (privacy === 'public' && isAdminMode) {
                         status = 'approved';
-                        uploadedBy = 'admin';
-                        isPrivateClone = false;
+                    } else if (privacy === 'public' && existing.scope === 'public' && existing.status === 'approved') {
+                        status = 'approved'; // giữ nguyên
+                    } else {
+                        status = 'pending'; // mặc định pending nếu chưa được duyệt
                     }
-
+                    // Cập nhật
+                    existing.title = title;
+                    existing.sentences = sentences;
+                    if (videoUrl) existing.storageUrl = videoUrl;
+                    existing.scope = scope;
+                    existing.status = status;
+                    await updateVideo(existing);
+                    addLog(`✅ Cập nhật video thành công ID: ${editId}`, 'success');
+                    // Nếu là public và pending, thông báo
+                    if (scope === 'public' && status === 'pending') {
+                        addLog(`📝 Video đã được gửi duyệt, chờ Admin phê duyệt.`, 'warning');
+                    }
+                } else {
+                    // Thêm mới
+                    if (privacy === 'public') {
+                        if (isAdminMode) {
+                            status = 'approved';
+                        } else {
+                            status = 'pending';
+                        }
+                    } else {
+                        status = 'approved'; // private luôn được phép
+                    }
                     const videoData = {
                         title: title,
                         storageUrl: videoUrl,
@@ -1564,54 +1769,51 @@
                         status: status,
                         scope: scope,
                         uploadedBy: uploadedBy,
-                        is_private_clone: isPrivateClone,
+                        is_private_clone: false,
                         created_at: Date.now()
                     };
-
-                    if (editId) {
-                        const existing = await getVideo(editId);
-                        if (!existing) throw new Error("Không tìm thấy video cần sửa.");
-                        existing.title = title;
-                        existing.sentences = sentences;
-                        if (videoUrl) existing.storageUrl = videoUrl;
-                        await updateVideo(existing);
-                        newId = editId;
-                        addLog(`✅ Cập nhật video thành công ID: ${newId}`, 'success');
+                    const newId = await addVideo(videoData);
+                    if (!newId) throw new Error("Lỗi khi thêm video vào Firestore");
+                    
+                    // Nếu là private hoặc user không admin, tự động thêm vào thư viện cá nhân
+                    if (privacy === 'private' || !isAdminMode) {
+                        await firebaseInstance.firestore().collection(FS_COLLECTION_LIBRARIES).add({
+                            userId: CURRENT_USER_ID,
+                            videoId: newId,
+                            added_at: Date.now()
+                        });
+                        addLog(`✅ Video đã được thêm vào thư viện cá nhân của bạn.`, 'success');
+                    }
+                    if (privacy === 'public' && !isAdminMode) {
+                        addLog(`📝 Video công khai đã được gửi duyệt, chờ Admin phê duyệt.`, 'warning');
+                    } else if (privacy === 'public' && isAdminMode) {
+                        addLog(`✅ Admin đã tải video công khai thành công!`, 'success');
                     } else {
-                        newId = await addVideo(videoData);
-                        if (!newId) throw new Error("Lỗi khi thêm video vào Firestore");
-                        
-                        if (!isAdminMode && firebaseInstance.firestore) {
-                            await firebaseInstance.firestore().collection(FS_COLLECTION_LIBRARIES).add({
-                                userId: CURRENT_USER_ID,
-                                videoId: newId,
-                                added_at: Date.now()
-                            });
-                            addLog(`✅ User tải video cá nhân thành công! Video đang chờ Admin duyệt.`, 'success');
-                        } else {
-                            addLog(`✅ Admin tải video công khai thành công!`, 'success');
-                        }
+                        addLog(`✅ Video riêng tư đã được tạo thành công!`, 'success');
                     }
+                }
 
-                    // Reset form
-                    if (uploadForm) uploadForm.reset();
-                    if (subtitleInputsContainer) subtitleInputsContainer.innerHTML = "";
-                    if (formError) { formError.classList.remove('visible'); formError.innerText = ''; }
-                    if (uploadModal) uploadModal.classList.remove("show");
+                // Reset form
+                if (uploadForm) uploadForm.reset();
+                if (subtitleInputsContainer) subtitleInputsContainer.innerHTML = "";
+                if (formError) { formError.classList.remove('visible'); formError.innerText = ''; }
+                if (uploadModal) uploadModal.classList.remove("show");
+                document.getElementById('uploadProgressWrapper').style.display = 'none';
 
-                    renderLibraryList();
-                    if (newId) {
-                        const newVideo = await getVideo(newId);
-                        if (newVideo) {
-                            addLog(`🔄 Tự động mở video vừa thêm!`, 'info');
-                            selectVideo(newVideo);
-                        }
+                renderLibraryList();
+                // Nếu là thêm mới và thành công, có thể tự động mở video
+                if (!editId) {
+                    // Lấy video vừa tạo
+                    const newVideo = await getVideo(newId);
+                    if (newVideo) {
+                        addLog(`🔄 Tự động mở video vừa thêm!`, 'info');
+                        selectVideo(newVideo);
                     }
-                } catch (err) {
-                    addLog("❌ Lỗi khi lưu video: " + err.message, 'error');
-                    if (formError) { 
-                        formError.innerText = "Lỗi: " + err.message;
-                        formError.classList.add('visible'); 
+                } else {
+                    // Edit: reload video hiện tại nếu đang mở
+                    if (currentVideoData && currentVideoData.id === editId) {
+                        const updated = await getVideo(editId);
+                        if (updated) selectVideo(updated);
                     }
                 }
             });
@@ -1640,19 +1842,29 @@
         getVideo(id).then(item => {
             if (!item) return;
             const modalTitle = document.getElementById("modalTitle");
-            if (modalTitle) modalTitle.innerText = "Chỉnh Sửa Video";
+            if (modalTitle) modalTitle.innerText = "Chỉnh Sửa Phụ Đề Video";
             const editIdInput = document.getElementById("editVideoId");
             if (editIdInput) editIdInput.value = item.id;
             const titleInput = document.getElementById("inputVideoTitle");
             if (titleInput) titleInput.value = item.title;
-            const urlInput = document.getElementById("inputVideoUrl");
-            if (urlInput) urlInput.value = item.storageUrl || '';
+            // Chọn privacy
+            const privacyRadios = document.querySelectorAll('input[name="privacy"]');
+            for (const radio of privacyRadios) {
+                if (radio.value === item.scope) {
+                    radio.checked = true;
+                } else {
+                    radio.checked = false;
+                }
+            }
             const modalVideo = document.getElementById("modalPreviewVideo");
             if (modalVideo && item.storageUrl) {
                 modalVideo.src = item.storageUrl;
                 modalVideo.load();
-                const placeholder = document.getElementById("modalVideoPlaceholder");
-                if (placeholder) placeholder.style.display = 'none';
+                document.getElementById('modalVideoPlaceholder').style.display = 'none';
+            } else if (modalVideo) {
+                modalVideo.removeAttribute('src');
+                modalVideo.load();
+                document.getElementById('modalVideoPlaceholder').style.display = 'flex';
             }
             if (subtitleInputsContainer) {
                 subtitleInputsContainer.innerHTML = "";

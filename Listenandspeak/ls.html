@@ -15,8 +15,7 @@
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/pinyin-pro.min.js"></script>
 
   <style>
-    /* ---- CSS GIỮ NGUYÊN NHƯ CŨ ---- */
-    /* (Tôi giữ nguyên toàn bộ CSS của bạn, chỉ thêm style cho tab) */
+    /* ---- CSS GIỮ NGUYÊN NHƯ CŨ (đã có đầy đủ) ---- */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #090d16; color: #f8fafc; min-height: 100vh; padding: 20px; background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.08) 0%, transparent 50%); background-attachment: fixed; }
     :root {
@@ -199,51 +198,60 @@
     @media (max-width: 1024px) { .main-layout { grid-template-columns: 1fr !important; } .main-layout.library-collapsed { grid-template-columns: 1fr !important; } .dashboard-card { max-height: none; } .sentence-list { max-height: 400px; } .video-player-container { height: 50vh; min-height: 300px; } }
     @media (max-width: 600px) { body { padding: 12px; } .top-bar { flex-direction: column; align-items: stretch; } .global-controls { flex-direction: column; align-items: stretch; } .recording-controls { flex-wrap: wrap; } .custom-video-controls { flex-wrap: wrap; gap: 6px; padding: 8px; } .volume-slider-wrapper input[type="range"] { width: 40px; } .video-player-container { height: 40vh; min-height: 220px; } #floatingLog { width: 90%; right: 5%; bottom: 10px; max-height: 250px; } }
 
-    /* ---- Thêm style cho tab upload mode ---- */
-    .upload-mode-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    .upload-mode-tab {
-      padding: 6px 16px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
+    /* ---- Style cho form nhập URL ---- */
+    .url-input-area {
       background: var(--bg-input);
-      color: var(--text-secondary);
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.8rem;
-      transition: 0.2s;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
     }
-    .upload-mode-tab.active {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
-    }
-    .upload-mode-tab:hover:not(.active) {
-      border-color: var(--primary);
-      color: var(--text-primary);
-    }
-    .upload-mode-panel {
-      display: none;
-    }
-    .upload-mode-panel.active {
+    .url-input-area label {
       display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+      font-size: 0.88rem;
     }
-    .video-url-input {
+    .url-input-area input {
       width: 100%;
       padding: 10px 14px;
-      background: var(--bg-input);
+      background: var(--bg-card);
       border: 1px solid var(--border);
       color: var(--text-primary);
       border-radius: var(--radius-sm);
       outline: none;
       font-size: 0.9rem;
-      margin-bottom: 8px;
     }
-    .video-url-input:focus {
+    .url-input-area input:focus {
       border-color: var(--primary);
+    }
+    .url-input-area .hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+    .url-input-area .hint a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .url-input-area .hint a:hover {
+      text-decoration: underline;
+    }
+    .upload-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--success);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .upload-btn:hover {
+      background: var(--success-hover);
     }
   </style>
 </head>
@@ -366,52 +374,37 @@
   <div id="uploadModal" class="modal">
     <div class="modal-content">
       <span class="close-modal">&times;</span>
-      <h2 id="modalTitle">Tải Video Mới & Tạo Phụ Đề</h2>
+      <h2 id="modalTitle">Tạo Video Mới</h2>
       <form id="uploadForm" style="margin-top:0; display:flex; flex-direction:column; flex:1; overflow:hidden;">
         <input type="hidden" id="editVideoId" value="" />
         <div class="modal-body-scroll">
+          <!-- Preview video -->
           <div class="modal-video-preview">
             <video id="modalPreviewVideo" style="width:100%; height:100%; object-fit:contain;" controls></video>
-            <div class="placeholder" id="modalVideoPlaceholder"><span>📹</span><span>Chọn tệp video để xem trước</span></div>
+            <div class="placeholder" id="modalVideoPlaceholder"><span>📹</span><span>Nhập URL video bên dưới để xem trước</span></div>
           </div>
-          <div style="background:var(--bg-input); padding:12px; border-radius:var(--radius-md); border:1px solid var(--border); margin-bottom:16px;">
-            <div style="display:flex; justify-content:space-between;"><span style="font-size:0.8rem; font-weight:700; color:var(--text-secondary);">Thời gian hiện tại:</span><span id="modalVideoTimeDisplay" style="font-family:monospace; font-size:1.1rem; font-weight:bold; color:var(--primary);">0.0s</span></div>
-            <div style="display:flex; gap:8px; margin-top:8px;">
-              <button type="button" id="btnModalRewind" class="btn btn-secondary" style="flex:1; padding:6px; font-size:0.75rem;">⏪ Tua lại 1s</button>
-              <button type="button" id="btnModalForward" class="btn btn-secondary" style="flex:1; padding:6px; font-size:0.75rem;">⏩ Tua đi 1s</button>
-            </div>
-          </div>
+
+          <!-- Form nhập thông tin -->
           <div class="form-group"><label>Tên bài học / Video:</label><input type="text" id="inputVideoTitle" placeholder="Ví dụ: Luyện chào hỏi hàng ngày" /></div>
-
-          <!-- ===== CHỌN CHẾ ĐỘ UPLOAD ===== -->
-          <div class="upload-mode-tabs">
-            <button type="button" class="upload-mode-tab active" data-mode="file">📁 Tải từ máy</button>
-            <button type="button" class="upload-mode-tab" data-mode="url">🔗 Nhập URL video</button>
-          </div>
-
-          <!-- Panel 1: Upload file -->
-          <div class="upload-mode-panel active" id="panel-file">
-            <div class="form-group"><label>Chọn File Video (MP4):</label><input type="file" id="inputVideoFile" accept="video/mp4,video/*" /></div>
-            <div id="uploadProgressWrapper" class="upload-progress-wrapper" style="display:none; margin-top:8px;">
-              <div class="upload-progress-bar"><div class="progress-fill" id="uploadProgressFill" style="width:0%;"></div></div>
-              <div class="upload-progress-text"><span id="uploadStatusText">Đang upload...</span><span id="uploadPercentText">0%</span></div>
-            </div>
-          </div>
-
-          <!-- Panel 2: Nhập URL -->
-          <div class="upload-mode-panel" id="panel-url">
-            <div class="form-group">
-              <label>URL video (đã upload lên Firebase Storage hoặc host khác):</label>
-              <input type="text" id="inputVideoUrl" class="video-url-input" placeholder="https://firebasestorage.googleapis.com/.../video.mp4" />
-              <p style="font-size:0.75rem; color:var(--text-muted);">📌 Bạn có thể upload video lên Firebase Console → Storage, copy link và dán vào đây.</p>
+          
+          <!-- NHẬP URL VIDEO (BẮT BUỘC) -->
+          <div class="url-input-area">
+            <label>🔗 URL video (bắt buộc):</label>
+            <input type="text" id="inputVideoUrl" placeholder="https://firebasestorage.googleapis.com/.../video.mp4" />
+            <div class="hint">
+              💡 <strong>Hướng dẫn:</strong> 
+              <a href="#" onclick="event.preventDefault(); alert('1. Vào Firebase Console → Storage\n2. Upload file video lên\n3. Click vào file → Copy link')">Cách lấy URL từ Firebase Storage</a>
             </div>
           </div>
 
           <hr style="border:0; border-top:1px solid var(--border); margin:8px 0;" />
+          
+          <!-- Import phụ đề -->
           <div class="form-group file-import-box" style="padding:8px 12px; background:rgba(56,189,248,0.05); border:1px dashed rgba(56,189,248,0.2); border-radius:var(--radius-md);">
             <label style="font-size:0.8rem;">📁 Nhập nhanh câu thoại bằng File phụ đề (.txt, .csv, .srt):</label>
             <input type="file" id="inputSubtitleFile" accept=".txt,.csv,.srt" style="margin-top:4px; font-size:0.8rem;" />
           </div>
+          
           <div><h3 style="font-size:1rem; font-weight:700; margin:0 0 8px 0;">Danh Sách Câu Thoại</h3></div>
           <div id="subtitleInputsContainer" style="max-height:260px; overflow-y:auto; padding-right:5px; margin-bottom:8px;"></div>
           <div style="display:flex; gap:10px; margin-bottom:12px;">
@@ -419,7 +412,7 @@
             <button type="button" id="btnClearSubtitles" class="btn btn-secondary" style="background:rgba(244,63,94,0.1); border-color:rgba(244,63,94,0.2); color:var(--danger); flex:1; padding:8px;">🗑️ Xóa Hết Câu</button>
           </div>
           <div id="formError" class="inline-error"></div>
-          <button type="submit" id="btnSubmitForm" class="btn btn-success" style="width:100%; padding:12px; font-size:1rem;">💾 Lưu Vào Thư Viện</button>
+          <button type="submit" id="btnSubmitForm" class="upload-btn">💾 Lưu Vào Thư Viện</button>
         </div>
       </form>
     </div>
@@ -608,36 +601,11 @@
     }
 
     // =====================================================================
-    // FIRESTORE & STORAGE HELPERS
+    // FIRESTORE CRUD (KHÔNG CÒN UPLOAD)
     // =====================================================================
     const FS_COLLECTION_VIDEOS = "videos";
     const FS_COLLECTION_LIBRARIES = "user_libraries";
 
-    // Upload file với progress (vẫn dùng Firebase, có thể bị CORS)
-    async function uploadVideoWithProgress(file, path, onProgress) {
-      return new Promise((resolve, reject) => {
-        const storageRef = firebaseInstance.storage().ref(path);
-        const uploadTask = storageRef.put(file);
-
-        uploadTask.on('state_changed', 
-          (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            if (onProgress) onProgress(progress, snapshot);
-          },
-          (error) => {
-            addLog("❌ Upload thất bại: " + error.message, 'error');
-            reject(error);
-          },
-          () => {
-            uploadTask.snapshot.ref.getDownloadURL().then(url => resolve(url));
-          }
-        );
-      });
-    }
-
-    // =====================================================================
-    // FIRESTORE CRUD (giữ nguyên)
-    // =====================================================================
     async function getAllVideos() {
       try {
         if (!firebaseInstance || !firebaseInstance.firestore) {
@@ -1392,14 +1360,24 @@
     }
 
     // =====================================================================
-    // SETUP EVENT LISTENERS (ĐÃ THÊM CHẾ ĐỘ NHẬP URL)
+    // SETUP EVENT LISTENERS (CHỈ DÙNG URL, KHÔNG UPLOAD)
     // =====================================================================
     function setupEventListeners() {
-        // ---- Mở / đóng modal ----
+        // Mở/đóng modal
         const openUploadBtn = document.getElementById('btnOpenUploadModal');
         if (openUploadBtn) {
             openUploadBtn.addEventListener('click', () => {
                 if (uploadModal) uploadModal.classList.add('show');
+                // Reset form
+                document.getElementById('editVideoId').value = '';
+                document.getElementById('inputVideoTitle').value = '';
+                document.getElementById('inputVideoUrl').value = '';
+                if (subtitleInputsContainer) subtitleInputsContainer.innerHTML = '';
+                addSubtitleRow(); // Thêm 1 dòng mặc định
+                const placeholder = document.getElementById('modalVideoPlaceholder');
+                if (placeholder) placeholder.style.display = 'flex';
+                const modalVideo = document.getElementById('modalPreviewVideo');
+                if (modalVideo) modalVideo.src = '';
             });
         }
         const closeModalBtn = document.querySelector('.close-modal');
@@ -1414,18 +1392,25 @@
             }
         });
 
-        // ---- Tab chọn chế độ upload ----
-        document.querySelectorAll('.upload-mode-tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.upload-mode-tab').forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                const mode = this.dataset.mode;
-                document.querySelectorAll('.upload-mode-panel').forEach(p => p.classList.remove('active'));
-                document.getElementById('panel-' + mode).classList.add('active');
+        // Khi nhập URL, tự động preview video
+        const urlInput = document.getElementById('inputVideoUrl');
+        if (urlInput) {
+            urlInput.addEventListener('input', function() {
+                const url = this.value.trim();
+                const modalVideo = document.getElementById('modalPreviewVideo');
+                const placeholder = document.getElementById('modalVideoPlaceholder');
+                if (url && modalVideo) {
+                    modalVideo.src = url;
+                    modalVideo.load();
+                    if (placeholder) placeholder.style.display = 'none';
+                } else if (modalVideo) {
+                    modalVideo.src = '';
+                    if (placeholder) placeholder.style.display = 'flex';
+                }
             });
-        });
+        }
 
-        // ---- Tab thư viện ----
+        // Tab thư viện
         document.querySelectorAll('.lib-tab').forEach(tab => {
             tab.addEventListener('click', function() {
                 document.querySelectorAll('.lib-tab').forEach(t => t.classList.remove('active'));
@@ -1435,7 +1420,7 @@
             });
         });
 
-        // ---- Toggle library ----
+        // Toggle library
         const toggleLibBtn = document.getElementById('btnToggleLibrary');
         if (toggleLibBtn && mainLayout) {
             toggleLibBtn.addEventListener('click', () => {
@@ -1446,7 +1431,7 @@
             });
         }
 
-        // ---- Theme ----
+        // Theme
         const themeToggle = document.getElementById('themeToggle');
         if (themeToggle) {
             themeToggle.addEventListener('click', () => {
@@ -1454,7 +1439,7 @@
             });
         }
 
-        // ---- Import subtitle file ----
+        // Import subtitle file
         const subtitleFileInput = document.getElementById('inputSubtitleFile');
         if (subtitleFileInput) {
             subtitleFileInput.addEventListener('change', function(e) {
@@ -1480,7 +1465,7 @@
             });
         }
 
-        // ---- Add / Clear subtitle rows ----
+        // Add / Clear subtitle rows
         const btnAddRow = document.getElementById('btnAddSubtitleRow');
         if (btnAddRow) {
             btnAddRow.addEventListener('click', () => addSubtitleRow());
@@ -1495,86 +1480,23 @@
             });
         }
 
-        // ===== NÚT SUBMIT (XỬ LÝ CẢ 2 CHẾ ĐỘ) =====
+        // ===== SUBMIT FORM (CHỈ DÙNG URL, KHÔNG UPLOAD) =====
         const btnSubmit = document.getElementById('btnSubmitForm');
         if (btnSubmit && uploadForm) {
             btnSubmit.addEventListener('click', async (e) => {
                 e.preventDefault();
                 if (formError) { formError.classList.remove('visible'); formError.innerText = ''; }
+                
                 const editId = document.getElementById("editVideoId").value.trim();
                 const title = document.getElementById("inputVideoTitle").value.trim();
+                const videoUrl = document.getElementById("inputVideoUrl").value.trim();
                 
-                // Kiểm tra chế độ upload
-                const activeModeTab = document.querySelector('.upload-mode-tab.active');
-                const mode = activeModeTab ? activeModeTab.dataset.mode : 'file';
-                
-                let videoUrl = null;
-                let uploadError = false;
-
-                if (mode === 'file') {
-                    // Chế độ upload file
-                    const fileInput = document.getElementById("inputVideoFile");
-                    const videoFile = fileInput ? fileInput.files[0] : null;
-                    if (!editId && !videoFile) {
-                        if (formError) { formError.innerText = "⚠️ Vui lòng chọn một tệp video (MP4)!"; formError.classList.add('visible'); }
-                        return;
-                    }
-                    if (videoFile) {
-                        // Upload file lên Storage
-                        const progressWrapper = document.getElementById('uploadProgressWrapper');
-                        const progressFill = document.getElementById('uploadProgressFill');
-                        const statusText = document.getElementById('uploadStatusText');
-                        const percentText = document.getElementById('uploadPercentText');
-                        progressWrapper.style.display = 'block';
-                        progressFill.style.width = '0%';
-                        statusText.innerText = 'Đang upload...';
-                        percentText.innerText = '0%';
-
-                        try {
-                            if (!firebaseInstance || !firebaseInstance.storage) {
-                                throw new Error("Firebase Storage chưa sẵn sàng.");
-                            }
-                            const safeName = sanitizeFilename(videoFile.name);
-                            const path = `videos/${Date.now()}_${safeName}`;
-                            addLog(`📤 Đang upload video: ${videoFile.name} (${(videoFile.size / 1024 / 1024).toFixed(1)} MB)`, 'info');
-
-                            const url = await uploadVideoWithProgress(videoFile, path, (progress) => {
-                                const pct = Math.round(progress);
-                                progressFill.style.width = pct + '%';
-                                percentText.innerText = pct + '%';
-                                statusText.innerText = `Đang upload... ${pct}%`;
-                            });
-
-                            progressFill.style.width = '100%';
-                            percentText.innerText = '100%';
-                            statusText.innerText = '✅ Upload hoàn tất!';
-                            videoUrl = url;
-                            addLog(`✅ Upload thành công!`, 'success');
-                        } catch (err) {
-                            addLog("❌ Upload thất bại: " + err.message, 'error');
-                            if (formError) { formError.innerText = "Lỗi upload: " + err.message; formError.classList.add('visible'); }
-                            uploadError = true;
-                            progressWrapper.style.display = 'none';
-                        }
-                    } else if (editId) {
-                        // Chỉnh sửa, giữ nguyên URL cũ
-                        const existing = await getVideo(editId);
-                        if (existing) videoUrl = existing.storageUrl;
-                    }
-                } else {
-                    // Chế độ nhập URL
-                    const urlInput = document.getElementById('inputVideoUrl');
-                    videoUrl = urlInput ? urlInput.value.trim() : '';
-                    if (!videoUrl) {
-                        if (formError) { formError.innerText = "⚠️ Vui lòng nhập URL video!"; formError.classList.add('visible'); }
-                        return;
-                    }
-                    addLog(`🔗 Sử dụng URL: ${videoUrl.substring(0, 50)}...`, 'info');
+                if (!title) {
+                    if (formError) { formError.innerText = "⚠️ Vui lòng nhập tên bài học / video!"; formError.classList.add('visible'); }
+                    return;
                 }
-
-                if (uploadError) return;
-                if (!videoUrl && !editId) {
-                    if (formError) { formError.innerText = "⚠️ Không có URL video!"; formError.classList.add('visible'); }
+                if (!videoUrl) {
+                    if (formError) { formError.innerText = "⚠️ Vui lòng nhập URL video!"; formError.classList.add('visible'); }
                     return;
                 }
 
@@ -1676,7 +1598,6 @@
                     if (subtitleInputsContainer) subtitleInputsContainer.innerHTML = "";
                     if (formError) { formError.classList.remove('visible'); formError.innerText = ''; }
                     if (uploadModal) uploadModal.classList.remove("show");
-                    document.getElementById('uploadProgressWrapper').style.display = 'none';
 
                     renderLibraryList();
                     if (newId) {
@@ -1719,19 +1640,19 @@
         getVideo(id).then(item => {
             if (!item) return;
             const modalTitle = document.getElementById("modalTitle");
-            if (modalTitle) modalTitle.innerText = "Chỉnh Sửa Phụ Đề Video";
+            if (modalTitle) modalTitle.innerText = "Chỉnh Sửa Video";
             const editIdInput = document.getElementById("editVideoId");
             if (editIdInput) editIdInput.value = item.id;
             const titleInput = document.getElementById("inputVideoTitle");
             if (titleInput) titleInput.value = item.title;
+            const urlInput = document.getElementById("inputVideoUrl");
+            if (urlInput) urlInput.value = item.storageUrl || '';
             const modalVideo = document.getElementById("modalPreviewVideo");
             if (modalVideo && item.storageUrl) {
                 modalVideo.src = item.storageUrl;
-            } else if (modalVideo) {
-                modalVideo.removeAttribute('src');
                 modalVideo.load();
                 const placeholder = document.getElementById("modalVideoPlaceholder");
-                if (placeholder) placeholder.style.display = "flex";
+                if (placeholder) placeholder.style.display = 'none';
             }
             if (subtitleInputsContainer) {
                 subtitleInputsContainer.innerHTML = "";

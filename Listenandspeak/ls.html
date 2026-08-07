@@ -5,21 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Luyện Nói Tiếng Trung Qua Video Ngắn</title>
   
-  <!-- ================================================================ -->
-  <!-- 👇 3 DÒNG FIREBASE SDK BẮT BUỘC (Đã thêm Storage) 👇 -->
-  <!-- ================================================================ -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-  <!-- ================================================================ -->
 
   <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/pinyin-pro.min.js">
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/pinyin-pro.min.js"></script>
 
   <style>
-    /* Toàn bộ CSS giữ nguyên (đã nhúng sẵn) */
+    /* ---- GIỮ NGUYÊN TOÀN BỘ CSS (đã có sẵn) ---- */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #090d16; color: #f8fafc; min-height: 100vh; padding: 20px; background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.08) 0%, transparent 50%); background-attachment: fixed; }
     :root {
@@ -201,6 +197,37 @@
     ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
     @media (max-width: 1024px) { .main-layout { grid-template-columns: 1fr !important; } .main-layout.library-collapsed { grid-template-columns: 1fr !important; } .dashboard-card { max-height: none; } .sentence-list { max-height: 400px; } .video-player-container { height: 50vh; min-height: 300px; } }
     @media (max-width: 600px) { body { padding: 12px; } .top-bar { flex-direction: column; align-items: stretch; } .global-controls { flex-direction: column; align-items: stretch; } .recording-controls { flex-wrap: wrap; } .custom-video-controls { flex-wrap: wrap; gap: 6px; padding: 8px; } .volume-slider-wrapper input[type="range"] { width: 40px; } .video-player-container { height: 40vh; min-height: 220px; } #floatingLog { width: 90%; right: 5%; bottom: 10px; max-height: 250px; } }
+
+    /* ---- THÊM PROGRESS BAR CHO UPLOAD ---- */
+    .upload-progress-wrapper {
+      margin-top: 12px;
+      display: none;
+    }
+    .upload-progress-wrapper.visible {
+      display: block;
+    }
+    .upload-progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-input);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .upload-progress-bar .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transition: width 0.3s ease;
+      border-radius: 4px;
+    }
+    .upload-progress-text {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
   </style>
 </head>
 <body>
@@ -218,7 +245,6 @@
     <div class="top-bar">
       <div class="top-bar-left">
         <span style="font-size:1.5rem;">🇨🇳</span>
-        <!-- User/Admin Status Display -->
         <div class="user-status-display" id="userStatusDisplay">👤 Đang tải User...</div>
         <button id="btnToggleLibrary" class="btn btn-secondary" style="padding:6px 12px; font-size:0.85rem;">📚 Hiện Thư Viện</button>
         <button id="btnOpenVocabHub" class="btn btn-secondary" style="padding:6px 12px; font-size:0.85rem;">📓 Sổ Từ Vựng</button>
@@ -236,13 +262,11 @@
       </div>
     </div>
 
-    <!-- HEADER -->
     <header>
       <div class="header-title-wrap"><h1>Short Video Shadowing</h1></div>
       <p id="headerSubtitle">Hệ thống luyện nói & lồng tiếng tiếng Trung trên nền tảng Video ngắn</p>
     </header>
 
-    <!-- MAIN LAYOUT -->
     <main class="main-layout library-collapsed" id="mainLayout">
       <aside class="library-section dashboard-card">
         <div class="library-tabs">
@@ -353,6 +377,11 @@
             <button type="button" id="btnAddSubtitleRow" class="btn btn-secondary" style="flex:1; padding:8px;">➕ Thêm Câu Thủ Công</button>
             <button type="button" id="btnClearSubtitles" class="btn btn-secondary" style="background:rgba(244,63,94,0.1); border-color:rgba(244,63,94,0.2); color:var(--danger); flex:1; padding:8px;">🗑️ Xóa Hết Câu</button>
           </div>
+          <!-- PROGRESS BAR UPLOAD -->
+          <div id="uploadProgressWrapper" class="upload-progress-wrapper">
+            <div class="upload-progress-bar"><div class="progress-fill" id="uploadProgressFill" style="width:0%;"></div></div>
+            <div class="upload-progress-text"><span id="uploadStatusText">Đang chuẩn bị...</span><span id="uploadPercentText">0%</span></div>
+          </div>
           <div id="formError" class="inline-error"></div>
           <button type="submit" id="btnSubmitForm" class="btn btn-success" style="width:100%; padding:12px; font-size:1rem;">💾 Lưu Vào Thư Viện</button>
         </div>
@@ -445,11 +474,10 @@
     }
 
     // =====================================================================
-    // 1.  FIREBASE BOOTSTRAP (SỬA LỖI KHỞI TẠO)
+    // 1.  FIREBASE BOOTSTRAP
     // =====================================================================
     let firebaseInstance = null;
     
-    // Kiểm tra Firebase SDK đã load chưa
     function checkFirebaseSDK() {
       if (typeof firebase === 'undefined') {
         addLog("❌ Lỗi: Firebase SDK chưa được load! Kiểm tra lại 3 dòng script.", 'error');
@@ -460,9 +488,7 @@
 
     function initFirebase() {
       if (!checkFirebaseSDK()) return false;
-      
       try {
-        // Nếu chưa có app nào, khởi tạo
         if (!firebase.apps.length) {
           firebase.initializeApp(FIREBASE_CONFIG);
           addLog("✅ Đã khởi tạo Firebase thành công.", 'success');
@@ -477,7 +503,6 @@
       }
     }
 
-    // Gọi khởi tạo ngay lập tức
     const firebaseOk = initFirebase();
 
     // =====================================================================
@@ -493,7 +518,7 @@
     function sanitizeHTML(str) { if (!str) return ''; const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return str.replace(/[&<>"']/g, m => map[m]); }
 
     // =====================================================================
-    // 3.  PARSERS (Phân tích file SRT / CSV / TXT)
+    // 3.  PARSERS
     // =====================================================================
     function parseCSVorTXT(text) {
       const normalized = text.replace(/\r\n/g, '\n');
@@ -543,12 +568,100 @@
     }
 
     // =====================================================================
-    // 4.  FIRESTORE & STORAGE HELPERS (SỬA LỖI KIỂM TRA FIREBASE)
+    // 4.  FIRESTORE & STORAGE HELPERS (có sửa để hiển thị progress)
     // =====================================================================
     const FS_COLLECTION_VIDEOS = "videos";
     const FS_COLLECTION_LIBRARIES = "user_libraries";
 
-    // ------ VIDEO CRUD ------
+    // ----- NÉN VIDEO TRƯỚC KHI UPLOAD (GIẢM DUNG LƯỢNG) -----
+    async function compressVideo(file) {
+      return new Promise((resolve, reject) => {
+        const maxWidth = 1280;   // giảm xuống 720p để nhẹ
+        const maxHeight = 720;
+        const bitrate = 1500000; // 1.5 Mbps
+
+        const video = document.createElement('video');
+        video.src = URL.createObjectURL(file);
+        video.muted = true;
+        video.preload = 'metadata';
+        video.onloadedmetadata = async () => {
+          let width = video.videoWidth;
+          let height = video.videoHeight;
+          // Giữ tỷ lệ
+          if (width > maxWidth || height > maxHeight) {
+            const ratio = Math.min(maxWidth / width, maxHeight / height);
+            width = Math.floor(width * ratio);
+            height = Math.floor(height * ratio);
+          }
+          // Tạo canvas
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          
+          // Tạo stream từ canvas
+          const stream = canvas.captureStream(30);
+          const recorder = new MediaRecorder(stream, {
+            mimeType: 'video/mp4',
+            videoBitsPerSecond: bitrate
+          });
+
+          const chunks = [];
+          recorder.ondataavailable = (e) => chunks.push(e.data);
+          recorder.onstop = () => {
+            const blob = new Blob(chunks, { type: 'video/mp4' });
+            const newFile = new File([blob], file.name.replace(/\.[^.]+$/, '') + '_compressed.mp4', {
+              type: 'video/mp4',
+              lastModified: Date.now()
+            });
+            resolve(newFile);
+          };
+
+          recorder.start();
+          // Vẽ từng frame
+          video.currentTime = 0;
+          video.play();
+          const drawFrame = () => {
+            if (video.paused || video.ended) {
+              recorder.stop();
+              return;
+            }
+            ctx.drawImage(video, 0, 0, width, height);
+            requestAnimationFrame(drawFrame);
+          };
+          drawFrame();
+
+          // Tự động dừng khi hết video
+          video.onended = () => {
+            recorder.stop();
+          };
+        };
+        video.onerror = () => reject(new Error('Không thể đọc video để nén.'));
+      });
+    }
+
+    // ----- UPLOAD VỚI PROGRESS -----
+    async function uploadVideoWithProgress(file, path, onProgress) {
+      return new Promise((resolve, reject) => {
+        const storageRef = firebaseInstance.storage().ref(path);
+        const uploadTask = storageRef.put(file);
+
+        uploadTask.on('state_changed', 
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            if (onProgress) onProgress(progress, snapshot);
+          },
+          (error) => reject(error),
+          () => {
+            uploadTask.snapshot.ref.getDownloadURL().then(url => resolve(url));
+          }
+        );
+      });
+    }
+
+    // =====================================================================
+    // 5.  FIRESTORE CRUD (giữ nguyên)
+    // =====================================================================
     async function getAllVideos() {
       try {
         if (!firebaseInstance || !firebaseInstance.firestore) {
@@ -626,7 +739,6 @@
       }
     }
 
-    // ------ USER FAVORITES (Libraries) ------
     async function getFavorites(userId) {
       try {
         if (!firebaseInstance || !firebaseInstance.firestore || !userId) return [];
@@ -688,7 +800,7 @@
     }
 
     // =====================================================================
-    // 5.  INDEXED DB HELPERS (Giữ nguyên cho VOCABULARY & RECORDINGS)
+    // 6.  INDEXED DB (vocabulary)
     // =====================================================================
     const VOCAB_STORE_NAME = "vocabulary";
     const DB_NAME = "ChineseShadowingDB_v8";
@@ -737,7 +849,7 @@
     function deleteVocab(id) { return executeTransaction(VOCAB_STORE_NAME, "readwrite", store => new Promise((resolve, reject) => { const req = store.delete(id); req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); })); }
 
     // =====================================================================
-    // 6.  APP STATE
+    // 7.  APP STATE
     // =====================================================================
     let currentVideoData = null;
     let CURRENT_USER_ID = null;
@@ -760,7 +872,7 @@
     const btnPlayPause = document.getElementById('btnPlayPause');
 
     // =====================================================================
-    // 7.  CUSTOM VIDEO PLAYER (SỬA LỖI + LOG)
+    // 8.  CUSTOM VIDEO PLAYER
     // =====================================================================
     function setupCustomVideoPlayer() {
         if (!video) {
@@ -768,7 +880,6 @@
             return;
         }
 
-        // Thêm bắt lỗi Video để Log ra lỗi chi tiết
         video.addEventListener('error', function() {
             const err = video.error;
             let msg = `❌ Lỗi Video: code=${err ? err.code : 'unknown'}`;
@@ -782,15 +893,9 @@
             addLog(msg, 'error');
         });
 
-        video.addEventListener('loadstart', function() {
-            addLog(`📥 Video đang bắt đầu tải...`, 'info');
-        });
-        video.addEventListener('loadeddata', function() {
-            addLog(`✅ Đã tải được một phần video.`, 'success');
-        });
-        video.addEventListener('canplay', function() {
-            addLog(`✅ Video đã sẵn sàng để phát.`, 'success');
-        });
+        video.addEventListener('loadstart', () => addLog(`📥 Video đang bắt đầu tải...`, 'info'));
+        video.addEventListener('loadeddata', () => addLog(`✅ Đã tải được một phần video.`, 'success'));
+        video.addEventListener('canplay', () => addLog(`✅ Video đã sẵn sàng để phát.`, 'success'));
 
         if (btnPlayPause) {
             btnPlayPause.addEventListener('click', () => {
@@ -841,7 +946,7 @@
     }
 
     // =====================================================================
-    // 8.  SENTENCE PLAYBACK (KHÔI PHỤC CHỨC NĂNG PHÁT CÂU THEO PHỤ ĐỀ)
+    // 9.  SENTENCE PLAYBACK
     // =====================================================================
     function playSentence(id) {
         if (!currentVideoData || !video) {
@@ -873,7 +978,7 @@
     }
 
     // =====================================================================
-    // 9.  RENDER SENTENCES (KHÔI PHỤC HIỂN THỊ CÂU THOẠI)
+    // 10. RENDER SENTENCES
     // =====================================================================
     function renderSentences() {
         if (!sentenceListContainer) return;
@@ -910,7 +1015,7 @@
     }
 
     // =====================================================================
-    // 10. RENDER PUBLIC / MY LIBRARY (Dùng Firestore)
+    // 11. RENDER LIBRARY LIST
     // =====================================================================
     async function renderLibraryList() {
         if (!videoLibraryList) return;
@@ -1083,7 +1188,7 @@
     }
 
     // =====================================================================
-    // 11. FIREBASE AUTH CHECK (SỬA LỖI KIỂM TRA)
+    // 12. FIREBASE AUTH
     // =====================================================================
     async function initializeAppWithFirebase() {
         if (!firebaseInstance || !firebaseInstance.auth) {
@@ -1141,9 +1246,7 @@
     }
 
     function startEngine() {
-        // Khởi tạo Player trước
         setupCustomVideoPlayer();
-        
         openDB().then(() => {
             renderLibraryList();
             loadVocabWords();
@@ -1160,7 +1263,7 @@
     }
 
     // =====================================================================
-    // 12. ADD SUBTITLE ROW (SỬA LỖI KIỂM TRA CONTAINER)
+    // 13. ADD SUBTITLE ROW
     // =====================================================================
     function addSubtitleRow(data = {}) {
         const container = document.getElementById('subtitleInputsContainer');
@@ -1313,7 +1416,7 @@
     }
 
     // =====================================================================
-    // 13. SETUP EVENT LISTENERS (Upload video lên Storage & Firestore)
+    // 14. SETUP EVENT LISTENERS (có sửa upload để nén + progress)
     // =====================================================================
     function setupEventListeners() {
         const openUploadBtn = document.getElementById('btnOpenUploadModal');
@@ -1452,19 +1555,54 @@
                 });
                 if (hasError) return;
 
+                // ===== BẮT ĐẦU UPLOAD VỚI NÉN + PROGRESS =====
+                const progressWrapper = document.getElementById('uploadProgressWrapper');
+                const progressFill = document.getElementById('uploadProgressFill');
+                const statusText = document.getElementById('uploadStatusText');
+                const percentText = document.getElementById('uploadPercentText');
+                progressWrapper.classList.add('visible');
+                progressFill.style.width = '0%';
+                statusText.innerText = 'Đang nén video...';
+                percentText.innerText = '0%';
+
                 try {
                     if (!firebaseInstance || !firebaseInstance.storage) {
                         throw new Error("Firebase Storage chưa sẵn sàng.");
                     }
+                    let finalFile = videoFile;
                     let storageUrl = null;
-                    if (videoFile) {
-                        const storageRef = firebaseInstance.storage().ref(`videos/${Date.now()}_${videoFile.name}`);
-                        addLog(`⏳ Đang upload video lên Firebase Storage...`, 'info');
-                        const snapshot = await storageRef.put(videoFile);
-                        storageUrl = await snapshot.ref.getDownloadURL();
-                        addLog(`✅ Upload video thành công! URL: ${storageUrl.substring(0, 50)}...`, 'success');
+
+                    // Nếu có file và kích thước > 20MB thì nén
+                    if (videoFile && videoFile.size > 20 * 1024 * 1024) {
+                        addLog(`⏳ Video lớn (${(videoFile.size / 1024 / 1024).toFixed(1)} MB), đang nén...`, 'info');
+                        statusText.innerText = 'Đang nén video (giảm dung lượng)...';
+                        try {
+                            finalFile = await compressVideo(videoFile);
+                            addLog(`✅ Nén xong, dung lượng: ${(finalFile.size / 1024 / 1024).toFixed(1)} MB`, 'success');
+                            statusText.innerText = 'Nén thành công, bắt đầu upload...';
+                        } catch (compressErr) {
+                            addLog(`⚠️ Không thể nén video, vẫn upload file gốc: ${compressErr.message}`, 'warning');
+                            statusText.innerText = 'Không nén được, upload file gốc...';
+                            finalFile = videoFile;
+                        }
+                    } else {
+                        statusText.innerText = 'Đang upload video...';
                     }
 
+                    const path = `videos/${Date.now()}_${finalFile.name}`;
+                    const url = await uploadVideoWithProgress(finalFile, path, (progress, snapshot) => {
+                        const pct = Math.round(progress);
+                        progressFill.style.width = pct + '%';
+                        percentText.innerText = pct + '%';
+                        if (pct < 100) statusText.innerText = `Đang upload... ${pct}%`;
+                    });
+                    storageUrl = url;
+                    progressFill.style.width = '100%';
+                    percentText.innerText = '100%';
+                    statusText.innerText = '✅ Upload hoàn tất!';
+                    addLog(`✅ Upload video thành công! URL: ${storageUrl.substring(0, 50)}...`, 'success');
+
+                    // Lưu vào Firestore
                     let newId = null;
                     let status = 'approved';
                     let scope = 'public';
@@ -1523,6 +1661,7 @@
                     if (subtitleInputsContainer) subtitleInputsContainer.innerHTML = "";
                     if (formError) { formError.classList.remove('visible'); formError.innerText = ''; }
                     if (uploadModal) uploadModal.classList.remove("show");
+                    progressWrapper.classList.remove('visible');
 
                     renderLibraryList();
                     if (newId) {
@@ -1535,13 +1674,14 @@
                 } catch (err) {
                     addLog("❌ Lỗi khi upload/lưu video: " + err.message, 'error');
                     if (formError) { formError.innerText = "Lỗi: " + err.message; formError.classList.add('visible'); }
+                    progressWrapper.classList.remove('visible');
                 }
             });
         }
     }
 
     // =====================================================================
-    // 14. SELECT VIDEO (Khôi phục chức năng chọn video để phát)
+    // 15. SELECT VIDEO
     // =====================================================================
     function selectVideo(item) {
         currentVideoData = item;
@@ -1585,10 +1725,9 @@
     }
 
     // =====================================================================
-    // 15. INIT (SỬA LỖI KHỞI ĐỘNG)
+    // 16. INIT
     // =====================================================================
     function init() {
-        // Kiểm tra Firebase đã được khởi tạo chưa
         if (!firebaseInstance || !firebaseInstance.auth) {
             if (userStatusDisplay) userStatusDisplay.innerHTML = "❌ Lỗi kết nối DB";
             addLog("❌ Không thể liên kết Firebase. Kiểm tra lại Config và SDK.", 'error');
@@ -1597,7 +1736,6 @@
         initializeAppWithFirebase();
     }
 
-    // Gọi init khi DOM đã sẵn sàng
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", init);
     } else {
